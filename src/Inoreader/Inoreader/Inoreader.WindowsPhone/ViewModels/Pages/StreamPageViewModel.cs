@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
 using Microsoft.Practices.Prism.Mvvm;
+using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Newtonsoft.Json.Linq;
 
 namespace Inoreader.ViewModels.Pages
@@ -12,6 +13,7 @@ namespace Inoreader.ViewModels.Pages
 	public class StreamPageViewModel : ViewModel
 	{
 		private readonly ApiClient _apiClient;
+		private readonly INavigationService _navigationService;
 		private string _steamId;
 
 		private string _title;
@@ -30,10 +32,11 @@ namespace Inoreader.ViewModels.Pages
 		}
 
 
-		public StreamPageViewModel(ApiClient apiClient)
+		public StreamPageViewModel(ApiClient apiClient, INavigationService navigationService)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			_apiClient = apiClient;
+			_navigationService = navigationService;
 		}
 
 		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
@@ -42,6 +45,11 @@ namespace Inoreader.ViewModels.Pages
 
 			_steamId = (string) navigationParameter;
 			LoadData();
+		}
+
+		public override void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
+		{
+			base.OnNavigatedFrom(viewModelState, suspending);
 		}
 
 		class AAA

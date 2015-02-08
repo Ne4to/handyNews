@@ -39,9 +39,9 @@ namespace Inoreader.ViewModels.Pages
 		{
 			base.OnNavigatedTo(navigationParameter, navigationMode, viewModelState);
 
-			// Forbid return to the Sign in page
-			if (navigationMode == NavigationMode.New)
-				_navigationService.ClearHistory();
+			// TODO Forbid return to the Sign in page
+			//if (navigationMode == NavigationMode.New)
+			//	_navigationService.ClearHistory();
 
 			Subscriptions.LoadSubscriptions();
 			Menu.LoadData();
