@@ -1,0 +1,161 @@
+﻿<storeApps:VisualStateAwarePage
+    x:Class="Inoreader.Views.Pages.SignInPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mvvm="using:Microsoft.Practices.Prism.Mvvm"
+    xmlns:storeApps="using:Microsoft.Practices.Prism.StoreApps"
+    xmlns:converters="using:Inoreader.Converters"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
+	mvvm:ViewModelLocator.AutoWireViewModel="true">
+	
+	<Page.Resources>
+		<converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+		
+		
+		<Thickness x:Key="PhoneBorderThickness">2.5</Thickness>
+		<FontFamily x:Key="PhoneFontFamilyNormal">Segoe WP</FontFamily>
+		<FontWeight x:Key="PhoneButtonFontWeight">Semibold</FontWeight>
+		<x:Double x:Key="TextStyleLargeFontSize">18.14</x:Double>
+		<Thickness x:Key="PhoneButtonContentPadding">9.5,0,9.5,3.5</Thickness>
+		<x:Double x:Key="PhoneButtonMinHeight">57.5</x:Double>
+		<x:Double x:Key="PhoneButtonMinWidth">109</x:Double>
+		<Thickness x:Key="PhoneTouchTargetOverhang">0,9.5</Thickness>
+		<SolidColorBrush x:Key="ButtonDisabledBackgroundThemeBrush" Color="Transparent"/>
+		
+		<Style x:Key="SignInButtonStyle" TargetType="Button">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderBrush" Value="{ThemeResource PhoneForegroundBrush}"/>
+			<Setter Property="Foreground" Value="{ThemeResource PhoneForegroundBrush}"/>
+			<Setter Property="FontFamily" Value="{ThemeResource PhoneFontFamilyNormal}"/>
+			<Setter Property="FontWeight" Value="{ThemeResource PhoneButtonFontWeight}"/>
+			<Setter Property="FontSize" Value="{ThemeResource TextStyleLargeFontSize}"/>
+			<Setter Property="Padding" Value="{ThemeResource PhoneButtonContentPadding}"/>
+			<Setter Property="MinHeight" Value="{ThemeResource PhoneButtonMinHeight}"/>
+			<Setter Property="MinWidth" Value="{ThemeResource PhoneButtonMinWidth}"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Grid x:Name="Grid" Background="Transparent">
+							<VisualStateManager.VisualStateGroups>
+								<VisualStateGroup x:Name="CommonStates">
+									<VisualStateGroup.Transitions>
+										<VisualTransition From="Pressed" To="PointerOver">
+											<Storyboard>
+												<PointerUpThemeAnimation Storyboard.TargetName="Grid"/>
+											</Storyboard>
+										</VisualTransition>
+										<VisualTransition From="PointerOver" To="Normal">
+											<Storyboard>
+												<PointerUpThemeAnimation Storyboard.TargetName="Grid"/>
+											</Storyboard>
+										</VisualTransition>
+										<VisualTransition From="Pressed" To="Normal">
+											<Storyboard>
+												<PointerUpThemeAnimation Storyboard.TargetName="Grid"/>
+											</Storyboard>
+										</VisualTransition>
+									</VisualStateGroup.Transitions>
+									<VisualState x:Name="Normal">
+										<Storyboard>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Background)" Storyboard.TargetName="Border">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<SolidColorBrush Color="#FF0099EB"/>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentPresenter.Foreground)" Storyboard.TargetName="ContentPresenter">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<SolidColorBrush Color="White"/>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+										</Storyboard>
+									</VisualState>
+									<VisualState x:Name="PointerOver">
+										<Storyboard>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentPresenter.Foreground)" Storyboard.TargetName="ContentPresenter">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<SolidColorBrush Color="White"/>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Background)" Storyboard.TargetName="Border">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<SolidColorBrush Color="#FF0089D1"/>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+										</Storyboard>
+									</VisualState>
+									<VisualState x:Name="Pressed">
+										<Storyboard>
+											<PointerDownThemeAnimation Storyboard.TargetName="Grid"/>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+												<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonPressedForegroundThemeBrush}"/>
+											</ObjectAnimationUsingKeyFrames>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<SolidColorBrush Color="#FF007DBF"/>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+										</Storyboard>
+									</VisualState>
+									<VisualState x:Name="Disabled">
+										<Storyboard>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<SolidColorBrush Color="White"/>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<SolidColorBrush Color="#FFC3CCD9"/>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+										</Storyboard>
+									</VisualState>
+								</VisualStateGroup>
+							</VisualStateManager.VisualStateGroups>
+							<Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="#FF0099EB" Margin="{ThemeResource PhoneTouchTargetOverhang}">
+								<ContentPresenter x:Name="ContentPresenter" AutomationProperties.AccessibilityView="Raw" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Foreground="White" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+							</Border>
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+			<Setter Property="BorderThickness" Value="0"/>
+		</Style>
+	</Page.Resources>
+
+    <Grid>
+		<StackPanel Margin="10,0">
+			<StackPanel Orientation="Horizontal">
+				<Image Style="{StaticResource LogoImageStyle}" />
+				<TextBlock x:Uid="SignInHeader" Text="Sign in" FontSize="24" Margin="10,0" FontWeight="SemiLight" />
+			</StackPanel>
+			
+			<TextBox x:Uid="SignInEmailBox" Header="Email" PlaceholderText="username@gmail.com" Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			<PasswordBox x:Uid="SignInPasswordBox" Header="Password" IsPasswordRevealButtonEnabled="True" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			<CheckBox x:Uid="SignInRememberMeBox" Content="Remember me" IsChecked="{Binding RememberMe, Mode=TwoWay}" Visibility="Collapsed" />
+			<Button x:Uid="SignInButton" Content="Sign in" Style="{StaticResource SignInButtonStyle}" Command="{Binding SignInCommand}" />
+			<HyperlinkButton x:Uid="SignUpButton" Content="Sign up" HorizontalAlignment="Left" Foreground="#FF0099EB" FontSize="18.14" NavigateUri="http://www.inoreader.com/" />
+		</StackPanel>
+		
+		<ProgressRing IsActive="{Binding IsBusy}" />
+	</Grid>
+</storeApps:VisualStateAwarePage>
