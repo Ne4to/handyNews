@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.ViewModels.Details;
+using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Microsoft.Practices.Unity;
@@ -11,9 +13,16 @@ namespace Inoreader.ViewModels.Pages
 	public class HubPageViewModel : ViewModel, INavigateBackwards
 	{
 		private readonly INavigationService _navigationService;
+		
+		private ICommand _aboutPageCommand;
 
 		public HubMenuViewModel Menu { get; private set; }
 		public SubscriptionsViewModel Subscriptions { get; private set; }
+
+		public ICommand AboutPageCommand
+		{
+			get { return _aboutPageCommand ?? (_aboutPageCommand = new DelegateCommand(OnAboutPage)); }
+		}
 
 		public HubPageViewModel(IUnityContainer container, INavigationService navigationService)
 		{
@@ -41,6 +50,11 @@ namespace Inoreader.ViewModels.Pages
 		public bool NavigateBack()
 		{
 			return Subscriptions.NavigateBack();
+		}
+
+		private void OnAboutPage()
+		{
+			_navigationService.Navigate(PageTokens.About, null);
 		}
 	}
 

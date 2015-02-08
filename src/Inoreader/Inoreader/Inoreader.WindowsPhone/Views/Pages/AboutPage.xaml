@@ -10,7 +10,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
 
-    <Grid>
-
-    </Grid>
+    <StackPanel Margin="10">
+		<TextBlock x:Uid="AboutAppTitle" Text="Inoreader Free" FontSize="20" />
+		<Image Source="ms-appx:///Assets/AboutLogo.png" HorizontalAlignment="Center" Margin="0,5" />
+		<TextBlock x:Uid="AboutAppDescription" Text="Free client for RSS aggregator www.inoreader.com" TextWrapping="Wrap" FontSize="14" />
+		<Button x:Uid="AboutReviewButton" Content="Review" Command="{Binding ReviewCommand}" />
+		<Button x:Uid="AboutSubmitBugButton" Content="Submit a bug" Command="{Binding SubmitBugCommand}" />
+		<Button x:Uid="AboutContributeButton" Content="Contribute" Command="{Binding ContributeCommand}" />
+    </StackPanel>
 </storeApps:VisualStateAwarePage>

@@ -94,6 +94,7 @@
       <DependentUpon>Resources.resw</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\Details\HubMenuViewModel.cs" />
+    <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
@@ -119,6 +120,9 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\AboutLogo.scale-100.png" />
+    <Content Include="Assets\AboutLogo.scale-140.png" />
+    <Content Include="Assets\AboutLogo.scale-240.png" />
     <Content Include="Assets\BadgeLogo.scale-100.png" />
     <Content Include="Assets\BadgeLogo.scale-140.png" />
     <Content Include="Assets\BadgeLogo.scale-240.png" />

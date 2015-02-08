@@ -117,6 +117,30 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AboutAppBarButton.Label" xml:space="preserve">
+    <value>О программе</value>
+    <comment>application bar button</comment>
+  </data>
+  <data name="AboutAppDescription.Text" xml:space="preserve">
+    <value>Бесплатный клиент для RSS аггрегатора www.inoreader.com</value>
+    <comment>About page</comment>
+  </data>
+  <data name="AboutAppTitle.Text" xml:space="preserve">
+    <value>Inoreader Free</value>
+    <comment>About page</comment>
+  </data>
+  <data name="AboutContributeButton.Content" xml:space="preserve">
+    <value>Участие в проекте</value>
+    <comment>About page</comment>
+  </data>
+  <data name="AboutReviewButton.Content" xml:space="preserve">
+    <value>Написать отзыв</value>
+    <comment>About page</comment>
+  </data>
+  <data name="AboutSubmitBugButton.Content" xml:space="preserve">
+    <value>Сообщить об ошибке</value>
+    <comment>About page</comment>
+  </data>
   <data name="AppDescription" xml:space="preserve">
     <value>Бесплатный клиент для RSS аггрегатора www.inoreader.com</value>
   </data>
