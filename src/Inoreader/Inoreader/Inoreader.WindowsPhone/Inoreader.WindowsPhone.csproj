@@ -85,6 +85,8 @@
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
     <Compile Include="PageTokens.cs" />
     <Compile Include="Resources\SubscriptionItemTemplateSelector.cs" />
+    <Compile Include="Services\ApplicationDataContainerExtensions.cs" />
+    <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CredentialService.cs" />
     <Compile Include="Services\ICredentialService.cs" />
     <Compile Include="Services\RichTextBlockExtensions.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
+    <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
     <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
@@ -105,6 +108,9 @@
     </Compile>
     <Compile Include="Views\Pages\HubPage.xaml.cs">
       <DependentUpon>HubPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\SignInPage.xaml.cs">
       <DependentUpon>SignInPage.xaml</DependentUpon>
@@ -156,6 +162,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\HubPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\SettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

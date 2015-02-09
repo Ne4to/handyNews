@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/09/2015 01:49:04
+// 	Generated: 02/09/2015 21:43:05
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -82,6 +82,17 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("ErrorDialogTitle");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "System language"
+        /// </summary>
+        public static string SettingsSystemLanguage
+        {
+            get
+            {
+                return resourceLoader.GetString("SettingsSystemLanguage");
             }
         }
         

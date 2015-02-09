@@ -13,11 +13,17 @@ namespace Inoreader.ViewModels.Pages
 	public class HubPageViewModel : ViewModel, INavigateBackwards
 	{
 		private readonly INavigationService _navigationService;
-		
+
+		private ICommand _settingsPageCommand;
 		private ICommand _aboutPageCommand;
 
 		public HubMenuViewModel Menu { get; private set; }
 		public SubscriptionsViewModel Subscriptions { get; private set; }
+
+		public ICommand SettingsPageCommand
+		{
+			get { return _settingsPageCommand ?? (_settingsPageCommand = new DelegateCommand(OnSettingsPage)); }
+		}
 
 		public ICommand AboutPageCommand
 		{
@@ -50,6 +56,11 @@ namespace Inoreader.ViewModels.Pages
 		public bool NavigateBack()
 		{
 			return Subscriptions.NavigateBack();
+		}
+		
+		private void OnSettingsPage()
+		{
+			_navigationService.Navigate(PageTokens.Settings, null);
 		}
 
 		private void OnAboutPage()

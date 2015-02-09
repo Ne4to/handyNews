@@ -6,5 +6,6 @@
 		public const string Hub = "Hub";
 		public const string Stream = "Stream";
 		public const string About = "About";
+		public const string Settings = "Settings";
 	}
 }

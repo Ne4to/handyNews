@@ -156,6 +156,19 @@
     <value>Refresh</value>
     <comment>application bar button</comment>
   </data>
+  <data name="SettingLanguageBox.Header" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="SettingsAppBarButton.Label" xml:space="preserve">
+    <value>Settings</value>
+    <comment>application bar button</comment>
+  </data>
+  <data name="SettingsRestartWarning.Text" xml:space="preserve">
+    <value>Restart the application to apply the changes.</value>
+  </data>
+  <data name="SettingsSystemLanguage" xml:space="preserve">
+    <value>System language</value>
+  </data>
   <data name="SignInButton.Content" xml:space="preserve">
     <value>Sign in</value>
     <comment>Sign in page</comment>

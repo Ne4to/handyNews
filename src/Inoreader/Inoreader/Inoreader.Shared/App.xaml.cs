@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.Phone.UI.Input;
@@ -24,6 +25,7 @@ namespace Inoreader
 		// New up the singleton container that will be used for type resolution in the app
 		readonly IUnityContainer _container = new UnityContainer();
 		readonly ApiClient _apiClient = new ApiClient();
+		readonly AppSettingsService _appSettingsService = new AppSettingsService();
 
 		public App()
 		{
@@ -52,11 +54,14 @@ namespace Inoreader
 
 			_container.RegisterType<ICredentialService, CredentialService>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_apiClient);
+			_container.RegisterInstance(_appSettingsService);
 
 			// Set a factory for the ViewModelLocator to use the container to construct view models so their 
 			// dependencies get injected by the container
 			//ViewModelLocationProvider.
 			//ViewModelLocator.SetDefaultViewModelFactory((viewModelType) => _container.Resolve(viewModelType));
+
+			Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = _appSettingsService.DisplayCulture;
 
 			ViewModelLocationProvider.SetDefaultViewModelFactory(ViewModelFactory);
 			ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(ViewModelTypeResolver);
