@@ -201,7 +201,10 @@ namespace Inoreader.Services
 			}
 
 			SetHeadersValue(strParams, startL.Name, true);
-			// TODO <em> - Italic
+			if (String.Equals(startL.Name, "em", StringComparison.OrdinalIgnoreCase))
+			{
+				strParams.Italic = true;
+			}
 
 			for (int index = lexemeIndex + 1; index < closeIndex; index++)
 			{
@@ -211,9 +214,13 @@ namespace Inoreader.Services
 				if (literalLexeme != null)
 				{
 					var item = new Run { Text = literalLexeme.Text };
+					
 					double? customFontSize = GetFontSize(strParams);
 					if (customFontSize.HasValue)
 						item.FontSize = customFontSize.Value;
+
+					if (strParams.Italic)
+						item.FontStyle = FontStyle.Italic;
 
 					inlines.Add(item);
 					continue;
@@ -237,7 +244,11 @@ namespace Inoreader.Services
 				}
 			}
 
-			SetHeadersValue(strParams, startL.Name, false);			
+			SetHeadersValue(strParams, startL.Name, false);
+			if (String.Equals(startL.Name, "em", StringComparison.OrdinalIgnoreCase))
+			{
+				strParams.Italic = false;
+			}
 
 			if (String.Equals(startL.Name, "p", StringComparison.OrdinalIgnoreCase))
 			{
