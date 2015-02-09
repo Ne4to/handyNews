@@ -6,7 +6,8 @@
 	<converters:FormatStringConverter x:Key="GeneralDateFormatStringConverter" StringFormat="g" />
 	<converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-	<SolidColorBrush Color="#F1F5FA" x:Key="ApplicationPageBackgroundThemeBrush" />
+	<!--<SolidColorBrush Color="#F1F5FA" x:Key="ApplicationPageBackgroundThemeBrush" />-->
+	<SolidColorBrush Color="#D7DDE6" x:Key="ApplicationPageBackgroundThemeBrush" />
 	
 	<Style x:Key="LogoImageStyle" TargetType="Image">
 		<Setter Property="Width" Value="16" />

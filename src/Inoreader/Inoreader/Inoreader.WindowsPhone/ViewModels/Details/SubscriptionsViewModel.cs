@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
+using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Inoreader.Api;
 using Inoreader.Api.Models;
@@ -82,6 +83,7 @@ namespace Inoreader.ViewModels.Details
 		{
 			IsBusy = true;
 
+			Exception error = null;
 			try
 			{
 				var tags = await _apiClient.GetTagsAsync();
@@ -132,13 +134,19 @@ namespace Inoreader.ViewModels.Details
 				TreeItems = _rootItems;
 				_isRoot = true;
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				throw;
+				error = ex;
 			}
 			finally
 			{
 				IsBusy = false;
+			}
+			
+			if (error != null)
+			{
+				MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
+				await msgbox.ShowAsync();
 			}
 		}
 

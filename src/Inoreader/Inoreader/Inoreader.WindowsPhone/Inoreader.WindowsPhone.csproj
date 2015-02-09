@@ -103,6 +103,7 @@
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
     <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
     <Compile Include="Views\Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
@@ -118,6 +119,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\Pages\StreamPage.xaml.cs">
       <DependentUpon>StreamPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\SubscriptionsPage.xaml.cs">
+      <DependentUpon>SubscriptionsPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +178,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Pages\StreamPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\SubscriptionsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

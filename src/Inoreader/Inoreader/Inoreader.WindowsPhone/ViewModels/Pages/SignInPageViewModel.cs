@@ -131,7 +131,7 @@ namespace Inoreader.ViewModels.Pages
 					_credentialService.Save(Email, Password);
 				}
 
-				_navigationService.Navigate(PageTokens.Hub, null);
+				_navigationService.Navigate(PageTokens.Subscriptions, null);
 			}
 			catch (Exception ex)
 			{

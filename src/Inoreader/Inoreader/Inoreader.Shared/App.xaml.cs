@@ -41,7 +41,7 @@ namespace Inoreader
 			StatusBar statusBar = StatusBar.GetForCurrentView();
 			await statusBar.HideAsync();
 
-			var pageToken = _apiClient.SignInRequired ? PageTokens.SignIn : PageTokens.Hub;
+			var pageToken = _apiClient.SignInRequired ? PageTokens.SignIn : PageTokens.Subscriptions;
 			NavigationService.Navigate(pageToken, null);			
 		}
 

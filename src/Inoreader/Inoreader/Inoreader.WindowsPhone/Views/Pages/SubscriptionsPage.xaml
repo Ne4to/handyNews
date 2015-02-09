@@ -1,0 +1,105 @@
+﻿<storeApps:VisualStateAwarePage
+    x:Class="Inoreader.Views.Pages.SubscriptionsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Inoreader.Views.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:storeApps="using:Microsoft.Practices.Prism.StoreApps"
+    xmlns:mvvm="using:Microsoft.Practices.Prism.Mvvm"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:resources="using:Inoreader.Resources"
+    xmlns:converters="using:Inoreader.Converters"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+	mvvm:ViewModelLocator.AutoWireViewModel="true">
+
+	<Page.Resources>
+		<converters:UnreadCountStringConverter x:Key="UnreadCountStringConverter" />
+
+		<Style x:Key="TreeItemTextStyle" TargetType="TextBlock">
+			<Setter Property="FontSize" Value="18" />
+			<Setter Property="FontWeight" Value="SemiLight" />
+		</Style>
+
+		<Style x:Key="TreeItemUnreadCountTextStyle" TargetType="TextBlock" BasedOn="{StaticResource TreeItemTextStyle}">
+			<Setter Property="Margin" Value="5,0,0,0" />
+		</Style>
+
+		<resources:SubscriptionItemTemplateSelector x:Key="SubscriptionItemTemplateSelector">
+			<resources:SubscriptionItemTemplateSelector.CategoryTemplate>
+				<DataTemplate>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="100" />
+						</Grid.ColumnDefinitions>
+
+						<TextBlock Text="&#xE09B;" FontFamily="Segoe UI Symbol" Style="{StaticResource TreeItemTextStyle}" Margin="0,0,5,0"  />
+						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" />
+						<TextBlock Grid.Column="2" Text="{Binding UnreadCount, Converter={StaticResource UnreadCountStringConverter}}" Style="{StaticResource TreeItemUnreadCountTextStyle}" />
+					</Grid>
+				</DataTemplate>
+			</resources:SubscriptionItemTemplateSelector.CategoryTemplate>
+
+			<resources:SubscriptionItemTemplateSelector.ItemTemplate>
+				<DataTemplate>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+
+						<Image Width="16" Height="16" Source="{Binding IconUrl}" Margin="0,0,5,0" />
+						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}"/>
+						<TextBlock Grid.Column="2" Text="{Binding UnreadCount, Converter={StaticResource UnreadCountStringConverter}}" Style="{StaticResource TreeItemUnreadCountTextStyle}" />
+					</Grid>
+				</DataTemplate>
+			</resources:SubscriptionItemTemplateSelector.ItemTemplate>
+		</resources:SubscriptionItemTemplateSelector>
+	</Page.Resources>
+
+	<Page.BottomAppBar>
+		<!--ClosedDisplayMode="Minimal"-->
+		<CommandBar>
+			<CommandBar.PrimaryCommands>
+				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="Refresh" Command="{Binding Subscriptions.RefreshCommand}" />
+			</CommandBar.PrimaryCommands>
+			<CommandBar.SecondaryCommands>
+				<AppBarButton x:Uid="SettingsAppBarButton" Label="Settings" Command="{Binding SettingsPageCommand}" />
+				<AppBarButton x:Uid="AboutAppBarButton" Label="About" Command="{Binding AboutPageCommand}" />
+			</CommandBar.SecondaryCommands>
+		</CommandBar>
+	</Page.BottomAppBar>
+
+	<Grid Margin="10">
+		<StackPanel>
+			<StackPanel Orientation="Horizontal">
+				<Image Style="{StaticResource LogoImageStyle}" />
+				<TextBlock Text="Inoreader Free" Margin="10,0" FontWeight="SemiLight" />
+			</StackPanel>
+
+			<ListView DataContext="{Binding Subscriptions}" ItemsSource="{Binding TreeItems}"
+				          ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
+				          IsItemClickEnabled="True"
+				          ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+				<ListView.ItemContainerStyle>
+					<Style TargetType="ListViewItem">
+						<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+					</Style>
+				</ListView.ItemContainerStyle>
+
+				<interactivity:Interaction.Behaviors>
+					<core:EventTriggerBehavior EventName="ItemClick">
+						<core:InvokeCommandAction Command="{Binding ItemClickCommand}" />
+					</core:EventTriggerBehavior>
+				</interactivity:Interaction.Behaviors>
+			</ListView>
+		</StackPanel>
+
+		<ProgressRing IsActive="{Binding Subscriptions.IsBusy}" />
+	</Grid>
+</storeApps:VisualStateAwarePage>

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using Windows.Data.Html;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -51,6 +53,47 @@ namespace Inoreader.Services
 				var tagLexeme = (HtmlTagLexeme)lexeme;
 				if (String.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
 				{
+					paragraph.Inlines.Add(new LineBreak());
+					continue;
+				}
+
+				if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
+				{
+					var src = tagLexeme.Attributes["src"];
+					if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
+						continue;
+
+					string widthStr;
+					int width = 0;
+					if (tagLexeme.Attributes.TryGetValue("width", out widthStr))
+					{
+						Int32.TryParse(widthStr, out width);
+					}
+
+					string heightStr;
+					int height = 0;
+					if (tagLexeme.Attributes.TryGetValue("height", out heightStr))
+					{
+						Int32.TryParse(heightStr, out height);
+					}
+
+					var image = new Image
+					{
+						Source = new BitmapImage(new Uri(src))
+					};
+
+					if (width != 0)
+						image.Width = width;
+
+					if (height != 0)
+						image.Height = height;
+
+					var inlineUiContainer = new InlineUIContainer
+					{
+						Child = image
+					};
+
+					paragraph.Inlines.Add(inlineUiContainer);
 					paragraph.Inlines.Add(new LineBreak());
 					continue;
 				}
@@ -107,15 +150,18 @@ namespace Inoreader.Services
 					var tagLexeme = (HtmlTagLexeme)lexeme;
 					if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
 					{
+						var src = tagLexeme.Attributes["src"];
+						if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
+							return;
+
 						var image = new Image
 						{
-							Source = new BitmapImage(new Uri(tagLexeme.Attributes["src"]))
+							Source = new BitmapImage(new Uri(src))
 						};
 
 						image.IsTapEnabled = true;
 						image.Tapped += async (sender, args) =>
 						{
-							// 
 							await Launcher.LaunchUriAsync(navigateUri);
 						};
 
@@ -125,7 +171,6 @@ namespace Inoreader.Services
 						};
 
 						inlines.Add(inlineUiContainer);
-						//hyperlink.Inlines.Add(inlineUiContainer);
 					}
 
 					return;
@@ -145,6 +190,9 @@ namespace Inoreader.Services
 				}
 				return;
 			}
+
+			// TODO <H1>-<H6>
+			// TODO <em> - Italic
 
 			for (int index = lexemeIndex + 1; index < closeIndex; index++)
 			{
@@ -348,7 +396,8 @@ namespace Inoreader.Services
 
 		public LiteralLexeme(string text)
 		{
-			Text = text;
+			//Text = text.Replace("&lt;", "<").Replace("&gt;", ">");
+			Text = HtmlUtilities.ConvertToText(text);
 		}
 	}
 

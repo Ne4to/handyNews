@@ -7,5 +7,6 @@
 		public const string Stream = "Stream";
 		public const string About = "About";
 		public const string Settings = "Settings";
+		public const string Subscriptions = "Subscriptions";
 	}
 }
