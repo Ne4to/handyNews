@@ -30,7 +30,7 @@
 		<resources:SubscriptionItemTemplateSelector x:Key="SubscriptionItemTemplateSelector">
 			<resources:SubscriptionItemTemplateSelector.CategoryTemplate>
 				<DataTemplate>
-					<Grid>
+					<Grid Margin="10,0">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="*" />
@@ -46,7 +46,7 @@
 
 			<resources:SubscriptionItemTemplateSelector.ItemTemplate>
 				<DataTemplate>
-					<Grid>
+					<Grid Margin="10,0">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="*" />
@@ -75,31 +75,34 @@
 		</CommandBar>
 	</Page.BottomAppBar>
 
-	<Grid Margin="10">
-		<StackPanel>
-			<StackPanel Orientation="Horizontal">
-				<Image Style="{StaticResource LogoImageStyle}" />
-				<TextBlock Text="Inoreader Free" Margin="10,0" FontWeight="SemiLight" />
-			</StackPanel>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
 
-			<ListView DataContext="{Binding Subscriptions}" ItemsSource="{Binding TreeItems}"
+		<StackPanel Orientation="Horizontal" Margin="10">
+			<Image Style="{StaticResource LogoImageStyle}" />
+			<TextBlock Text="Inoreader Free" Margin="10,0" FontWeight="SemiLight" />
+		</StackPanel>
+
+		<ListView Grid.Row="1" DataContext="{Binding Subscriptions}" ItemsSource="{Binding TreeItems}"
 				          ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
 				          IsItemClickEnabled="True"
 				          ContinuumNavigationTransitionInfo.ExitElementContainer="True">
-				<ListView.ItemContainerStyle>
-					<Style TargetType="ListViewItem">
-						<Setter Property="HorizontalContentAlignment" Value="Stretch" />
-					</Style>
-				</ListView.ItemContainerStyle>
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+				</Style>
+			</ListView.ItemContainerStyle>
 
-				<interactivity:Interaction.Behaviors>
-					<core:EventTriggerBehavior EventName="ItemClick">
-						<core:InvokeCommandAction Command="{Binding ItemClickCommand}" />
-					</core:EventTriggerBehavior>
-				</interactivity:Interaction.Behaviors>
-			</ListView>
-		</StackPanel>
+			<interactivity:Interaction.Behaviors>
+				<core:EventTriggerBehavior EventName="ItemClick">
+					<core:InvokeCommandAction Command="{Binding ItemClickCommand}" />
+				</core:EventTriggerBehavior>
+			</interactivity:Interaction.Behaviors>
+		</ListView>
 
-		<ProgressRing IsActive="{Binding Subscriptions.IsBusy}" />
+		<ProgressRing Grid.Row="1" IsActive="{Binding Subscriptions.IsBusy}" />
 	</Grid>
 </storeApps:VisualStateAwarePage>

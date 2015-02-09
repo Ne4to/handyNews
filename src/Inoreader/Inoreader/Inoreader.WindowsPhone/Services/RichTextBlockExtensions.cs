@@ -229,7 +229,7 @@ namespace Inoreader.Services
 				var tagLexeme = (HtmlTagLexeme)lexeme;
 				if (String.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
 				{
-					inlines.Add(new LineBreak());
+					inlines.Add(new LineBreak());					
 					continue;
 				}
 
