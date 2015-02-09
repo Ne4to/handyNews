@@ -30,7 +30,6 @@ namespace Inoreader.ViewModels.Details
 
 		#endregion
 
-
 		#region Properties
 
 		private string _subscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
