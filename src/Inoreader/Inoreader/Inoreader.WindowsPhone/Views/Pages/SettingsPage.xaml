@@ -15,14 +15,14 @@
 			<Image Style="{StaticResource LogoImageStyle}" />
 			<TextBlock Text="Inoreader Free" Margin="10,0" FontWeight="SemiLight" FontSize="18.14" />
 		</StackPanel>
-
+		
 		<ComboBox x:Uid="SettingLanguageBox" 
 				  Header="Language" 
 				  ItemsSource="{Binding Languages}" 
 				  SelectedItem="{Binding SelectedLang, Mode=TwoWay}"
 				  DisplayMemberPath="Title" />
-		
-		<TextBlock x:Uid="SettingsRestartWarning" 
+
+			<TextBlock x:Uid="SettingsRestartWarning" 
 				   Text="Restart the application to apply the changes." 
 				   TextWrapping="Wrap" 
 				   Foreground="IndianRed"

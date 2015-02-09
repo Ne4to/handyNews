@@ -156,4 +156,374 @@
 
 	<!-- #endregion Button style -->
 
+	<!-- #region ComboBox style -->
+	<SolidColorBrush x:Key="ComboBoxBackgroundThemeBrush" Color="#FF0099EB"/>
+	<Thickness x:Key="ComboBoxBorderThemeThickness">0</Thickness>
+	<x:Double x:Key="ContentControlFontSize">20.26</x:Double>
+	<x:Double x:Key="ComboBoxItemMinHeightThemeSize">33.5</x:Double>
+	<Thickness x:Key="ComboBoxPlaceholderTextThemeMargin">6.5,0.8</Thickness>
+	<SolidColorBrush x:Key="ComboBoxDisabledBackgroundThemeBrush" Color="Transparent"/>
+	<SolidColorBrush x:Key="ListBoxItemSelectedBackgroundThemeBrush" Color="#FF0089D1"/>
+	<Style TargetType="ComboBox">
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Background" Value="{ThemeResource ComboBoxBackgroundThemeBrush}"/>
+		<Setter Property="BorderBrush" Value="{ThemeResource ComboBoxBorderThemeBrush}"/>
+		<Setter Property="BorderThickness" Value="{ThemeResource ComboBoxBorderThemeThickness}"/>
+		<Setter Property="HorizontalContentAlignment" Value="Left"/>
+		<Setter Property="FontFamily" Value="{ThemeResource PhoneFontFamilyNormal}"/>
+		<Setter Property="FontSize" Value="{ThemeResource ContentControlFontSize}"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ComboBox">
+					<Grid x:Name="ComboBoxGrid">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+						<VisualStateManager.VisualStateGroups>
+							<VisualStateGroup x:Name="CommonStates">
+								<VisualStateGroup.Transitions>
+									<VisualTransition From="Pressed" To="PointerOver">
+										<Storyboard>
+											<PointerUpThemeAnimation Storyboard.TargetName="Background"/>
+										</Storyboard>
+									</VisualTransition>
+									<VisualTransition From="PointerOver" To="Normal">
+										<Storyboard>
+											<PointerUpThemeAnimation Storyboard.TargetName="Background"/>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextBlock">
+												<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PhoneMidBrush}"/>
+											</ObjectAnimationUsingKeyFrames>
+											<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PlaceholderTextBlock">
+												<DiscreteObjectKeyFrame KeyTime="0" Value="1"/>
+											</ObjectAnimationUsingKeyFrames>
+										</Storyboard>
+									</VisualTransition>
+									<VisualTransition From="Pressed" To="Normal">
+										<Storyboard>
+											<PointerUpThemeAnimation Storyboard.TargetName="Background"/>
+										</Storyboard>
+									</VisualTransition>
+								</VisualStateGroup.Transitions>
+								<VisualState x:Name="Normal">
+									<Storyboard>
+										<DoubleAnimation Duration="0" To="{ThemeResource ComboBoxFlyoutListPlaceholderTextOpacity}" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PlaceholderTextBlock"/>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Background)" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="#FF0099EB"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="PointerOver">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Background)" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="#FF0089D1"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="Pressed">
+									<Storyboard>
+										<PointerDownThemeAnimation Storyboard.TargetName="Background"/>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="#FF007DBF"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxPressedBorderThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="UserControl">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxPressedForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="Highlighted">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxHighlightedBackgroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxHighlightedBorderThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="UserControl">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxHighlightedForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="Disabled">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="HeaderContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxDisabledForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxDisabledForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="#FFC3CCD9"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxDisabledBorderThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="FlyoutButton">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxDisabledBorderThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="UserControl">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxDisabledForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextBlock">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxDisabledForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PlaceholderTextBlock"/>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxDisabledForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+							<VisualStateGroup x:Name="DropDownStates">
+								<VisualState x:Name="Opened">
+									<Storyboard>
+										<DoubleAnimation Duration="0:0:0.25" EnableDependentAnimation="True" From="{Binding TemplateSettings.DropDownClosedHeight, RelativeSource={RelativeSource Mode=TemplatedParent}}" To="{Binding TemplateSettings.DropDownOpenedHeight, RelativeSource={RelativeSource Mode=TemplatedParent}}" Storyboard.TargetProperty="Height" Storyboard.TargetName="ItemsPresenterHost">
+											<DoubleAnimation.EasingFunction>
+												<ExponentialEase EasingMode="EaseInOut" Exponent="6"/>
+											</DoubleAnimation.EasingFunction>
+										</DoubleAnimation>
+										<DoubleAnimation Duration="0:0:0.25" To="{Binding TemplateSettings.DropDownOffset, RelativeSource={RelativeSource Mode=TemplatedParent}}" Storyboard.TargetProperty="Y" Storyboard.TargetName="ItemsPresenterTranslateTransform">
+											<DoubleAnimation.EasingFunction>
+												<ExponentialEase EasingMode="EaseInOut" Exponent="6"/>
+											</DoubleAnimation.EasingFunction>
+										</DoubleAnimation>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible" Storyboard.TargetName="UserControl">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="True"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Background">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="#FF0099EB"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="UserControl">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ComboBoxHighlightedForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="Closed">
+									<Storyboard>
+										<DoubleAnimation Duration="0:0:0.2" EnableDependentAnimation="True" From="{Binding TemplateSettings.DropDownOpenedHeight, RelativeSource={RelativeSource Mode=TemplatedParent}}" To="{Binding TemplateSettings.DropDownClosedHeight, RelativeSource={RelativeSource Mode=TemplatedParent}}" Storyboard.TargetProperty="Height" Storyboard.TargetName="ItemsPresenterHost">
+											<DoubleAnimation.EasingFunction>
+												<ExponentialEase EasingMode="EaseInOut" Exponent="6"/>
+											</DoubleAnimation.EasingFunction>
+										</DoubleAnimation>
+										<DoubleAnimation Duration="0:0:0.2" To="{Binding TemplateSettings.DropDownOffset, RelativeSource={RelativeSource Mode=TemplatedParent}}" Storyboard.TargetProperty="Y" Storyboard.TargetName="ItemsPresenterTranslateTransform">
+											<DoubleAnimation.EasingFunction>
+												<ExponentialEase EasingMode="EaseInOut" Exponent="6"/>
+											</DoubleAnimation.EasingFunction>
+										</DoubleAnimation>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+							<VisualStateGroup x:Name="PresenterStates">
+								<VisualState x:Name="Full"/>
+								<VisualState x:Name="InlineNormal">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="FlyoutButton">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="ShortListOuterBorder">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="InlinePlaceholder">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="FlyoutButton">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" Storyboard.TargetName="ShortListOuterBorder">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+										</ObjectAnimationUsingKeyFrames>
+										<DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PlaceholderTextContentPresenter"/>
+										<DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="ItemsPresenter"/>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+						</VisualStateManager.VisualStateGroups>
+						<ContentPresenter x:Name="HeaderContentPresenter" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" FlowDirection="{TemplateBinding FlowDirection}" HorizontalAlignment="Left" Margin="0,0,0,-4.5" Style="{StaticResource HeaderContentPresenterStyle}" Visibility="Collapsed"/>
+						<Button x:Name="FlyoutButton" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" FontWeight="Normal" FlowDirection="{TemplateBinding FlowDirection}" FontSize="{ThemeResource ContentControlFontSize}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" MinHeight="{ThemeResource ComboBoxItemMinHeightThemeSize}" Padding="6.5,0,0,0" Grid.Row="1">
+							<ContentPresenter x:Name="ContentPresenter" Margin="0,0.8,0,0" MinHeight="32.5">
+								<TextBlock x:Name="PlaceholderTextBlock" Margin="0" Style="{StaticResource ComboBoxPlaceholderTextBlockStyle}" Text="{TemplateBinding PlaceholderText}"/>
+							</ContentPresenter>
+						</Button>
+						<Border x:Name="ShortListOuterBorder" Margin="{ThemeResource PhoneTouchTargetOverhang}" Grid.Row="1" Visibility="Collapsed">
+							<Border x:Name="Background" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+								<UserControl x:Name="UserControl" Foreground="{TemplateBinding Foreground}" FlowDirection="{TemplateBinding FlowDirection}" IsHitTestVisible="False">
+									<Canvas x:Name="ItemsPresenterHost" HorizontalAlignment="Left" MinHeight="{ThemeResource ComboBoxItemMinHeightThemeSize}">
+										<ContentPresenter x:Name="PlaceholderTextContentPresenter" Content="{TemplateBinding PlaceholderText}" Margin="{ThemeResource ComboBoxPlaceholderTextThemeMargin}" Opacity="0" Style="{StaticResource PlaceholderContentPresenterStyle}"/>
+										<ItemsPresenter x:Name="ItemsPresenter" Margin="0,0.8,0,0">
+											<ItemsPresenter.RenderTransform>
+												<TranslateTransform x:Name="ItemsPresenterTranslateTransform"/>
+											</ItemsPresenter.RenderTransform>
+										</ItemsPresenter>
+									</Canvas>
+								</UserControl>
+							</Border>
+						</Border>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	
+	<Style TargetType="ComboBoxItem">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="TabNavigation" Value="Local"/>
+		<Setter Property="Padding" Value="6.5,8"/>
+		<Setter Property="HorizontalContentAlignment" Value="Left"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ComboBoxItem">
+					<Border x:Name="LayoutRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+						<VisualStateManager.VisualStateGroups>
+							<VisualStateGroup x:Name="CommonStates">
+								<VisualStateGroup.Transitions>
+									<VisualTransition From="Pressed" To="Normal">
+										<Storyboard>
+											<PointerUpThemeAnimation Storyboard.TargetName="InnerGrid"/>
+										</Storyboard>
+									</VisualTransition>
+								</VisualStateGroup.Transitions>
+								<VisualState x:Name="Normal"/>
+								<VisualState x:Name="PointerOver">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentPresenter.Foreground)" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="White"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="Disabled">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="LayoutRoot">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="Transparent"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListBoxItemDisabledForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="Pressed">
+									<Storyboard>
+										<PointerDownThemeAnimation Storyboard.TargetName="InnerGrid"/>
+										<DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="PressedBackground"/>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="White"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+							<VisualStateGroup x:Name="SelectionStates">
+								<VisualState x:Name="Unselected"/>
+								<VisualState x:Name="Selected">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="InnerGrid">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListBoxItemSelectedBackgroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="White"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="SelectedUnfocused">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="InnerGrid">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListBoxItemSelectedBackgroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="White"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="SelectedDisabled">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="InnerGrid">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListBoxItemSelectedDisabledBackgroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListBoxItemSelectedDisabledForegroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="SelectedPointerOver">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="InnerGrid">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListBoxItemSelectedPointerOverBackgroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="White"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+								<VisualState x:Name="SelectedPressed">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="InnerGrid">
+											<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListBoxItemSelectedBackgroundThemeBrush}"/>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<SolidColorBrush Color="White"/>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+						</VisualStateManager.VisualStateGroups>
+						<Grid x:Name="InnerGrid" Background="Transparent">
+							<Rectangle x:Name="PressedBackground" Fill="{ThemeResource ListBoxItemPressedBackgroundThemeBrush}" Opacity="0"/>
+							<ContentPresenter x:Name="ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTransitions="{TemplateBinding ContentTransitions}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+						</Grid>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	
+	<!-- #endregion -->
+
 </ResourceDictionary>
