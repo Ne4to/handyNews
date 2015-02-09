@@ -33,12 +33,12 @@
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
 							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition Width="100" />
 						</Grid.ColumnDefinitions>
 
 						<TextBlock Text="&#xE09B;" FontFamily="Segoe UI Symbol" Style="{StaticResource TreeItemTextStyle}" Margin="0,0,5,0"  />
-						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" />
+						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis" />
 						<TextBlock Grid.Column="2" Text="{Binding UnreadCount, Converter={StaticResource UnreadCountStringConverter}}" Style="{StaticResource TreeItemUnreadCountTextStyle}" />
 					</Grid>
 				</DataTemplate>
@@ -49,12 +49,12 @@
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 
 						<Image Width="16" Height="16" Source="{Binding IconUrl}" Margin="0,0,5,0" />
-						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}"/>
+						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"/>
 						<TextBlock Grid.Column="2" Text="{Binding UnreadCount, Converter={StaticResource UnreadCountStringConverter}}" Style="{StaticResource TreeItemUnreadCountTextStyle}" />
 					</Grid>
 				</DataTemplate>

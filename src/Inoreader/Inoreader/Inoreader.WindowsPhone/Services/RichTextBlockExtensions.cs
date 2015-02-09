@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using Windows.Data.Html;
 using Windows.System;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
@@ -13,6 +14,13 @@ namespace Inoreader.Services
 {
 	public class RichTextBlockExtensions
 	{
+		private const double FontSizeH1 = 28D;
+		private const double FontSizeH2 = 24D;
+		private const double FontSizeH3 = 20D;
+		private const double FontSizeH4 = 17D;
+		private const double FontSizeH5 = 14D;
+		private const double FontSizeH6 = 12D;
+
 		public static readonly DependencyProperty HtmlContentProperty = DependencyProperty.RegisterAttached("HtmlContent", typeof(string), typeof(RichTextBlockExtensions), new PropertyMetadata(default(string), new PropertyChangedCallback(HtmlContentChanged)));
 
 		private static void HtmlContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -103,7 +111,8 @@ namespace Inoreader.Services
 					var closeIndex = GetCloseIndex(lexemeIndex, lexemes);
 					if (closeIndex != -1)
 					{
-						AddBeginEnd(paragraph.Inlines, lexemes, lexemeIndex, closeIndex);
+						var strParams = new StringParameters();
+						AddBeginEnd(paragraph.Inlines, lexemes, lexemeIndex, closeIndex, strParams);
 						lexemeIndex = closeIndex;
 					}
 				}
@@ -112,7 +121,7 @@ namespace Inoreader.Services
 			return paragraph;
 		}
 
-		private static void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex)
+		private static void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex, StringParameters strParams)
 		{
 			var startL = (HtmlTagLexeme)lexemes[lexemeIndex];
 
@@ -191,7 +200,7 @@ namespace Inoreader.Services
 				return;
 			}
 
-			// TODO <H1>-<H6>
+			SetHeadersValue(strParams, startL.Name, true);
 			// TODO <em> - Italic
 
 			for (int index = lexemeIndex + 1; index < closeIndex; index++)
@@ -201,7 +210,12 @@ namespace Inoreader.Services
 				var literalLexeme = lexeme as LiteralLexeme;
 				if (literalLexeme != null)
 				{
-					inlines.Add(new Run() { Text = literalLexeme.Text });
+					var item = new Run { Text = literalLexeme.Text };
+					double? customFontSize = GetFontSize(strParams);
+					if (customFontSize.HasValue)
+						item.FontSize = customFontSize.Value;
+
+					inlines.Add(item);
 					continue;
 				}
 
@@ -217,11 +231,13 @@ namespace Inoreader.Services
 					var closeIndex2 = GetCloseIndex(index, lexemes);
 					if (closeIndex2 != -1)
 					{
-						AddBeginEnd(inlines, lexemes, index, closeIndex2);
+						AddBeginEnd(inlines, lexemes, index, closeIndex2, strParams);
 						index = closeIndex2;
 					}
 				}
 			}
+
+			SetHeadersValue(strParams, startL.Name, false);			
 
 			if (String.Equals(startL.Name, "p", StringComparison.OrdinalIgnoreCase))
 			{
@@ -232,6 +248,59 @@ namespace Inoreader.Services
 			{
 				inlines.Add(new LineBreak());
 			}
+		}
+
+		private static void SetHeadersValue(StringParameters strParams, string tagName, bool value)
+		{
+			switch (tagName.ToLower())
+			{
+				case "h1":
+					strParams.H1 = value;
+					return;
+
+				case "h2":
+					strParams.H2 = value;
+					return;
+
+				case "h3":
+					strParams.H3 = value;
+					return;
+
+				case "h4":
+					strParams.H4 = value;
+					return;
+
+				case "h5":
+					strParams.H5 = value;
+					return;
+
+				case "h6":
+					strParams.H6 = value;
+					return;
+			}
+		}
+
+		private static double? GetFontSize(StringParameters strParams)
+		{
+			if (strParams.H1)
+				return FontSizeH1;
+
+			if (strParams.H2)
+				return FontSizeH2;
+			
+			if (strParams.H3)
+				return FontSizeH3;
+			
+			if (strParams.H4)
+				return FontSizeH4;
+			
+			if (strParams.H5)
+				return FontSizeH5;
+			
+			if (strParams.H6)
+				return FontSizeH6;
+
+			return null;
 		}
 
 		private static int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
@@ -384,6 +453,18 @@ namespace Inoreader.Services
 		{
 			element.SetValue(HtmlContentProperty, value);
 		}
+	}
+
+	class StringParameters
+	{
+		public bool Bold { get; set; }
+		public bool Italic { get; set; }
+		public bool H1 { get; set; }
+		public bool H2 { get; set; }
+		public bool H3 { get; set; }
+		public bool H4 { get; set; }
+		public bool H5 { get; set; }
+		public bool H6 { get; set; }
 	}
 
 	public interface ILexeme

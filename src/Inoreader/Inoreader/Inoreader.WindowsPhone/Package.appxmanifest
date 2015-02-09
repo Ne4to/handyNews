@@ -24,9 +24,6 @@
           </m3:ShowNameOnTiles>
         </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#D4EBF2" />
-        <m3:InitialRotationPreference>
-          <m3:Rotation Preference="portrait" />
-        </m3:InitialRotationPreference>
       </m3:VisualElements>
     </Application>
   </Applications>
