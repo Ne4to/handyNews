@@ -2,6 +2,8 @@
 using System.Windows.Input;
 using Windows.ApplicationModel.Store;
 using Windows.System;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 
@@ -9,6 +11,8 @@ namespace Inoreader.ViewModels.Pages
 {
 	public class AboutPageViewModel : ViewModel
 	{
+		private readonly TelemetryClient _telemetryClient;
+
 		#region Fields
 
 		private ICommand _reviewCommand;
@@ -35,19 +39,28 @@ namespace Inoreader.ViewModels.Pages
 		}
 
 		#endregion
-		
+
+		public AboutPageViewModel(TelemetryClient telemetryClient)
+		{
+			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			_telemetryClient = telemetryClient;
+		}
+
 		private async void OnReview()
 		{
+			_telemetryClient.TrackEvent(TelemetryEvents.Review);
 			await Launcher.LaunchUriAsync(new Uri("ms-windows-store:reviewapp?appid=" + CurrentApp.AppId));
 		}
 
 		private async void OnSubmitBug()
 		{
+			_telemetryClient.TrackEvent(TelemetryEvents.SubmitBug);
 			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/InoreaderFree/issues/new"));
 		}
 		
 		private async void OnContribute()
-		{
+		{			
+			_telemetryClient.TrackEvent(TelemetryEvents.Contribute);
 			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/InoreaderFree"));
 		}
 	}

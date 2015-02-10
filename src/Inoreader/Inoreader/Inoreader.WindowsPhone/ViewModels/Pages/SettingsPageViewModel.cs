@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Services;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Practices.Prism.Mvvm;
 
 namespace Inoreader.ViewModels.Pages
@@ -13,6 +15,7 @@ namespace Inoreader.ViewModels.Pages
 		#region Fields
 
 		private readonly AppSettingsService _settingsService;
+		private readonly TelemetryClient _telemetryClient;
 		private readonly string _initialDisplayCulture;
 
 		private List<Lang> _languages;
@@ -47,10 +50,12 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public SettingsPageViewModel(AppSettingsService settingsService)
+		public SettingsPageViewModel(AppSettingsService settingsService, TelemetryClient telemetryClient)
 		{
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
+			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			_settingsService = settingsService;
+			_telemetryClient = telemetryClient;
 			_initialDisplayCulture = _settingsService.DisplayCulture;
 		}
 
@@ -64,16 +69,24 @@ namespace Inoreader.ViewModels.Pages
 											new Lang("en-US"),
 											new Lang("ru-RU")
 										});
-			
+
 			SelectedLang = Languages.FirstOrDefault(l => l.Name == _initialDisplayCulture) ?? Languages.FirstOrDefault();
 			NeedAppRestart = false;
 		}
 
 		private void OnSelectedLangChanged()
 		{
+			if (_initialDisplayCulture != SelectedLang.Name)
+			{
+				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeDisplayCulture);
+				eventTelemetry.Properties.Add("OldValue", _initialDisplayCulture);
+				eventTelemetry.Properties.Add("NewValue", SelectedLang.Name);
+				_telemetryClient.TrackEvent(eventTelemetry);				
+			}
+
 			_settingsService.DisplayCulture = SelectedLang.Name;
 			_settingsService.Save();
-
+			
 			NeedAppRestart = SelectedLang.Name != _initialDisplayCulture;
 		}
 	}

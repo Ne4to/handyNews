@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Input;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
 using Inoreader.Services;
+using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Newtonsoft.Json.Linq;
@@ -18,6 +20,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly INavigationService _navigationService;
 		private readonly ICredentialService _credentialService;
 		private readonly ApiClient _apiClient;
+		private readonly TelemetryClient _telemetryClient;
 
 		#region Fields
 
@@ -79,15 +82,17 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ApiClient apiClient)
+		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ApiClient apiClient, TelemetryClient telemetryClient)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (credentialService == null) throw new ArgumentNullException("credentialService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
+			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 
 			_navigationService = navigationService;
 			_credentialService = credentialService;
 			_apiClient = apiClient;
+			_telemetryClient = telemetryClient;
 		}
 
 #if DEBUG
@@ -124,7 +129,14 @@ namespace Inoreader.ViewModels.Pages
 
 			try
 			{
+				var stopwatch = Stopwatch.StartNew();
+				
 				await _apiClient.SignInAsync(Email, Password);
+				
+				stopwatch.Stop();
+				_telemetryClient.TrackMetric(TemetryMetrics.SignInResponseTime, stopwatch.Elapsed.TotalSeconds);
+				_telemetryClient.TrackEvent(TelemetryEvents.SignIn);
+				
 
 				if (RememberMe)
 				{
@@ -136,6 +148,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
+				_telemetryClient.TrackException(ex);
 			}
 			finally
 			{

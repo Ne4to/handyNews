@@ -12,6 +12,7 @@ using Inoreader.ViewModels.Pages;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Microsoft.Practices.Unity;
+using Microsoft.ApplicationInsights;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -22,6 +23,11 @@ namespace Inoreader
 	/// </summary>
 	public sealed partial class App
 	{
+		/// <summary>
+		/// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
+		/// </summary>
+		public readonly TelemetryClient TelemetryClient = new TelemetryClient();
+
 		// New up the singleton container that will be used for type resolution in the app
 		readonly IUnityContainer _container = new UnityContainer();
 		readonly ApiClient _apiClient = new ApiClient();
@@ -29,10 +35,7 @@ namespace Inoreader
 
 		public App()
 		{
-			InitializeComponent();
-
-			//var culture = new CultureInfo("ru-RU");
-			//Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = culture.Name; 
+			InitializeComponent();		
 		}
 
 		protected override async Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
@@ -55,6 +58,7 @@ namespace Inoreader
 			_container.RegisterType<ICredentialService, CredentialService>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_apiClient);
 			_container.RegisterInstance(_appSettingsService);
+			_container.RegisterInstance(TelemetryClient);			
 
 			// Set a factory for the ViewModelLocator to use the container to construct view models so their 
 			// dependencies get injected by the container
@@ -69,6 +73,8 @@ namespace Inoreader
 
 		protected override void OnHardwareButtonsBackPressed(object sender, BackPressedEventArgs e)
 		{
+			TelemetryClient.TrackEvent(TelemetryEvents.HardwareButtonsBackPressed);
+
 			var view = ((Frame)Window.Current.Content).Content as IView;
 			if (view != null)
 			{

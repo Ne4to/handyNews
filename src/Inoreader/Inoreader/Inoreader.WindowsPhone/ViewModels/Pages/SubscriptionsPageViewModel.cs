@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.ViewModels.Details;
+using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
