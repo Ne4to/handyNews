@@ -38,14 +38,20 @@ namespace Inoreader
 			InitializeComponent();		
 		}
 
-		protected override async Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
+		protected override Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
 		{
+			var pageToken = _apiClient.SignInRequired ? PageTokens.SignIn : PageTokens.Subscriptions;
+			NavigationService.Navigate(pageToken, null);
+			return Task.FromResult(0);
+		}
+
+		protected override async void OnLaunched(LaunchActivatedEventArgs args)
+		{
+			base.OnLaunched(args);
+
 			// Hide the status bar
 			StatusBar statusBar = StatusBar.GetForCurrentView();
 			await statusBar.HideAsync();
-
-			var pageToken = _apiClient.SignInRequired ? PageTokens.SignIn : PageTokens.Subscriptions;
-			NavigationService.Navigate(pageToken, null);			
 		}
 
 		protected override async Task OnInitializeAsync(IActivatedEventArgs args)
