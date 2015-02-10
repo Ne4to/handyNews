@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="4306f800-9943-49b1-ada8-24b106191df3" Publisher="CN=Alexey" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="4306f800-9943-49b1-ada8-24b106191df3" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="27564AlexeySosnin.InoreaderFree" Publisher="CN=0EFE90CF-F703-43EF-98AD-5BAA6514CABD" Version="1.1.0.3" />
+  <mp:PhoneIdentity PhoneProductId="cb4310d2-f658-43f3-b665-2dca632784a9" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>Inoreader.WindowsPhone</DisplayName>
-    <PublisherDisplayName>Alexey</PublisherDisplayName>
+    <DisplayName>Inoreader Free</DisplayName>
+    <PublisherDisplayName>Alexey Sosnin</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>

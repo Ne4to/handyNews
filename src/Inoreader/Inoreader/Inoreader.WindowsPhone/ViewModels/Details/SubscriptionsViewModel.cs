@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
@@ -7,6 +8,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Inoreader.Api;
 using Inoreader.Api.Models;
+using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -20,6 +22,7 @@ namespace Inoreader.ViewModels.Details
 		private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 		private readonly INavigationService _navigationService;
 		private readonly ApiClient _apiClient;
+		private readonly TelemetryClient _telemetryClient;
 
 		private bool _isBusy;
 		private List<TreeItemBase> _treeItems;
@@ -70,13 +73,15 @@ namespace Inoreader.ViewModels.Details
 		#endregion
 
 
-		public SubscriptionsViewModel(INavigationService navigationService, ApiClient apiClient)
+		public SubscriptionsViewModel(INavigationService navigationService, ApiClient apiClient, TelemetryClient telemetryClient)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
+			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
+			_telemetryClient = telemetryClient;
 		}
 
 		public async void LoadSubscriptions()
@@ -86,9 +91,14 @@ namespace Inoreader.ViewModels.Details
 			Exception error = null;
 			try
 			{
+				var stopwatch = Stopwatch.StartNew();
+
 				var tags = await _apiClient.GetTagsAsync();
 				var subscriptions = await _apiClient.GetSubscriptionsAsync();
 				var unreadCount = await _apiClient.GetUnreadCountAsync();
+
+				stopwatch.Stop();
+				_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
 
 				var unreadCountDictionary = unreadCount.UnreadCounts.ToDictionary(uk => uk.Id, uk => uk.Count);
 
@@ -108,7 +118,7 @@ namespace Inoreader.ViewModels.Details
 					var subsQuery = from s in subscriptions.Subscriptions
 									where s.Categories != null
 										  && s.Categories.Any(c => String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
-									orderby s.Title
+									orderby s.Title// descending 
 									select CreateSubscriptionItem(s, unreadCountDictionary);
 
 					categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
@@ -137,6 +147,7 @@ namespace Inoreader.ViewModels.Details
 			catch (Exception ex)
 			{
 				error = ex;
+				_telemetryClient.TrackException(ex);
 			}
 			finally
 			{
