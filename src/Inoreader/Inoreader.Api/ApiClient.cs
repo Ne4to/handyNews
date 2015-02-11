@@ -22,7 +22,12 @@ namespace Inoreader.Api
 
 		public ApiClient()
 		{
-			_httpClient = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate });
+			var httpClientHandler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+			_httpClient = new HttpClient(httpClientHandler);
+			_httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue()
+			{
+				NoCache = true
+			};
 			_sessionStore = new ApiSessionStore();
 		}
 
@@ -130,6 +135,18 @@ namespace Inoreader.Api
 			return GetAsync<StreamResponse>(uri);
 		}
 
+		public Task AddTagAsync(string tag, string itemId)
+		{
+			var uri = String.Format("https://www.inoreader.com/reader/api/0/edit-tag?a={0}&i={1}", tag, itemId);
+			return GetNoResultAsync(uri);
+		}
+
+		public Task RemoveTagAsync(string tag, string itemId)
+		{
+			var uri = String.Format("https://www.inoreader.com/reader/api/0/edit-tag?r={0}&i={1}", tag, itemId);
+			return GetNoResultAsync(uri);
+		}
+
 		private async Task<T> GetAsync<T>(string requestUri)
 		{
 			var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
@@ -147,6 +164,21 @@ namespace Inoreader.Api
 			var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
 			return JObject.Parse(responseString).ToObject<T>();
+		}
+
+		private async Task GetNoResultAsync(string requestUri)
+		{
+			var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+			string auth = _sessionStore.Auth;
+			if (!String.IsNullOrEmpty(auth))
+			{
+				requestMessage.Headers.Authorization = new AuthenticationHeaderValue("GoogleLogin", "auth=" + auth);
+			}
+
+			var response = await _httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+
+			response.EnsureSuccessStatusCode();
 		}
 	}
 }

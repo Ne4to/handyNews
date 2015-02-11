@@ -153,6 +153,10 @@
   <data name="RefreshAppBarButton.Label" xml:space="preserve">
     <value>Обновить</value>
   </data>
+  <data name="SetReadAppBarButton.Label" xml:space="preserve">
+    <value>Прочитано</value>
+    <comment>application bar button</comment>
+  </data>
   <data name="SettingLanguageBox.Header" xml:space="preserve">
     <value>Язык</value>
   </data>

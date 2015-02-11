@@ -156,6 +156,10 @@
     <value>Refresh</value>
     <comment>application bar button</comment>
   </data>
+  <data name="SetReadAppBarButton.Label" xml:space="preserve">
+    <value>Read</value>
+    <comment>application bar button</comment>
+  </data>
   <data name="SettingLanguageBox.Header" xml:space="preserve">
     <value>Language</value>
   </data>

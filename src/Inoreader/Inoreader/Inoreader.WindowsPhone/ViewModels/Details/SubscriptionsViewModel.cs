@@ -203,6 +203,7 @@ namespace Inoreader.ViewModels.Details
 
 		private void OnRefresh()
 		{
+			_telemetryClient.TrackEvent(TelemetryEvents.ManualRefreshSubscriptions);
 			LoadSubscriptions();
 		}
 

@@ -5,6 +5,8 @@
 
 	<converters:FormatStringConverter x:Key="GeneralDateFormatStringConverter" StringFormat="g" />
 	<converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	<converters:ItemClickEventArgsToItemConverter x:Key="ItemClickEventArgsToItemConverter" />
+	<converters:BooleanToBrushConverter TrueBrush="#82A8FF" FalseBrush="Transparent" x:Key="UnreadToBrushConverter" />
 
 	<!--<SolidColorBrush Color="#F1F5FA" x:Key="ApplicationPageBackgroundThemeBrush" />-->
 	<SolidColorBrush Color="#D7DDE6" x:Key="ApplicationPageBackgroundThemeBrush" />

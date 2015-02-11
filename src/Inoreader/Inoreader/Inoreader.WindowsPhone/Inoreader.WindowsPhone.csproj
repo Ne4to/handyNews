@@ -84,16 +84,21 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Behaviors\ItemsScrollBehavior.cs" />
+    <Compile Include="Converters\BooleanToBrushConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\FormatStringConverter.cs" />
+    <Compile Include="Converters\ItemClickEventArgsToItemConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
     <Compile Include="PageTokens.cs" />
+    <Compile Include="Resources\SteamItemTemplateSelector.cs" />
     <Compile Include="Resources\SubscriptionItemTemplateSelector.cs" />
     <Compile Include="Services\ApplicationDataContainerExtensions.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CredentialService.cs" />
     <Compile Include="Services\ICredentialService.cs" />
     <Compile Include="Services\RichTextBlockExtensions.cs" />
+    <Compile Include="Services\SpecialTags.cs" />
     <Compile Include="Strings\en-US\Resources.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -109,6 +114,9 @@
     <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
+    <Compile Include="Views\Details\EmptySpaceItem.xaml.cs">
+      <DependentUpon>EmptySpaceItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
@@ -166,6 +174,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Views\Details\EmptySpaceItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\AboutPage.xaml">
       <SubType>Designer</SubType>

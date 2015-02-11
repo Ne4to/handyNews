@@ -8,6 +8,8 @@
 		public const string SubmitBug = "SubmitBug";
 		public const string Contribute = "Contribute";
 		public const string ChangeDisplayCulture = "ChangeDisplayCulture";
+		public const string MarkAsRead = "MarkAsRead";
+		public const string ManualRefreshSubscriptions = "ManualRefreshSubscriptions";
 	}
 
 	public static class TemetryMetrics
