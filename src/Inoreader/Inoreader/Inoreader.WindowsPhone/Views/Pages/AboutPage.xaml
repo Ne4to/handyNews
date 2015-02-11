@@ -17,5 +17,9 @@
 		<Button x:Uid="AboutReviewButton" Content="Review" Command="{Binding ReviewCommand}" />
 		<Button x:Uid="AboutSubmitBugButton" Content="Submit a bug" Command="{Binding SubmitBugCommand}" />
 		<Button x:Uid="AboutContributeButton" Content="Contribute" Command="{Binding ContributeCommand}" />
+		<TextBlock>
+			<Run x:Uid="AboutAppVersionLabel" Text="version: " />
+			<Run Text="{Binding AppVersion}" />
+		</TextBlock>
     </StackPanel>
 </storeApps:VisualStateAwarePage>

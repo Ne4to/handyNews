@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Store;
 using Windows.System;
 using Microsoft.ApplicationInsights;
@@ -20,6 +21,15 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _contributeCommand;
 
 		#endregion
+
+		public string AppVersion
+		{
+			get
+			{
+				var v = Package.Current.Id.Version;
+				return String.Format("{0}.{1}.{2}.{3}", v.Major, v.Minor, v.Build, v.Revision);
+			}
+		}
 		
 		#region Commands
 

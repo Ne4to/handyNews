@@ -129,6 +129,9 @@
     <value>Inoreader Free</value>
     <comment>About page</comment>
   </data>
+  <data name="AboutAppVersionLabel.Text" xml:space="preserve">
+    <value>version: </value>
+  </data>
   <data name="AboutContributeButton.Content" xml:space="preserve">
     <value>Contribute</value>
     <comment>About page</comment>

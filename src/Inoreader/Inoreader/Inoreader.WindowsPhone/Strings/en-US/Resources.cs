@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/11/2015 22:33:20
+// 	Generated: 02/12/2015 00:10:01
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
