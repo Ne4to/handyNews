@@ -20,6 +20,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private List<Lang> _languages;
 		private Lang _selectedLang;
+		private bool _hideEmptySubscriptions;
 		private bool _needAppRestart;
 
 		#endregion
@@ -39,6 +40,16 @@ namespace Inoreader.ViewModels.Pages
 			{
 				if (SetProperty(ref _selectedLang, value))
 					OnSelectedLangChanged();
+			}
+		}
+
+		public bool HideEmptySubscriptions
+		{
+			get { return _hideEmptySubscriptions; }
+			set
+			{
+				if (SetProperty(ref _hideEmptySubscriptions, value))
+					OnHideEmptySubscriptionsChanged();
 			}
 		}
 
@@ -72,6 +83,7 @@ namespace Inoreader.ViewModels.Pages
 
 			SelectedLang = Languages.FirstOrDefault(l => l.Name == _initialDisplayCulture) ?? Languages.FirstOrDefault();
 			NeedAppRestart = false;
+			HideEmptySubscriptions = _settingsService.HideEmptySubscriptions;
 		}
 
 		private void OnSelectedLangChanged()
@@ -81,13 +93,27 @@ namespace Inoreader.ViewModels.Pages
 				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeDisplayCulture);
 				eventTelemetry.Properties.Add("OldValue", _initialDisplayCulture);
 				eventTelemetry.Properties.Add("NewValue", SelectedLang.Name);
-				_telemetryClient.TrackEvent(eventTelemetry);				
+				_telemetryClient.TrackEvent(eventTelemetry);
 			}
 
 			_settingsService.DisplayCulture = SelectedLang.Name;
 			_settingsService.Save();
-			
+
 			NeedAppRestart = SelectedLang.Name != _initialDisplayCulture;
+		}
+
+		private void OnHideEmptySubscriptionsChanged()
+		{
+			if (HideEmptySubscriptions != _settingsService.HideEmptySubscriptions)
+			{
+				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeHideEmptySubscriptions);
+				eventTelemetry.Properties.Add("OldValue", _settingsService.HideEmptySubscriptions.ToString());
+				eventTelemetry.Properties.Add("NewValue", HideEmptySubscriptions.ToString());
+				_telemetryClient.TrackEvent(eventTelemetry);
+			}
+
+			_settingsService.HideEmptySubscriptions = HideEmptySubscriptions;
+			_settingsService.Save();
 		}
 	}
 

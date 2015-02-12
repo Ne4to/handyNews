@@ -25,6 +25,10 @@
 				  SelectedItem="{Binding SelectedLang, Mode=TwoWay}"
 				  DisplayMemberPath="Title" />
 
+			<CheckBox x:Uid="SettingHideEmptySubscriptions" 
+					  Content="Hide empty subscriptions"
+					  IsChecked="{Binding HideEmptySubscriptions, Mode=TwoWay}" />
+
 			<TextBlock x:Uid="SettingsRestartWarning" 
 				   Text="Restart the application to apply the changes." 
 				   TextWrapping="Wrap" 

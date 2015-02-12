@@ -8,6 +8,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Inoreader.Api;
 using Inoreader.Api.Models;
+using Inoreader.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -23,6 +24,7 @@ namespace Inoreader.ViewModels.Details
 		private readonly INavigationService _navigationService;
 		private readonly ApiClient _apiClient;
 		private readonly TelemetryClient _telemetryClient;
+		private readonly AppSettingsService _settingsService;
 
 		private bool _isBusy;
 		private List<TreeItemBase> _treeItems;
@@ -73,15 +75,17 @@ namespace Inoreader.ViewModels.Details
 		#endregion
 
 
-		public SubscriptionsViewModel(INavigationService navigationService, ApiClient apiClient, TelemetryClient telemetryClient)
+		public SubscriptionsViewModel(INavigationService navigationService, ApiClient apiClient, TelemetryClient telemetryClient, AppSettingsService settingsService)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (settingsService == null) throw new ArgumentNullException("settingsService");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
+			_settingsService = settingsService;
 		}
 
 		public async void LoadSubscriptions()
@@ -99,7 +103,7 @@ namespace Inoreader.ViewModels.Details
 
 				stopwatch.Stop();
 				_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
-
+				
 				var unreadCountDictionary = unreadCount.UnreadCounts.ToDictionary(uk => uk.Id, uk => uk.Count);
 
 				var catsQuery = from tag in tags.Tags
@@ -131,13 +135,18 @@ namespace Inoreader.ViewModels.Details
 				// hide empty groups
 				categories.RemoveAll(c => c.Subscriptions.Count == 0);
 
-				var singleItems = from s in subscriptions.Subscriptions
+				var singleItems = (from s in subscriptions.Subscriptions								  
 								  where s.Categories == null || s.Categories.Length == 0
 								  orderby s.Title
-								  select CreateSubscriptionItem(s, unreadCountDictionary);
+								  select CreateSubscriptionItem(s, unreadCountDictionary)).ToList();
 
 				var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
 				allItems.AddRange(singleItems);
+
+				if (_settingsService.HideEmptySubscriptions)
+				{
+					HideEmpty(allItems);					
+				}
 
 				_rootItems = allItems;
 
@@ -158,6 +167,15 @@ namespace Inoreader.ViewModels.Details
 			{
 				MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
 				await msgbox.ShowAsync();
+			}
+		}
+
+		private void HideEmpty(List<TreeItemBase> allItems)
+		{
+			allItems.RemoveAll(c => c.UnreadCount == 0);
+			foreach (var cat in allItems.OfType<CategoryItem>())
+			{
+				cat.Subscriptions.RemoveAll(c => c.UnreadCount == 0);
 			}
 		}
 

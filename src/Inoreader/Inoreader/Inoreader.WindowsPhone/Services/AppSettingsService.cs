@@ -9,10 +9,12 @@ namespace Inoreader.Services
 		private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.LocalSettings;
 
 		public string DisplayCulture { get; set; }
+		public bool HideEmptySubscriptions { get; set; }
 
 		public AppSettingsService()
 		{
 			DisplayCulture = String.Empty;
+			HideEmptySubscriptions = true;
 
 			Load();
 		}
@@ -24,12 +26,14 @@ namespace Inoreader.Services
 				return;
 
 			DisplayCulture = container.GetValue("DisplayCulture", String.Empty);
+			HideEmptySubscriptions = container.GetValue("HideEmptySubscriptions", true);
 		}
 
 		public void Save()
 		{
 			var container = _rootContainer.CreateContainer(SettingsContainerName, ApplicationDataCreateDisposition.Always);
 			container.Values["DisplayCulture"] = DisplayCulture;
+			container.Values["HideEmptySubscriptions"] = HideEmptySubscriptions;
 		}
 	}
 }

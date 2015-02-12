@@ -162,6 +162,9 @@
     <value>Read</value>
     <comment>application bar button</comment>
   </data>
+  <data name="SettingHideEmptySubscriptions.Content" xml:space="preserve">
+    <value>Hide empty subscriptions</value>
+  </data>
   <data name="SettingLanguageBox.Header" xml:space="preserve">
     <value>Language</value>
   </data>
