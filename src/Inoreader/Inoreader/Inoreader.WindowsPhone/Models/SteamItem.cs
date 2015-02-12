@@ -18,6 +18,7 @@ namespace Inoreader.Models
 		public string Id { get; set; }
 		public DateTimeOffset Published { get; set; }
 		public string Title { get; set; }
+		public string WebUri { get; set; }
 		public string Content { get; set; }
 
 		public bool Unread

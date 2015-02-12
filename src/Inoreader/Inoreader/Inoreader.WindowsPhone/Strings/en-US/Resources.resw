@@ -151,6 +151,9 @@
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="OpenInWebAppBarButton.Label" xml:space="preserve">
+    <value>web</value>
+  </data>
   <data name="PageHeaderTitle.Text" xml:space="preserve">
     <value>Inoreader Free</value>
   </data>

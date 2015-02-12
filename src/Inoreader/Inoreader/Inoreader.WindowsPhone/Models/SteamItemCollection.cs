@@ -53,14 +53,27 @@ namespace Inoreader.Models
 		private static IEnumerable<SteamItem> GetItems(StreamResponse stream)
 		{
 			var itemsQuery = from it in stream.items
-				select new SteamItem
-				{
-					Id = it.id,
-					Published = UnixTimeStampToDateTime(it.published),
-					Title = it.title,
-					Content = it.summary.content,
-				};
+							 select new SteamItem
+							 {
+								 Id = it.id,
+								 Published = UnixTimeStampToDateTime(it.published),
+								 Title = it.title,
+								 Content = it.summary.content,
+								 WebUri = GetWebUri(it)
+							 };
 			return itemsQuery;
+		}
+
+		private static string GetWebUri(Item item)
+		{
+			if (item.alternate == null)
+				return null;
+
+			var q = from a in item.alternate
+					where String.Equals(a.type, "text/html", StringComparison.OrdinalIgnoreCase)
+					select a.href;
+
+			return q.FirstOrDefault();
 		}
 
 		private async Task<StreamResponse> LoadAsync(int count, string continuation)
@@ -71,7 +84,7 @@ namespace Inoreader.Models
 			try
 			{
 				var stopwatch = Stopwatch.StartNew();
-				
+
 				stream = await _apiClient.GetStreamAsync(_steamId, count, continuation);
 
 				stopwatch.Stop();
@@ -129,7 +142,7 @@ namespace Inoreader.Models
 				var baseIndex = Count - 1;
 
 				InsertRange(Count - 1, items);
-				
+
 				// Now notify of the new items
 				NotifyOfInsertedItems(baseIndex, items.Length);
 

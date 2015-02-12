@@ -149,6 +149,9 @@
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Ошибка</value>
   </data>
+  <data name="OpenInWebAppBarButton.Label" xml:space="preserve">
+    <value>веб</value>
+  </data>
   <data name="PageHeaderTitle.Text" xml:space="preserve">
     <value>Inoreader Free</value>
   </data>

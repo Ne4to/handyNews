@@ -272,6 +272,11 @@
 								Label="Read"
 								Icon="Read" 
 								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}" />
+
+			<AppBarButton x:Uid="OpenInWebAppBarButton"
+						  Icon="World"
+						  Label="web"
+						  Command="{Binding OpenWebCommand}"/>			
 		</CommandBar>
 	</Page.BottomAppBar>
 

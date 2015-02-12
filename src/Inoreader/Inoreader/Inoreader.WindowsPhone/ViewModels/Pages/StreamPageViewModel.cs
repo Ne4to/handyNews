@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
@@ -33,6 +34,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
+		private DelegateCommand _openWebCommand;
 
 		#endregion
 
@@ -78,6 +80,11 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand SelectItemCommand
 		{
 			get { return _selectItemCommand ?? (_selectItemCommand = new DelegateCommand<object>(OnSelectItem)); }
+		}		
+
+		public ICommand OpenWebCommand
+		{
+			get { return _openWebCommand ?? (_openWebCommand = new DelegateCommand(OnOpenWeb, CanOpenWeb)); }
 		}
 
 		#endregion
@@ -130,10 +137,13 @@ namespace Inoreader.ViewModels.Pages
 
 				Items = steamItems;
 				_currentItem = Items.FirstOrDefault();
+
 				if (_currentItem != null)
 				{
 					_currentItem.IsSelected = true;
 				}
+
+				RaiseOpenWebCommandCanExecuteChanged();
 			}
 			catch (Exception ex)
 			{
@@ -156,6 +166,12 @@ namespace Inoreader.ViewModels.Pages
 #endif
 		}
 
+		private void RaiseOpenWebCommandCanExecuteChanged()
+		{
+			if (_openWebCommand != null)
+				_openWebCommand.RaiseCanExecuteChanged();
+		}
+
 		private void OnItemsScroll(object obj)
 		{
 			var items = (object[])obj;
@@ -174,6 +190,7 @@ namespace Inoreader.ViewModels.Pages
 
 			_currentItem = firstItem;
 			_currentItem.IsSelected = true;
+			RaiseOpenWebCommandCanExecuteChanged();
 			SetCurrentItemRead(!_currentItem.Unread);
 		}
 
@@ -187,8 +204,24 @@ namespace Inoreader.ViewModels.Pages
 
 				_currentItem = item;
 				_currentItem.IsSelected = true;
+				RaiseOpenWebCommandCanExecuteChanged();
 				SetCurrentItemRead(!_currentItem.Unread);
 			}
+		}
+		
+		private bool CanOpenWeb()
+		{
+			return _currentItem != null && !String.IsNullOrEmpty(_currentItem.WebUri);
+		}
+		
+		private async void OnOpenWeb()
+		{
+			if (_currentItem == null || String.IsNullOrEmpty(_currentItem.WebUri))
+				return;
+
+			var uri = new Uri(_currentItem.WebUri);
+			_telemetryClient.TrackEvent(TelemetryEvents.OpenItemInWeb);
+			await Launcher.LaunchUriAsync(uri);
 		}
 
 		private async void MarkAsRead(string id, bool newValue)
