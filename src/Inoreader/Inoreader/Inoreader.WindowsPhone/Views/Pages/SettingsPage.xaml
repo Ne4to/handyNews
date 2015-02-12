@@ -16,12 +16,9 @@
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-			<Image Style="{StaticResource LogoImageStyle}" />
-			<TextBlock Text="Inoreader Free" FontSize="24" Margin="10,0" FontWeight="SemiLight" />
-		</StackPanel>
+		<TextBlock Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
 
-		<StackPanel Grid.Row="1" Margin="10">
+		<StackPanel Grid.Row="1" Margin="10,0,10,10">
 			<ComboBox x:Uid="SettingLanguageBox" 
 				  Header="Language" 
 				  ItemsSource="{Binding Languages}" 

@@ -280,7 +280,7 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBlock Text="{Binding Title}" FontWeight="SemiLight"  FontSize="24" Margin="10,10,10,0" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="WordEllipsis" />
+		<TextBlock Text="{Binding Title}" Style="{StaticResource PageHeaderTextStyle}" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="WordEllipsis" />
 		<ProgressBar Grid.Row="0" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
 		<ListView Grid.Row="1" ItemsSource="{Binding Items}" 

@@ -6,24 +6,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mvvm="using:Microsoft.Practices.Prism.Mvvm"
     xmlns:storeApps="using:Microsoft.Practices.Prism.StoreApps"
-    xmlns:converters="using:Inoreader.Converters"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
-	
-	<Page.Resources>
-	
-
-	</Page.Resources>
 
     <Grid>
 		<StackPanel Margin="10">
-			<StackPanel Orientation="Horizontal">
-				<Image Style="{StaticResource LogoImageStyle}" />
-				<TextBlock x:Uid="SignInHeader" Text="Sign in" FontSize="24" Margin="10,0" FontWeight="SemiLight" />
-			</StackPanel>
+			<TextBlock x:Uid="SignInHeader" Text="Sign in" Style="{StaticResource PageHeaderTextStyle}" Margin="0" />
 			
-			<TextBox x:Uid="SignInEmailBox" Header="Email" PlaceholderText="username@gmail.com" Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			<TextBox x:Uid="SignInEmailBox" Header="Email" PlaceholderText="username@gmail.com" 
+					 Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					 Margin="0,10,0,0" />
 			<PasswordBox x:Uid="SignInPasswordBox" Header="Password" IsPasswordRevealButtonEnabled="True" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 			<CheckBox x:Uid="SignInRememberMeBox" Content="Remember me" IsChecked="{Binding RememberMe, Mode=TwoWay}" Visibility="Collapsed" />
 			<Button x:Uid="SignInButton" Content="Sign in" Command="{Binding SignInCommand}" />

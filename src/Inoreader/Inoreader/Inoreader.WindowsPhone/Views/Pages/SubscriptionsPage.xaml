@@ -81,11 +81,8 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-			<Image Style="{StaticResource LogoImageStyle}" />
-			<TextBlock Text="Inoreader Free" FontWeight="SemiLight" FontSize="24" Margin="10,0" />
-		</StackPanel>
-
+		<TextBlock Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
+		
 		<ListView Grid.Row="1" DataContext="{Binding Subscriptions}" ItemsSource="{Binding TreeItems}"
 				          ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
 				          IsItemClickEnabled="True"
