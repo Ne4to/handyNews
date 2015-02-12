@@ -10,8 +10,6 @@
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:behaviors="using:Inoreader.Behaviors"
-    xmlns:system="using:System"
-    xmlns:converters="using:Inoreader.Converters"
     xmlns:resources="using:Inoreader.Resources"
     xmlns:details="using:Inoreader.Views.Details"
     mc:Ignorable="d"

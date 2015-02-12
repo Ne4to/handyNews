@@ -16,7 +16,7 @@
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<TextBlock Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
+		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
 
 		<StackPanel Grid.Row="1" Margin="10,0,10,10">
 			<ComboBox x:Uid="SettingLanguageBox" 

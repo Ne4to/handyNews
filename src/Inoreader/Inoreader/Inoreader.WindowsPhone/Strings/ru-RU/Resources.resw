@@ -125,10 +125,6 @@
     <value>Бесплатный клиент для RSS аггрегатора www.inoreader.com</value>
     <comment>About page</comment>
   </data>
-  <data name="AboutAppTitle.Text" xml:space="preserve">
-    <value>Inoreader Free</value>
-    <comment>About page</comment>
-  </data>
   <data name="AboutAppVersionLabel.Text" xml:space="preserve">
     <value>версия: </value>
   </data>
@@ -152,6 +148,9 @@
   </data>
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Ошибка</value>
+  </data>
+  <data name="PageHeaderTitle.Text" xml:space="preserve">
+    <value>Inoreader Free</value>
   </data>
   <data name="RefreshAppBarButton.Label" xml:space="preserve">
     <value>Обновить</value>

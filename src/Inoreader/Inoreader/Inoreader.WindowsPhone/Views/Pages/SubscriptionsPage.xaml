@@ -81,7 +81,7 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBlock Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
+		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
 		
 		<ListView Grid.Row="1" DataContext="{Binding Subscriptions}" ItemsSource="{Binding TreeItems}"
 				          ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
