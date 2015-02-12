@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/12/2015 20:32:47
+// 	Generated: 02/12/2015 22:21:36
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -82,6 +82,17 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("ErrorDialogTitle");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "Read all"
+        /// </summary>
+        public static string ReadAllSubscriptionItem
+        {
+            get
+            {
+                return resourceLoader.GetString("ReadAllSubscriptionItem");
             }
         }
         

@@ -18,6 +18,8 @@ namespace Inoreader.ViewModels.Details
 {
 	public class SubscriptionsViewModel : BindableBase
 	{
+		private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
+
 		#region Fields
 
 		private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -103,7 +105,7 @@ namespace Inoreader.ViewModels.Details
 
 				stopwatch.Stop();
 				_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
-				
+
 				var unreadCountDictionary = unreadCount.UnreadCounts.ToDictionary(uk => uk.Id, uk => uk.Count);
 
 				var catsQuery = from tag in tags.Tags
@@ -130,22 +132,42 @@ namespace Inoreader.ViewModels.Details
 										  from c in s.Categories
 										  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
 										  select c.Label).FirstOrDefault();
+
+					var readAllItem = new SubscriptionItem
+					{
+						Id = categoryItem.Id,
+						SortId = categoryItem.SortId,
+						IconUrl = ReadAllIconUrl,
+						Title = Strings.Resources.ReadAllSubscriptionItem,
+						UnreadCount = categoryItem.UnreadCount
+					};
+
+					categoryItem.Subscriptions.Insert(0, readAllItem);
 				}
 
 				// hide empty groups
 				categories.RemoveAll(c => c.Subscriptions.Count == 0);
 
-				var singleItems = (from s in subscriptions.Subscriptions								  
-								  where s.Categories == null || s.Categories.Length == 0
-								  orderby s.Title
-								  select CreateSubscriptionItem(s, unreadCountDictionary)).ToList();
+				var singleItems = (from s in subscriptions.Subscriptions
+								   where s.Categories == null || s.Categories.Length == 0
+								   orderby s.Title
+								   select CreateSubscriptionItem(s, unreadCountDictionary)).ToList();
 
 				var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
 				allItems.AddRange(singleItems);
 
+				var readAllRootItem = new SubscriptionItem
+				{
+					Id = String.Empty,
+					IconUrl = ReadAllIconUrl,
+					Title = Strings.Resources.ReadAllSubscriptionItem,
+					UnreadCount = allItems.Sum(s => s.UnreadCount)
+				};
+				allItems.Insert(0, readAllRootItem);
+
 				if (_settingsService.HideEmptySubscriptions)
 				{
-					HideEmpty(allItems);					
+					HideEmpty(allItems);
 				}
 
 				_rootItems = allItems;
@@ -162,7 +184,7 @@ namespace Inoreader.ViewModels.Details
 			{
 				IsBusy = false;
 			}
-			
+
 			if (error != null)
 			{
 				MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
