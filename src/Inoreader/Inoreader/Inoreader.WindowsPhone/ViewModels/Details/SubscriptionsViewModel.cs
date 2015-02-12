@@ -8,6 +8,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Inoreader.Api;
 using Inoreader.Api.Models;
+using Inoreader.Models;
 using Inoreader.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
@@ -259,26 +260,5 @@ namespace Inoreader.ViewModels.Details
 
 			return true;
 		}
-	}
-
-	public abstract class TreeItemBase
-	{
-		public string Id { get; set; }
-		public string SortId { get; set; }
-		public string Title { get; set; }
-		public int UnreadCount { get; set; }
-	}
-
-	public class SubscriptionItem : TreeItemBase
-	{
-		public string Url { get; set; }
-		public string HtmlUrl { get; set; }
-		public string IconUrl { get; set; }
-		public long FirstItemMsec { get; set; }
-	}
-
-	public class CategoryItem : TreeItemBase
-	{
-		public List<SubscriptionItem> Subscriptions { get; set; }
 	}
 }

@@ -105,13 +105,19 @@
       <DependentUpon>Resources.resw</DependentUpon>
     </Compile>
     <Compile Include="TelemetryEvents.cs" />
+    <Compile Include="Models\CategoryItem.cs" />
     <Compile Include="ViewModels\Details\HubMenuViewModel.cs" />
+    <Compile Include="Models\SubscriptionItem.cs" />
+    <Compile Include="Models\TreeItemBase.cs" />
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
+    <Compile Include="Models\EmptySpaceSteamItem.cs" />
     <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
     <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
+    <Compile Include="Models\SteamItem.cs" />
+    <Compile Include="Models\SteamItemCollection.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
     <Compile Include="Views\Details\EmptySpaceItem.xaml.cs">

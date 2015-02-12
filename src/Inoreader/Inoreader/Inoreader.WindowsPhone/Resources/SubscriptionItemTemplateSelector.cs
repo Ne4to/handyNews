@@ -1,6 +1,7 @@
 ﻿using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Inoreader.Models;
 using Inoreader.ViewModels.Details;
 using Inoreader.ViewModels.Pages;
 

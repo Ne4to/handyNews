@@ -232,26 +232,29 @@
 		<resources:SteamItemTemplateSelector x:Key="SteamItemTemplateSelector">
 			<resources:SteamItemTemplateSelector.SteamItemTemplate>
 				<DataTemplate>
-					<Grid Background="#FEFEFE" Margin="5,0,10,10">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="4" />
-							<ColumnDefinition Width="*" />
-						</Grid.ColumnDefinitions>
+					<Border Margin="5,0,10,10" 
+							BorderThickness="1" 
+							BorderBrush="{Binding IsSelected, Converter={StaticResource IsSelectedToBrushConverter}}">
+						<Grid Background="#FEFEFE">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="4" />
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
 
-						<Grid Background="{Binding Unread, Converter={StaticResource UnreadToBrushConverter}}">
+							<Grid Background="{Binding Unread, Converter={StaticResource UnreadToBrushConverter}}">
 
-						</Grid>
+							</Grid>
 
-						<StackPanel Margin="5" Grid.Column="1">
-							<TextBlock Text="{Binding Title}"
-							           FontSize="14" TextWrapping="WrapWholeWords" />
-							<TextBlock Text="{Binding Published, Converter={StaticResource GeneralDateFormatStringConverter}}"
-							           FontSize="11"
-							           FontWeight="SemiLight" />
+							<StackPanel Margin="5" Grid.Column="1">
+								<TextBlock Text="{Binding Title}"
+								           FontSize="14" TextWrapping="WrapWholeWords" />
+								<TextBlock Text="{Binding Published, Converter={StaticResource GeneralDateFormatStringConverter}}"
+								           FontSize="11"
+								           FontWeight="SemiLight" />
 
-							<RichTextBlock services:RichTextBlockExtensions.HtmlContent="{Binding Content}" IsTextSelectionEnabled="False" />
-						</StackPanel>
-					</Grid>
+								<RichTextBlock services:RichTextBlockExtensions.HtmlContent="{Binding Content}" IsTextSelectionEnabled="False" />
+							</StackPanel>
+						</Grid></Border>
 				</DataTemplate>
 			</resources:SteamItemTemplateSelector.SteamItemTemplate>
 			<resources:SteamItemTemplateSelector.EmptySpaceTemplate>
