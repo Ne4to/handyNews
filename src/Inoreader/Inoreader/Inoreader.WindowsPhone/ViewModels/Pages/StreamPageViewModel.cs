@@ -197,13 +197,20 @@ namespace Inoreader.ViewModels.Pages
 			eventTelemetry.Properties.Add("AsRead", newValue.ToString());
 			_telemetryClient.TrackEvent(eventTelemetry);
 
-			if (newValue)
+			try
 			{
-				await _apiClient.AddTagAsync(SpecialTags.MarkItemAsRead, id);
+				if (newValue)
+				{
+					await _apiClient.AddTagAsync(SpecialTags.MarkItemAsRead, id);
+				}
+				else
+				{
+					await _apiClient.RemoveTagAsync(SpecialTags.MarkItemAsRead, id);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				await _apiClient.RemoveTagAsync(SpecialTags.MarkItemAsRead, id);
+				_telemetryClient.TrackException(ex);
 			}
 		}
 
