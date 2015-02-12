@@ -11,7 +11,7 @@
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
 
     <StackPanel Margin="10">
-		<TextBlock x:Uid="AboutAppTitle" Text="Inoreader Free" FontSize="20" />
+		<TextBlock x:Uid="AboutAppTitle" Text="Inoreader Free" FontSize="24" FontWeight="SemiLight" />
 		<Image Source="ms-appx:///Assets/AboutLogo.png" HorizontalAlignment="Center" Margin="0,5" />
 		<TextBlock x:Uid="AboutAppDescription" Text="Free client for RSS aggregator www.inoreader.com" TextWrapping="Wrap" FontSize="14" />
 		<Button x:Uid="AboutReviewButton" Content="Review" Command="{Binding ReviewCommand}" />

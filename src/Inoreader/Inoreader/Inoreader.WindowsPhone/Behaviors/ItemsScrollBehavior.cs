@@ -23,30 +23,26 @@ namespace Inoreader.Behaviors
 		public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
 			"Command", typeof(ICommand), typeof(ItemsScrollBehavior), new PropertyMetadata(default(ICommand)));
 
-		// TODO How to set right Y coord? we need skeep header only.
-		private int y = 50;
-
 		public ICommand Command
 		{
 			get { return (ICommand)GetValue(CommandProperty); }
 			set { SetValue(CommandProperty, value); }
 		}
 
-		public ItemsScrollBehavior()
+		private void UpdateCheckPoint()
 		{
-			_checkPoint = new Point(Window.Current.Bounds.Width / 2, y);
+			var control = (FrameworkElement)AssociatedObject;
+			var transform = control.TransformToVisual(Window.Current.Content);
 
-			Window.Current.SizeChanged += Window_SizeChanged;
-		}
-
-		private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs e)
-		{
-			_checkPoint = new Point(Window.Current.Bounds.Width / 2, y);
+			var p = new Point(Window.Current.Bounds.Width / 2, 10);
+			_checkPoint = transform.TransformPoint(p);
 		}
 
 		public void Attach(DependencyObject associatedObject)
 		{
 			AssociatedObject = associatedObject;
+
+			((FrameworkElement)AssociatedObject).SizeChanged += AssociatedObject_SizeChanged;
 
 			var scrollViewer = GetScrollViewer(associatedObject);
 			if (scrollViewer != null)
@@ -59,12 +55,17 @@ namespace Inoreader.Behaviors
 				if (element != null)
 					element.Loaded += element_Loaded;
 			}
+		}
 
-			//VisualTreeHelper.
+		void AssociatedObject_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			UpdateCheckPoint();
 		}
 
 		public void Detach()
 		{
+			((FrameworkElement)AssociatedObject).SizeChanged -= AssociatedObject_SizeChanged;
+
 			var scrollViewer = GetScrollViewer(AssociatedObject);
 			if (scrollViewer != null)
 				scrollViewer.ViewChanged -= MainPage_ViewChanged;
@@ -94,7 +95,9 @@ namespace Inoreader.Behaviors
 			var element = (DependencyObject)sender;
 			var scrollViewer = GetScrollViewer(element);
 			if (scrollViewer != null)
-			scrollViewer.ViewChanged += MainPage_ViewChanged;
+				scrollViewer.ViewChanged += MainPage_ViewChanged;
+
+			UpdateCheckPoint();
 		}
 
 		private ScrollViewer GetScrollViewer(DependencyObject depObj)

@@ -10,13 +10,19 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
 
-    <StackPanel Margin="10">
-		<StackPanel Orientation="Horizontal">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+
+		<StackPanel Orientation="Horizontal" Margin="10,10,10,0">
 			<Image Style="{StaticResource LogoImageStyle}" />
-			<TextBlock Text="Inoreader Free" Margin="10,0" FontWeight="SemiLight" FontSize="18.14" />
+			<TextBlock Text="Inoreader Free" FontSize="24" Margin="10,0" FontWeight="SemiLight" />
 		</StackPanel>
-		
-		<ComboBox x:Uid="SettingLanguageBox" 
+
+		<StackPanel Grid.Row="1" Margin="10">
+			<ComboBox x:Uid="SettingLanguageBox" 
 				  Header="Language" 
 				  ItemsSource="{Binding Languages}" 
 				  SelectedItem="{Binding SelectedLang, Mode=TwoWay}"
@@ -28,5 +34,6 @@
 				   Foreground="IndianRed"
 				   FontSize="16"
 				   Visibility="{Binding NeedAppRestart, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-	</StackPanel>
+		</StackPanel>
+	</Grid>   
 </storeApps:VisualStateAwarePage>

@@ -126,7 +126,6 @@ namespace Inoreader.Api
 
 		public Task<StreamResponse> GetStreamAsync(string id, int count = 20, string continuation = null)
 		{
-			//https://www.inoreader.com/reader/api/0/stream/contents/feed/http://habrahabr.ru/rss?n=20&xt=user/-/state/com.google/read&output=json
 			var uri = String.Format("https://www.inoreader.com/reader/api/0/stream/contents/{0}?n={1}&xt=user/-/state/com.google/read&output=json", id, count);
 			
 			if (continuation != null)

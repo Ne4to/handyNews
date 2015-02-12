@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.Foundation;
 using Windows.UI.Popups;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
+using Inoreader.Api.Models;
 using Inoreader.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -26,7 +33,7 @@ namespace Inoreader.ViewModels.Pages
 		private string _steamId;
 
 		private string _title;
-		private List<SteamItem> _items;
+		private SteamItemCollection _items;
 		private bool _isBusy;
 		private bool _currentItemRead;
 		private SteamItem _currentItem;
@@ -41,19 +48,19 @@ namespace Inoreader.ViewModels.Pages
 		public string Title
 		{
 			get { return _title; }
-			set { SetProperty(ref _title, value); }
+			private set { SetProperty(ref _title, value); }
 		}
 
-		public List<SteamItem> Items
+		public SteamItemCollection Items
 		{
 			get { return _items; }
-			set { SetProperty(ref _items, value); }
+			private set { SetProperty(ref _items, value); }
 		}
 
 		public bool IsBusy
 		{
 			get { return _isBusy; }
-			set { SetProperty(ref _isBusy, value); }
+			private set { SetProperty(ref _isBusy, value); }
 		}
 
 		public bool CurrentItemRead
@@ -125,28 +132,10 @@ namespace Inoreader.ViewModels.Pages
 			Exception error = null;
 			try
 			{
-				var stopwatch = Stopwatch.StartNew();
+				var steamItems = new SteamItemCollection(_apiClient, _steamId, _telemetryClient, b => IsBusy = b);
+				Title = await steamItems.InitAsync();
 
-				var stream = await _apiClient.GetStreamAsync(_steamId);
-
-				stopwatch.Stop();
-				_telemetryClient.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
-
-				Title = stream.title;
-
-				var itemsQuery = from it in stream.items
-								 select new SteamItem
-								 {
-									 Id = it.id,
-									 Published = UnixTimeStampToDateTime(it.published),
-									 Title = it.title,
-									 Content = it.summary.content,
-								 };
-
-				var steamItems = new List<SteamItem>(itemsQuery);
-				steamItems.Add(new EmptySpaceSteamItem());
 				Items = steamItems;
-
 				_currentItem = Items.FirstOrDefault();
 			}
 			catch (Exception ex)
@@ -168,12 +157,6 @@ namespace Inoreader.ViewModels.Pages
 			testData.Items.AddRange(Items.Select(i => i.Content));
 			var tt = JObject.FromObject(testData).ToString();
 #endif
-		}
-
-		public static DateTimeOffset UnixTimeStampToDateTime(int unixTimeStamp)
-		{
-			var epochDate = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-			return epochDate.AddSeconds(unixTimeStamp);
 		}
 
 		private void OnItemsScroll(object obj)
@@ -212,9 +195,9 @@ namespace Inoreader.ViewModels.Pages
 		private async void MarkAsRead(string id, bool newValue)
 		{
 			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsRead);
-			eventTelemetry.Properties.Add("AsRead", newValue.ToString());			
-			_telemetryClient.TrackEvent(eventTelemetry);		
-			
+			eventTelemetry.Properties.Add("AsRead", newValue.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
+
 			if (newValue)
 			{
 				await _apiClient.AddTagAsync(SpecialTags.MarkItemAsRead, id);
@@ -226,7 +209,7 @@ namespace Inoreader.ViewModels.Pages
 		}
 
 		private void SetCurrentItemRead(bool newValue)
-		{			
+		{
 			_currentItemRead = newValue;
 			OnPropertyChanged("CurrentItemRead");
 		}
@@ -278,5 +261,147 @@ namespace Inoreader.ViewModels.Pages
 
 	public class EmptySpaceSteamItem : SteamItem
 	{
+	}
+
+	public class SteamItemCollection : List<SteamItem>, ISupportIncrementalLoading, INotifyCollectionChanged
+	{
+		private readonly ApiClient _apiClient;
+		private readonly string _steamId;
+		private readonly TelemetryClient _telemetryClient;
+		private readonly Action<bool> _onBusy;
+		private string _continuation;
+
+		bool _busy = false;
+
+		public SteamItemCollection(ApiClient apiClient, string steamId, TelemetryClient telemetryClient, Action<bool> onBusy)
+			: base(20)
+		{
+			if (apiClient == null) throw new ArgumentNullException("apiClient");
+			if (steamId == null) throw new ArgumentNullException("steamId");
+			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (onBusy == null) throw new ArgumentNullException("onBusy");
+
+			_apiClient = apiClient;
+			_steamId = steamId;
+			_telemetryClient = telemetryClient;
+			_onBusy = onBusy;
+		}
+
+		public async Task<string> InitAsync()
+		{
+			var stream = await LoadAsync(20, null);
+			_continuation = stream.continuation;
+			var itemsQuery = GetItems(stream);
+
+			AddRange(itemsQuery);
+			Add(new EmptySpaceSteamItem());
+
+			return stream.title;
+		}
+
+		private static IEnumerable<SteamItem> GetItems(StreamResponse stream)
+		{
+			var itemsQuery = from it in stream.items
+							 select new SteamItem
+							 {
+								 Id = it.id,
+								 Published = UnixTimeStampToDateTime(it.published),
+								 Title = it.title,
+								 Content = it.summary.content,
+							 };
+			return itemsQuery;
+		}
+
+		private async Task<StreamResponse> LoadAsync(int count, string continuation)
+		{
+			StreamResponse stream;
+
+			_onBusy(true);
+			try
+			{
+				var stopwatch = Stopwatch.StartNew();
+				
+				stream = await _apiClient.GetStreamAsync(_steamId, count, continuation);
+
+				stopwatch.Stop();
+				_telemetryClient.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
+			}
+			finally
+			{
+				_onBusy(false);
+			}
+
+			return stream;
+		}
+
+		public static DateTimeOffset UnixTimeStampToDateTime(int unixTimeStamp)
+		{
+			var epochDate = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+			return epochDate.AddSeconds(unixTimeStamp);
+		}
+
+		#region ISupportIncrementalLoading
+
+		public bool HasMoreItems
+		{
+			get { return !String.IsNullOrEmpty(_continuation); }
+		}
+
+		public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+		{
+			if (_busy)
+			{
+				throw new InvalidOperationException("Only one operation in flight at a time");
+			}
+
+			_busy = true;
+
+			return AsyncInfo.Run((c) => LoadMoreItemsAsync(c, count));
+		}
+
+		#endregion
+
+		#region INotifyCollectionChanged
+
+		public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+		#endregion
+
+		async Task<LoadMoreItemsResult> LoadMoreItemsAsync(CancellationToken c, uint count)
+		{
+			try
+			{
+				var stream = await LoadAsync((int)count, _continuation);
+				_continuation = stream.continuation;
+
+				var items = GetItems(stream).ToArray();
+				var baseIndex = Count - 1;
+
+				InsertRange(Count - 1, items);
+				
+				// Now notify of the new items
+				NotifyOfInsertedItems(baseIndex, items.Length);
+
+				return new LoadMoreItemsResult { Count = (uint)items.Length };
+			}
+			finally
+			{
+				_busy = false;
+			}
+		}
+
+		void NotifyOfInsertedItems(int baseIndex, int count)
+		{
+			if (CollectionChanged == null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < count; i++)
+			{
+				var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this[baseIndex], baseIndex);
+				CollectionChanged(this, args);
+			}
+		}
 	}
 }

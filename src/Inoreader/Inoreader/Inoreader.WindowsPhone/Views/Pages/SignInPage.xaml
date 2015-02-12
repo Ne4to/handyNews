@@ -17,7 +17,7 @@
 	</Page.Resources>
 
     <Grid>
-		<StackPanel Margin="10,0">
+		<StackPanel Margin="10">
 			<StackPanel Orientation="Horizontal">
 				<Image Style="{StaticResource LogoImageStyle}" />
 				<TextBlock x:Uid="SignInHeader" Text="Sign in" FontSize="24" Margin="10,0" FontWeight="SemiLight" />

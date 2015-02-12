@@ -10,7 +10,7 @@
 
 	<!--<SolidColorBrush Color="#F1F5FA" x:Key="ApplicationPageBackgroundThemeBrush" />-->
 	<SolidColorBrush Color="#D7DDE6" x:Key="ApplicationPageBackgroundThemeBrush" />
-	
+
 	<Style x:Key="LogoImageStyle" TargetType="Image">
 		<Setter Property="Width" Value="24" />
 		<Setter Property="Height" Value="24" />
@@ -21,7 +21,7 @@
 		<Setter Property="Background" Value="#33537F" />
 		<Setter Property="Foreground" Value="White" />
 	</Style>
-	
+
 	<Style TargetType="ProgressRing">
 		<Setter Property="Foreground" Value="#33537F" />
 		<Setter Property="Background" Value="Transparent" />
@@ -29,8 +29,14 @@
 		<Setter Property="HorizontalAlignment" Value="Center" />
 	</Style>
 
+	<Style TargetType="ProgressBar">
+		<Setter Property="Foreground" Value="#33537F" />
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="VerticalAlignment" Value="Top" />
+	</Style>
+
 	<!-- #region Button style -->
-	
+
 	<Thickness x:Key="PhoneBorderThickness">2.5</Thickness>
 	<FontFamily x:Key="PhoneFontFamilyNormal">Segoe WP</FontFamily>
 	<FontWeight x:Key="PhoneButtonFontWeight">Semibold</FontWeight>
@@ -391,7 +397,7 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
-	
+
 	<Style TargetType="ComboBoxItem">
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="Foreground" Value="White"/>
@@ -526,7 +532,7 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
-	
+
 	<!-- #endregion -->
 
 </ResourceDictionary>
