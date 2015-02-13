@@ -151,6 +151,9 @@
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="ErrorShareMessage" xml:space="preserve">
+    <value>Nothing to share</value>
+  </data>
   <data name="EverythingReadBlock.Text" xml:space="preserve">
     <value>Everything read</value>
   </data>
@@ -186,6 +189,10 @@
   </data>
   <data name="SettingsSystemLanguage" xml:space="preserve">
     <value>System language</value>
+  </data>
+  <data name="ShareAppBarButton.Label" xml:space="preserve">
+    <value>share</value>
+    <comment>application bar button</comment>
   </data>
   <data name="SignInButton.Content" xml:space="preserve">
     <value>Sign in</value>

@@ -149,6 +149,9 @@
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Ошибка</value>
   </data>
+  <data name="ErrorShareMessage" xml:space="preserve">
+    <value>Нечем поделиться</value>
+  </data>
   <data name="EverythingReadBlock.Text" xml:space="preserve">
     <value>Все прочитано</value>
   </data>
@@ -183,6 +186,10 @@
   </data>
   <data name="SettingsSystemLanguage" xml:space="preserve">
     <value>Язык системы</value>
+  </data>
+  <data name="ShareAppBarButton.Label" xml:space="preserve">
+    <value>поделиться</value>
+    <comment>application bar button</comment>
   </data>
   <data name="SignInButton.Content" xml:space="preserve">
     <value>Войти</value>

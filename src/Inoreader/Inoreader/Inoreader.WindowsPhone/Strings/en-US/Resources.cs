@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/13/2015 21:31:15
+// 	Generated: 02/13/2015 22:24:04
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -82,6 +82,17 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("ErrorDialogTitle");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "Nothing to share"
+        /// </summary>
+        public static string ErrorShareMessage
+        {
+            get
+            {
+                return resourceLoader.GetString("ErrorShareMessage");
             }
         }
         

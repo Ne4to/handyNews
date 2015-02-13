@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
@@ -30,12 +31,14 @@ namespace Inoreader.ViewModels.Pages
 		private SteamItemCollection _items;
 		private bool _isBusy;
 		private bool _currentItemRead;
+		private bool _currentItemReadEnabled;
 		private SteamItem _currentItem;
 
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
 		private DelegateCommand _openWebCommand;
 		private ICommand _refreshCommand;
+		private DelegateCommand _shareCommand;
 
 		#endregion
 
@@ -69,6 +72,12 @@ namespace Inoreader.ViewModels.Pages
 			}
 		}
 
+		public bool CurrentItemReadEnabled
+		{
+			get { return _currentItemReadEnabled; }
+			set { SetProperty(ref _currentItemReadEnabled, value); }
+		}
+
 		#endregion
 
 		#region Commands
@@ -81,7 +90,7 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand SelectItemCommand
 		{
 			get { return _selectItemCommand ?? (_selectItemCommand = new DelegateCommand<object>(OnSelectItem)); }
-		}		
+		}
 
 		public ICommand OpenWebCommand
 		{
@@ -91,6 +100,11 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand RefreshCommand
 		{
 			get { return _refreshCommand ?? (_refreshCommand = new DelegateCommand(OnRefresh)); }
+		}
+
+		public ICommand ShareCommand
+		{
+			get { return _shareCommand ?? (_shareCommand = new DelegateCommand(OnShare, CanShare)); }
 		}
 
 		#endregion
@@ -105,6 +119,9 @@ namespace Inoreader.ViewModels.Pages
 			_apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryClient = telemetryClient;
+
+			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+			dataTransferManager.DataRequested += dataTransferManager_DataRequested;
 		}
 
 		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
@@ -118,6 +135,12 @@ namespace Inoreader.ViewModels.Pages
 		public override void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
 		{
 			base.OnNavigatedFrom(viewModelState, suspending);
+
+			if (!suspending)
+			{
+				DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+				dataTransferManager.DataRequested -= dataTransferManager_DataRequested;
+			}
 		}
 #if DEBUG
 		class AAA
@@ -154,7 +177,9 @@ namespace Inoreader.ViewModels.Pages
 					SetCurrentItemRead(false);
 				}
 
+				CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceSteamItem);
 				RaiseOpenWebCommandCanExecuteChanged();
+				RaiseShareCommandCanExecuteChanged();
 			}
 			catch (Exception ex)
 			{
@@ -183,12 +208,21 @@ namespace Inoreader.ViewModels.Pages
 				_openWebCommand.RaiseCanExecuteChanged();
 		}
 
+		private void RaiseShareCommandCanExecuteChanged()
+		{
+			if (_shareCommand != null)
+				_shareCommand.RaiseCanExecuteChanged();
+		}
+
 		private void OnItemsScroll(object obj)
 		{
 			var items = (object[])obj;
 			var firstItem = (SteamItem)items[0];
 			if (firstItem is EmptySpaceSteamItem)
+			{
+				CurrentItemReadEnabled = false;
 				return;
+			}
 
 			if (!firstItem.NeedSetReadExplicitly && firstItem.Unread)
 			{
@@ -201,8 +235,11 @@ namespace Inoreader.ViewModels.Pages
 
 			_currentItem = firstItem;
 			_currentItem.IsSelected = true;
-			RaiseOpenWebCommandCanExecuteChanged();
 			SetCurrentItemRead(!_currentItem.Unread);
+
+			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceSteamItem);
+			RaiseOpenWebCommandCanExecuteChanged();
+			RaiseShareCommandCanExecuteChanged();			
 		}
 
 		private void OnSelectItem(object obj)
@@ -215,16 +252,23 @@ namespace Inoreader.ViewModels.Pages
 
 				_currentItem = item;
 				_currentItem.IsSelected = true;
-				RaiseOpenWebCommandCanExecuteChanged();
 				SetCurrentItemRead(!_currentItem.Unread);
+
+				CurrentItemReadEnabled = _currentItem != null;
+				RaiseOpenWebCommandCanExecuteChanged();
+				RaiseShareCommandCanExecuteChanged();				
+			}
+			else
+			{
+				CurrentItemReadEnabled = false;
 			}
 		}
-		
+
 		private bool CanOpenWeb()
 		{
 			return _currentItem != null && !String.IsNullOrEmpty(_currentItem.WebUri);
 		}
-		
+
 		private async void OnOpenWeb()
 		{
 			if (_currentItem == null || String.IsNullOrEmpty(_currentItem.WebUri))
@@ -234,11 +278,21 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(TelemetryEvents.OpenItemInWeb);
 			await Launcher.LaunchUriAsync(uri);
 		}
-		
+
 		private void OnRefresh()
 		{
 			_telemetryClient.TrackEvent(TelemetryEvents.ManualRefreshStream);
 			LoadData();
+		}
+
+		private void OnShare()
+		{
+			DataTransferManager.ShowShareUI();
+		}
+
+		private bool CanShare()
+		{
+			return _currentItem != null && !(_currentItem is EmptySpaceSteamItem);
 		}
 
 		private async void MarkAsRead(string id, bool newValue)
@@ -289,6 +343,23 @@ namespace Inoreader.ViewModels.Pages
 				SetCurrentItemRead(false);
 				MarkAsRead(_currentItem.Id, false);
 			}
+		}
+
+		void dataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
+		{
+			if (_currentItem == null || _currentItem is EmptySpaceSteamItem)
+			{
+				args.Request.FailWithDisplayText(Strings.Resources.ErrorShareMessage);
+				return;
+			}
+
+			var dataPackage = args.Request.Data;
+			dataPackage.Properties.Title = _currentItem.Title;
+			if (!String.IsNullOrEmpty(_currentItem.WebUri))
+				dataPackage.SetWebLink(new Uri(_currentItem.WebUri));
+
+			dataPackage.SetHtmlFormat(_currentItem.Content);
+
 		}
 	}
 }

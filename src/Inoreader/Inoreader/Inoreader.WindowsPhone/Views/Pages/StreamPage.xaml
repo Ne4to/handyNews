@@ -274,7 +274,8 @@
 			<AppBarToggleButton x:Uid="SetReadAppBarButton"
 								Label="read"
 								Icon="Read" 
-								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}" />
+								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}"
+								IsEnabled="{Binding CurrentItemReadEnabled}" />
 
 			<AppBarButton x:Uid="OpenInWebAppBarButton"
 						  Icon="World"
@@ -282,6 +283,13 @@
 						  Command="{Binding OpenWebCommand}"/>
 
 			<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding RefreshCommand}" />			
+			
+			<CommandBar.SecondaryCommands>
+				<AppBarButton x:Uid="ShareAppBarButton"
+							  Icon="ReShare"
+							  Label="share"
+							  Command="{Binding ShareCommand}"/>
+			</CommandBar.SecondaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
 
