@@ -12,6 +12,7 @@
     xmlns:behaviors="using:Inoreader.Behaviors"
     xmlns:resources="using:Inoreader.Resources"
     xmlns:details="using:Inoreader.Views.Details"
+    xmlns:converters="using:Inoreader.Converters"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
@@ -263,6 +264,8 @@
 				</DataTemplate>
 			</resources:SteamItemTemplateSelector.EmptySpaceTemplate>
 		</resources:SteamItemTemplateSelector>
+
+		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" />
 	</storeApps:VisualStateAwarePage.Resources>
 
 
@@ -301,6 +304,15 @@
 				</core:EventTriggerBehavior>
 			</interactivity:Interaction.Behaviors>
 		</ListView>
+
+		<TextBlock Grid.Row="1" 
+				   x:Uid="EverythingReadBlock" 
+				   Text="Everything read"
+				   HorizontalAlignment="Center"
+				   VerticalAlignment="Center" 
+				   FontSize="22"
+				   Foreground="#FF58677C"
+				   Visibility="{Binding Items.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}"/>
 	</Grid>
 </storeApps:VisualStateAwarePage>
 

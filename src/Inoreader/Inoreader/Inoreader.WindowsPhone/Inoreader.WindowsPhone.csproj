@@ -90,7 +90,9 @@
     <Compile Include="Converters\FormatStringConverter.cs" />
     <Compile Include="Converters\ItemClickEventArgsToItemConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
+    <Compile Include="Converters\ZeroCountToVisibilityConverter.cs" />
     <Compile Include="PageTokens.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Resources\SteamItemTemplateSelector.cs" />
     <Compile Include="Resources\SubscriptionItemTemplateSelector.cs" />
     <Compile Include="Services\ApplicationDataContainerExtensions.cs" />

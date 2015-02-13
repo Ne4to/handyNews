@@ -149,6 +149,9 @@
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Ошибка</value>
   </data>
+  <data name="EverythingReadBlock.Text" xml:space="preserve">
+    <value>Все прочитано</value>
+  </data>
   <data name="OpenInWebAppBarButton.Label" xml:space="preserve">
     <value>веб</value>
   </data>

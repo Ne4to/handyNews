@@ -1,20 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Xaml.Data;
+using Inoreader.Annotations;
 using Inoreader.Api;
 using Inoreader.Api.Models;
 using Microsoft.ApplicationInsights;
 
 namespace Inoreader.Models
 {
-	public class SteamItemCollection : List<SteamItem>, ISupportIncrementalLoading, INotifyCollectionChanged
+	public class SteamItemCollection : List<SteamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
 	{
 		private readonly ApiClient _apiClient;
 		private readonly string _steamId;
@@ -22,10 +25,10 @@ namespace Inoreader.Models
 		private readonly Action<bool> _onBusy;
 		private string _continuation;
 
-		bool _busy = false;
+		bool _busy;
 
 		public SteamItemCollection(ApiClient apiClient, string steamId, TelemetryClient telemetryClient, Action<bool> onBusy)
-			: base(20)
+			: base(10)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (steamId == null) throw new ArgumentNullException("steamId");
@@ -40,12 +43,13 @@ namespace Inoreader.Models
 
 		public async Task<string> InitAsync()
 		{
-			var stream = await LoadAsync(20, null);
+			var stream = await LoadAsync(10, null);
 			_continuation = stream.continuation;
 			var itemsQuery = GetItems(stream);
 
 			AddRange(itemsQuery);
 			Add(new EmptySpaceSteamItem());
+			OnPropertyChanged("Count");
 
 			return stream.title;
 		}
@@ -120,7 +124,7 @@ namespace Inoreader.Models
 
 			_busy = true;
 
-			return AsyncInfo.Run((c) => LoadMoreItemsAsync(c, count));
+			return AsyncInfo.Run(c => LoadMoreItemsAsync(c, count));
 		}
 
 		#endregion
@@ -142,6 +146,7 @@ namespace Inoreader.Models
 				var baseIndex = Count - 1;
 
 				InsertRange(Count - 1, items);
+				OnPropertyChanged("Count");
 
 				// Now notify of the new items
 				NotifyOfInsertedItems(baseIndex, items.Length);
@@ -167,5 +172,20 @@ namespace Inoreader.Models
 				CollectionChanged(this, args);
 			}
 		}
+
+		#region INotifyPropertyChanged
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		[NotifyPropertyChangedInvocator]
+		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+		{
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(propertyName));
+		}
+
+		#endregion
+
 	}
 }
