@@ -35,6 +35,7 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
 		private DelegateCommand _openWebCommand;
+		private ICommand _refreshCommand;
 
 		#endregion
 
@@ -85,6 +86,11 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand OpenWebCommand
 		{
 			get { return _openWebCommand ?? (_openWebCommand = new DelegateCommand(OnOpenWeb, CanOpenWeb)); }
+		}
+
+		public ICommand RefreshCommand
+		{
+			get { return _refreshCommand ?? (_refreshCommand = new DelegateCommand(OnRefresh)); }
 		}
 
 		#endregion
@@ -141,6 +147,11 @@ namespace Inoreader.ViewModels.Pages
 				if (_currentItem != null)
 				{
 					_currentItem.IsSelected = true;
+					SetCurrentItemRead(!_currentItem.Unread);
+				}
+				else
+				{
+					SetCurrentItemRead(false);
 				}
 
 				RaiseOpenWebCommandCanExecuteChanged();
@@ -222,6 +233,12 @@ namespace Inoreader.ViewModels.Pages
 			var uri = new Uri(_currentItem.WebUri);
 			_telemetryClient.TrackEvent(TelemetryEvents.OpenItemInWeb);
 			await Launcher.LaunchUriAsync(uri);
+		}
+		
+		private void OnRefresh()
+		{
+			_telemetryClient.TrackEvent(TelemetryEvents.ManualRefreshStream);
+			LoadData();
 		}
 
 		private async void MarkAsRead(string id, bool newValue)

@@ -279,7 +279,9 @@
 			<AppBarButton x:Uid="OpenInWebAppBarButton"
 						  Icon="World"
 						  Label="web"
-						  Command="{Binding OpenWebCommand}"/>			
+						  Command="{Binding OpenWebCommand}"/>
+
+			<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding RefreshCommand}" />			
 		</CommandBar>
 	</Page.BottomAppBar>
 
