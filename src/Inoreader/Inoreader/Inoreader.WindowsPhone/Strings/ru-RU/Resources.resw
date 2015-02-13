@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AboutAppBarButton.Label" xml:space="preserve">
-    <value>О программе</value>
+    <value>о программе</value>
     <comment>application bar button</comment>
   </data>
   <data name="AboutAppDescription.Text" xml:space="preserve">
@@ -159,10 +159,10 @@
     <value>Читать все</value>
   </data>
   <data name="RefreshAppBarButton.Label" xml:space="preserve">
-    <value>Обновить</value>
+    <value>обновить</value>
   </data>
   <data name="SetReadAppBarButton.Label" xml:space="preserve">
-    <value>Прочитано</value>
+    <value>прочитано</value>
     <comment>application bar button</comment>
   </data>
   <data name="SettingHideEmptySubscriptions.Content" xml:space="preserve">
@@ -172,7 +172,7 @@
     <value>Язык</value>
   </data>
   <data name="SettingsAppBarButton.Label" xml:space="preserve">
-    <value>Настройки</value>
+    <value>настройки</value>
     <comment>application bar button</comment>
   </data>
   <data name="SettingsRestartWarning.Text" xml:space="preserve">
@@ -198,6 +198,9 @@
   </data>
   <data name="SignInRememberMeBox.Content" xml:space="preserve">
     <value>Запомнить меня</value>
+  </data>
+  <data name="SignOutAppBarButton.Label" xml:space="preserve">
+    <value>выйти</value>
   </data>
   <data name="SignUpButton.Content" xml:space="preserve">
     <value>Регистрация</value>

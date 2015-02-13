@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AboutAppBarButton.Label" xml:space="preserve">
-    <value>About</value>
+    <value>about</value>
     <comment>application bar button</comment>
   </data>
   <data name="AboutAppDescription.Text" xml:space="preserve">
@@ -161,11 +161,11 @@
     <value>Read all</value>
   </data>
   <data name="RefreshAppBarButton.Label" xml:space="preserve">
-    <value>Refresh</value>
+    <value>refresh</value>
     <comment>application bar button</comment>
   </data>
   <data name="SetReadAppBarButton.Label" xml:space="preserve">
-    <value>Read</value>
+    <value>read</value>
     <comment>application bar button</comment>
   </data>
   <data name="SettingHideEmptySubscriptions.Content" xml:space="preserve">
@@ -175,7 +175,7 @@
     <value>Language</value>
   </data>
   <data name="SettingsAppBarButton.Label" xml:space="preserve">
-    <value>Settings</value>
+    <value>settings</value>
     <comment>application bar button</comment>
   </data>
   <data name="SettingsRestartWarning.Text" xml:space="preserve">
@@ -207,6 +207,9 @@
   <data name="SignInRememberMeBox.Content" xml:space="preserve">
     <value>Remember me</value>
     <comment>Sign in page</comment>
+  </data>
+  <data name="SignOutAppBarButton.Label" xml:space="preserve">
+    <value>sign out</value>
   </data>
   <data name="SignUpButton.Content" xml:space="preserve">
     <value>Sign up</value>

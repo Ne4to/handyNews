@@ -15,7 +15,7 @@ using ReactiveUI;
 
 namespace Inoreader.ViewModels.Pages
 {
-	public class SignInPageViewModel : ViewModel
+	public class SignInPageViewModel : ViewModel, INavigateBackwards
 	{
 		private readonly INavigationService _navigationService;
 		private readonly ICredentialService _credentialService;
@@ -160,6 +160,11 @@ namespace Inoreader.ViewModels.Pages
 				MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
 				await msgbox.ShowAsync();
 			}
+		}
+
+		public bool NavigateBack()
+		{
+			return true;
 		}
 	}
 

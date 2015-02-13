@@ -89,9 +89,10 @@ namespace Inoreader
 				{
 					if (!navigateBackwards.NavigateBack())
 					{
-						e.Handled = true;
-						return;
+						e.Handled = true;					
 					}
+
+					return;
 				}
 			}
 

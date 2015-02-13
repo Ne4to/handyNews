@@ -1,4 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#@ output extension=".config" #>
+<?xml version="1.0" encoding="utf-8"?>
 <ApplicationInsights schemaVersion="2014-05-30" xmlns="http://schemas.microsoft.com/ApplicationInsights/2013/Settings">
   <ActiveProfile>Production</ActiveProfile>
   <DebugBuildProfile>Development</DebugBuildProfile>
@@ -58,7 +62,17 @@
     </Profile>
   </Profiles>
   <!-- This key is for Application Insights resource 'Inoreader Free' in resource group 'Inoreader' -->
-  <InstrumentationKey>0ab09916-1a6f-465e-a0db-a46cdf9cd533</InstrumentationKey>  
+<# 
+// Get the Visual Studio API as a service:
+var dte = ((IServiceProvider)this.Host).GetService(typeof(DTE)) as DTE;
+var build = dte.Solution.SolutionBuild.ActiveConfiguration.Name;
+var instrumentationKey = 
+(build == "Release" 
+? "  <InstrumentationKey>d8e79305-061a-4d3f-8e37-f49546680a7d</InstrumentationKey>" 
+: "  <InstrumentationKey>0ab09916-1a6f-465e-a0db-a46cdf9cd533</InstrumentationKey>");
+
+Write(instrumentationKey);
+#>  
 
 <!-- 
     Learn more about Application Insights configuration with ApplicationInsights.config here: 

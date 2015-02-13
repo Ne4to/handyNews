@@ -269,7 +269,7 @@
 	<Page.BottomAppBar>
 		<CommandBar>
 			<AppBarToggleButton x:Uid="SetReadAppBarButton"
-								Label="Read"
+								Label="read"
 								Icon="Read" 
 								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}" />
 

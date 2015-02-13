@@ -66,11 +66,12 @@
 		<!--ClosedDisplayMode="Minimal"-->
 		<CommandBar>
 			<CommandBar.PrimaryCommands>
-				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="Refresh" Command="{Binding Subscriptions.RefreshCommand}" />
+				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding Subscriptions.RefreshCommand}" />
 			</CommandBar.PrimaryCommands>
 			<CommandBar.SecondaryCommands>
-				<AppBarButton x:Uid="SettingsAppBarButton" Label="Settings" Command="{Binding SettingsPageCommand}" />
-				<AppBarButton x:Uid="AboutAppBarButton" Label="About" Command="{Binding AboutPageCommand}" />
+				<AppBarButton x:Uid="SettingsAppBarButton" Label="settings" Command="{Binding SettingsPageCommand}" />
+				<AppBarButton x:Uid="AboutAppBarButton" Label="about" Command="{Binding AboutPageCommand}" />
+				<AppBarButton x:Uid="SignOutAppBarButton" Label="sign out" Command="{Binding SignOutCommand}" />
 			</CommandBar.SecondaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
