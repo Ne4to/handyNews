@@ -19,6 +19,7 @@
     <ApplicationInsightsResourceId>/subscriptions/c40bde5d-b8ab-49a3-bb30-f3a4f34bbe2f/resourcegroups/Inoreader/providers/microsoft.insights/components/Inoreader Free</ApplicationInsightsResourceId>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>arm</AppxBundlePlatforms>
+    <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
