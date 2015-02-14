@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
+using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -15,6 +16,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
+using NotificationsExtensions.BadgeContent;
 
 namespace Inoreader.ViewModels.Details
 {
@@ -179,6 +181,8 @@ namespace Inoreader.ViewModels.Details
 
 				TreeItems = _rootItems;
 				_isRoot = true;
+
+				UpdateBadge(unreadCount);
 			}
 			catch (Exception ex)
 			{
@@ -195,6 +199,15 @@ namespace Inoreader.ViewModels.Details
 				MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
 				await msgbox.ShowAsync();
 			}
+		}
+
+		private void UpdateBadge(UnreadCountResponse unreadCount)
+		{
+			var unreadAllItem = unreadCount.UnreadCounts.FirstOrDefault(uc => uc.Id.EndsWith("/state/com.google/reading-list", StringComparison.OrdinalIgnoreCase));
+			int totalUnreadCount = unreadAllItem != null ? unreadAllItem.Count : TreeItems.Sum(ti => ti.UnreadCount);
+
+			BadgeNumericNotificationContent badgeContent = new BadgeNumericNotificationContent((uint)totalUnreadCount);			
+			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeContent.CreateNotification());			
 		}
 
 		private void HideEmpty(List<TreeItemBase> allItems)
