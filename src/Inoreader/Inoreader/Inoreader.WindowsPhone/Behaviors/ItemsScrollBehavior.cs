@@ -6,6 +6,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Inoreader.Services;
 using Microsoft.Xaml.Interactivity;
 
 namespace Inoreader.Behaviors
@@ -44,7 +45,7 @@ namespace Inoreader.Behaviors
 
 			((FrameworkElement)AssociatedObject).SizeChanged += AssociatedObject_SizeChanged;
 
-			var scrollViewer = GetScrollViewer(associatedObject);
+			var scrollViewer = VisualTreeUtilities.GetVisualChild<ScrollViewer>(associatedObject);
 			if (scrollViewer != null)
 			{
 				scrollViewer.ViewChanged += MainPage_ViewChanged;
@@ -66,7 +67,7 @@ namespace Inoreader.Behaviors
 		{
 			((FrameworkElement)AssociatedObject).SizeChanged -= AssociatedObject_SizeChanged;
 
-			var scrollViewer = GetScrollViewer(AssociatedObject);
+			var scrollViewer = VisualTreeUtilities.GetVisualChild<ScrollViewer>(AssociatedObject);
 			if (scrollViewer != null)
 				scrollViewer.ViewChanged -= MainPage_ViewChanged;
 		}
@@ -93,25 +94,11 @@ namespace Inoreader.Behaviors
 		void element_Loaded(object sender, RoutedEventArgs e)
 		{
 			var element = (DependencyObject)sender;
-			var scrollViewer = GetScrollViewer(element);
+			var scrollViewer = VisualTreeUtilities.GetVisualChild<ScrollViewer>(element);
 			if (scrollViewer != null)
 				scrollViewer.ViewChanged += MainPage_ViewChanged;
 
 			UpdateCheckPoint();
-		}
-
-		private ScrollViewer GetScrollViewer(DependencyObject depObj)
-		{
-			if (depObj is ScrollViewer) return depObj as ScrollViewer;
-
-			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-			{
-				var child = VisualTreeHelper.GetChild(depObj, i);
-
-				var result = GetScrollViewer(child);
-				if (result != null) return result;
-			}
-			return null;
 		}
 	}
 }

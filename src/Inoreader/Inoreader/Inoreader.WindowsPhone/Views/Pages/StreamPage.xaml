@@ -230,8 +230,8 @@
 			</Setter>
 		</Style>
 
-		<resources:SteamItemTemplateSelector x:Key="SteamItemTemplateSelector">
-			<resources:SteamItemTemplateSelector.SteamItemTemplate>
+		<resources:StreamItemTemplateSelector x:Key="StreamItemTemplateSelector">
+			<resources:StreamItemTemplateSelector.StreamItemTemplate>
 				<DataTemplate>
 					<Border Margin="5,0,10,10" 
 							BorderThickness="1" 
@@ -257,13 +257,13 @@
 							</StackPanel>
 						</Grid></Border>
 				</DataTemplate>
-			</resources:SteamItemTemplateSelector.SteamItemTemplate>
-			<resources:SteamItemTemplateSelector.EmptySpaceTemplate>
+			</resources:StreamItemTemplateSelector.StreamItemTemplate>
+			<resources:StreamItemTemplateSelector.EmptySpaceTemplate>
 				<DataTemplate>
 					<details:EmptySpaceItem />
 				</DataTemplate>
-			</resources:SteamItemTemplateSelector.EmptySpaceTemplate>
-		</resources:SteamItemTemplateSelector>
+			</resources:StreamItemTemplateSelector.EmptySpaceTemplate>
+		</resources:StreamItemTemplateSelector>
 
 		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" />
 	</storeApps:VisualStateAwarePage.Resources>
@@ -302,9 +302,11 @@
 		<TextBlock Text="{Binding Title}" Style="{StaticResource PageHeaderTextStyle}" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="WordEllipsis" />
 		<ProgressBar Grid.Row="0" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-		<ListView Grid.Row="1" ItemsSource="{Binding Items}" 
+		<ListView Grid.Row="1" 
+				  x:Name="ItemsListView"
+				  ItemsSource="{Binding Items}" 
 				  ItemContainerStyle="{StaticResource ListViewItemStyle1}"
-				  ItemTemplateSelector="{StaticResource SteamItemTemplateSelector}" 
+				  ItemTemplateSelector="{StaticResource StreamItemTemplateSelector}" 
 				  IsItemClickEnabled="True">
 			<interactivity:Interaction.Behaviors>
 				<behaviors:ItemsScrollBehavior Command="{Binding ItemsScrollCommand}" />

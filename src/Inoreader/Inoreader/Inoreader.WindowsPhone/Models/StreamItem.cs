@@ -1,24 +1,40 @@
 using System;
+using System.Runtime.Serialization;
 using Microsoft.Practices.Prism.Mvvm;
 
 namespace Inoreader.Models
 {
-	public class SteamItem : BindableBase
+	[DataContract]
+	public class StreamItem : BindableBaseEx
 	{
 		#region Fields
 
+		[DataMember]
 		private bool _unread = true;
+		
+		[DataMember]
 		private bool _needSetReadExplicitly;
+		
+		[DataMember]
 		private bool _isSelected;
 
 		#endregion
 		
 		#region Properties
 		
+		[DataMember]
 		public string Id { get; set; }
+		
+		[DataMember]
 		public DateTimeOffset Published { get; set; }
+		
+		[DataMember]
 		public string Title { get; set; }
+		
+		[DataMember]
 		public string WebUri { get; set; }
+		
+		[DataMember]
 		public string Content { get; set; }
 
 		public bool Unread

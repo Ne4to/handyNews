@@ -7,6 +7,8 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Inoreader.Api;
+using Inoreader.Models;
+using Inoreader.Models.States;
 using Inoreader.Services;
 using Inoreader.ViewModels.Pages;
 using Microsoft.Practices.Prism.Mvvm;
@@ -114,6 +116,15 @@ namespace Inoreader
 		{
 			var typeName = viewType.ToString().Replace("Inoreader.Views", "Inoreader.ViewModels") + "ViewModel";
 			return Type.GetType(typeName);
+		}
+
+		protected override void OnRegisterKnownTypesForSerialization()
+		{
+			base.OnRegisterKnownTypesForSerialization();
+
+			SessionStateService.RegisterKnownType(typeof(StreamItem));
+			SessionStateService.RegisterKnownType(typeof(EmptySpaceStreamItem));
+			SessionStateService.RegisterKnownType(typeof(StreamItemCollectionState));
 		}
 	}
 }

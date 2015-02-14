@@ -92,16 +92,19 @@
     <Compile Include="Converters\ItemClickEventArgsToItemConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
     <Compile Include="Converters\ZeroCountToVisibilityConverter.cs" />
+    <Compile Include="Models\BindableBaseEx.cs" />
+    <Compile Include="Models\States\StreamItemCollectionState.cs" />
     <Compile Include="PageTokens.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="Resources\SteamItemTemplateSelector.cs" />
+    <Compile Include="Resources\StreamItemTemplateSelector.cs" />
     <Compile Include="Resources\SubscriptionItemTemplateSelector.cs" />
-    <Compile Include="Services\ApplicationDataContainerExtensions.cs" />
+    <Compile Include="Services\Extensions.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CredentialService.cs" />
     <Compile Include="Services\ICredentialService.cs" />
     <Compile Include="Services\RichTextBlockExtensions.cs" />
     <Compile Include="Services\SpecialTags.cs" />
+    <Compile Include="Services\VisualTreeUtilities.cs" />
     <Compile Include="Strings\en-US\Resources.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -113,14 +116,14 @@
     <Compile Include="Models\SubscriptionItem.cs" />
     <Compile Include="Models\TreeItemBase.cs" />
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
-    <Compile Include="Models\EmptySpaceSteamItem.cs" />
+    <Compile Include="Models\EmptySpaceStreamItem.cs" />
     <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
     <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
-    <Compile Include="Models\SteamItem.cs" />
-    <Compile Include="Models\SteamItemCollection.cs" />
+    <Compile Include="Models\StreamItem.cs" />
+    <Compile Include="Models\StreamItemCollection.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
     <Compile Include="Views\Details\EmptySpaceItem.xaml.cs">
@@ -132,6 +135,7 @@
     <Compile Include="Views\Pages\HubPage.xaml.cs">
       <DependentUpon>HubPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Views\Pages\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
@@ -181,6 +185,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ApplicationInsights.tt</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="ApplicationInsights.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -314,6 +319,7 @@
       <Name>Behaviors SDK %28XAML%29</Name>
     </SDKReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>

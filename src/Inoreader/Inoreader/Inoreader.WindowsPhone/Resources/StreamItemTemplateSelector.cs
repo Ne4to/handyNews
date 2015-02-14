@@ -4,9 +4,9 @@ using Inoreader.Models;
 
 namespace Inoreader.Resources
 {
-	public class SteamItemTemplateSelector : DataTemplateSelector
+	public class StreamItemTemplateSelector : DataTemplateSelector
 	{
-		public DataTemplate SteamItemTemplate { get; set; }
+		public DataTemplate StreamItemTemplate { get; set; }
 		public DataTemplate EmptySpaceTemplate { get; set; }
 
 		protected override DataTemplate SelectTemplateCore(object item)
@@ -15,10 +15,10 @@ namespace Inoreader.Resources
 				return base.SelectTemplateCore(null);
 
 			var type = item.GetType();
-			if (type == typeof(EmptySpaceSteamItem))
+			if (type == typeof(EmptySpaceStreamItem))
 				return EmptySpaceTemplate;
 
-			return SteamItemTemplate;
+			return StreamItemTemplate;
 		}
 	}
 }

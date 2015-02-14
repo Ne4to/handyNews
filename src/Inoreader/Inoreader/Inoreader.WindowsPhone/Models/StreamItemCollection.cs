@@ -13,32 +13,53 @@ using Windows.UI.Xaml.Data;
 using Inoreader.Annotations;
 using Inoreader.Api;
 using Inoreader.Api.Models;
+using Inoreader.Models.States;
 using Microsoft.ApplicationInsights;
 
 namespace Inoreader.Models
 {
-	public class SteamItemCollection : List<SteamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
+	public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
 	{
 		private readonly ApiClient _apiClient;
-		private readonly string _steamId;
+		private readonly string _streamId;
 		private readonly TelemetryClient _telemetryClient;
 		private readonly Action<bool> _onBusy;
 		private string _continuation;
 
 		bool _busy;
 
-		public SteamItemCollection(ApiClient apiClient, string steamId, TelemetryClient telemetryClient, Action<bool> onBusy)
+		public StreamItemCollection(ApiClient apiClient, string streamId, TelemetryClient telemetryClient, Action<bool> onBusy)
 			: base(10)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (steamId == null) throw new ArgumentNullException("steamId");
+			if (streamId == null) throw new ArgumentNullException("streamId");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (onBusy == null) throw new ArgumentNullException("onBusy");
 
 			_apiClient = apiClient;
-			_steamId = steamId;
+			_streamId = streamId;
 			_telemetryClient = telemetryClient;
 			_onBusy = onBusy;
+		}
+
+		public StreamItemCollection([NotNull] StreamItemCollectionState state, 
+			[NotNull] ApiClient apiClient,
+			[NotNull] TelemetryClient telemetryClient, 
+			[NotNull] Action<bool> onBusy)
+			: base (state.Items.Length)
+		{
+			if (state == null) throw new ArgumentNullException("state");
+			if (apiClient == null) throw new ArgumentNullException("apiClient");
+			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (onBusy == null) throw new ArgumentNullException("onBusy");
+
+			_apiClient = apiClient;
+			_telemetryClient = telemetryClient;
+			_onBusy = onBusy;
+
+			_streamId = state.StreamId;
+			_continuation = state.Continuation;
+			AddRange(state.Items);
 		}
 
 		public async Task<string> InitAsync()
@@ -48,16 +69,16 @@ namespace Inoreader.Models
 			var itemsQuery = GetItems(stream);
 
 			AddRange(itemsQuery);
-			Add(new EmptySpaceSteamItem());
+			Add(new EmptySpaceStreamItem());
 			OnPropertyChanged("Count");
 
 			return stream.title;
 		}
 
-		private static IEnumerable<SteamItem> GetItems(StreamResponse stream)
+		private static IEnumerable<StreamItem> GetItems(StreamResponse stream)
 		{
 			var itemsQuery = from it in stream.items
-							 select new SteamItem
+							 select new StreamItem
 							 {
 								 Id = it.id,
 								 Published = UnixTimeStampToDateTime(it.published),
@@ -89,7 +110,7 @@ namespace Inoreader.Models
 			{
 				var stopwatch = Stopwatch.StartNew();
 
-				stream = await _apiClient.GetStreamAsync(_steamId, count, continuation);
+				stream = await _apiClient.GetStreamAsync(_streamId, count, continuation);
 
 				stopwatch.Stop();
 				_telemetryClient.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
@@ -187,5 +208,15 @@ namespace Inoreader.Models
 
 		#endregion
 
+		public StreamItemCollectionState GetSate()
+		{
+			var state = new StreamItemCollectionState();
+
+			state.StreamId = _streamId;
+			state.Continuation = _continuation;
+			state.Items = this.ToArray();
+
+			return state;
+		}
 	}
 }

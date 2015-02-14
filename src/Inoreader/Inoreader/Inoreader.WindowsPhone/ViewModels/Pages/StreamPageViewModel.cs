@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
@@ -8,6 +9,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
 using Inoreader.Models;
+using Inoreader.Models.States;
 using Inoreader.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -25,14 +27,14 @@ namespace Inoreader.ViewModels.Pages
 		private readonly ApiClient _apiClient;
 		private readonly INavigationService _navigationService;
 		private readonly TelemetryClient _telemetryClient;
-		private string _steamId;
+		private string _streamId;
 
 		private string _title;
-		private SteamItemCollection _items;
+		private StreamItemCollection _items;
 		private bool _isBusy;
 		private bool _currentItemRead;
 		private bool _currentItemReadEnabled;
-		private SteamItem _currentItem;
+		private StreamItem _currentItem;
 
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
@@ -50,7 +52,7 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _title, value); }
 		}
 
-		public SteamItemCollection Items
+		public StreamItemCollection Items
 		{
 			get { return _items; }
 			private set { SetProperty(ref _items, value); }
@@ -75,7 +77,7 @@ namespace Inoreader.ViewModels.Pages
 		public bool CurrentItemReadEnabled
 		{
 			get { return _currentItemReadEnabled; }
-			set { SetProperty(ref _currentItemReadEnabled, value); }
+			private set { SetProperty(ref _currentItemReadEnabled, value); }
 		}
 
 		#endregion
@@ -126,22 +128,65 @@ namespace Inoreader.ViewModels.Pages
 
 		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
 		{
-			base.OnNavigatedTo(navigationParameter, navigationMode, viewModelState);
+			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
+			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
-			_steamId = (string)navigationParameter;
-			LoadData();
+			_streamId = (string)navigationParameter;
+
+			if (!RestoreState(viewModelState))
+				LoadData();
 		}
 
 		public override void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
 		{
-			base.OnNavigatedFrom(viewModelState, suspending);
+			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
+			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
-			if (!suspending)
+			if (suspending)
+			{
+				if (viewModelState != null)
+					SaveState(viewModelState);
+			}
+			else
 			{
 				DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
 				dataTransferManager.DataRequested -= dataTransferManager_DataRequested;
 			}
 		}
+
+		private void SaveState(Dictionary<string, object> viewModelState)
+		{
+			viewModelState["Title"] = Title;
+
+			if (Items != null)
+				viewModelState["Items"] = Items.GetSate();
+
+			viewModelState["CurrentItemRead"] = CurrentItemRead;
+			viewModelState["CurrentItemReadEnabled"] = CurrentItemReadEnabled;			
+		}
+
+		private bool RestoreState(Dictionary<string, object> viewModelState)
+		{
+			if (viewModelState == null)
+				return false;
+
+			Title = viewModelState.GetValue<string>("Title");
+
+			_currentItemRead = viewModelState.GetValue<bool>("CurrentItemRead");
+			OnPropertyChanged("CurrentItemRead");
+
+			CurrentItemReadEnabled = viewModelState.GetValue<bool>("CurrentItemReadEnabled");
+			
+			var itemsState = viewModelState.GetValue<StreamItemCollectionState>("Items");
+			if (itemsState == null)
+				return false;
+
+			_currentItem = itemsState.Items.FirstOrDefault(i => i.IsSelected);
+			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryClient, b => IsBusy = b);
+
+			return true;
+		}
+
 #if DEBUG
 		class AAA
 		{
@@ -154,6 +199,7 @@ namespace Inoreader.ViewModels.Pages
 		}
 		static AAA testData = new AAA();
 #endif
+
 		private async void LoadData()
 		{
 			IsBusy = true;
@@ -161,10 +207,10 @@ namespace Inoreader.ViewModels.Pages
 			Exception error = null;
 			try
 			{
-				var steamItems = new SteamItemCollection(_apiClient, _steamId, _telemetryClient, b => IsBusy = b);
-				Title = await steamItems.InitAsync();
+				var streamItems = new StreamItemCollection(_apiClient, _streamId, _telemetryClient, b => IsBusy = b);
+				Title = await streamItems.InitAsync();
 
-				Items = steamItems;
+				Items = streamItems;
 				_currentItem = Items.FirstOrDefault();
 
 				if (_currentItem != null)
@@ -177,7 +223,7 @@ namespace Inoreader.ViewModels.Pages
 					SetCurrentItemRead(false);
 				}
 
-				CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceSteamItem);
+				CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
 				RaiseOpenWebCommandCanExecuteChanged();
 				RaiseShareCommandCanExecuteChanged();
 			}
@@ -217,8 +263,8 @@ namespace Inoreader.ViewModels.Pages
 		private void OnItemsScroll(object obj)
 		{
 			var items = (object[])obj;
-			var firstItem = (SteamItem)items[0];
-			if (firstItem is EmptySpaceSteamItem)
+			var firstItem = (StreamItem)items[0];
+			if (firstItem is EmptySpaceStreamItem)
 			{
 				CurrentItemReadEnabled = false;
 				return;
@@ -237,15 +283,15 @@ namespace Inoreader.ViewModels.Pages
 			_currentItem.IsSelected = true;
 			SetCurrentItemRead(!_currentItem.Unread);
 
-			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceSteamItem);
+			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
 			RaiseOpenWebCommandCanExecuteChanged();
-			RaiseShareCommandCanExecuteChanged();			
+			RaiseShareCommandCanExecuteChanged();
 		}
 
 		private void OnSelectItem(object obj)
 		{
-			var item = obj as SteamItem;
-			if (item != null && !(item is EmptySpaceSteamItem))
+			var item = obj as StreamItem;
+			if (item != null && !(item is EmptySpaceStreamItem))
 			{
 				if (_currentItem != null)
 					_currentItem.IsSelected = false;
@@ -256,7 +302,7 @@ namespace Inoreader.ViewModels.Pages
 
 				CurrentItemReadEnabled = _currentItem != null;
 				RaiseOpenWebCommandCanExecuteChanged();
-				RaiseShareCommandCanExecuteChanged();				
+				RaiseShareCommandCanExecuteChanged();
 			}
 			else
 			{
@@ -292,7 +338,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private bool CanShare()
 		{
-			return _currentItem != null && !(_currentItem is EmptySpaceSteamItem);
+			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
 		}
 
 		private async void MarkAsRead(string id, bool newValue)
@@ -326,7 +372,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private void OnCurrentItemReadChanged(bool newValue)
 		{
-			if (_currentItem == null || _currentItem is EmptySpaceSteamItem)
+			if (_currentItem == null || _currentItem is EmptySpaceStreamItem)
 				return;
 
 			if (newValue)
@@ -347,7 +393,7 @@ namespace Inoreader.ViewModels.Pages
 
 		void dataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
 		{
-			if (_currentItem == null || _currentItem is EmptySpaceSteamItem)
+			if (_currentItem == null || _currentItem is EmptySpaceStreamItem)
 			{
 				args.Request.FailWithDisplayText(Strings.Resources.ErrorShareMessage);
 				return;
@@ -359,7 +405,6 @@ namespace Inoreader.ViewModels.Pages
 				dataPackage.SetWebLink(new Uri(_currentItem.WebUri));
 
 			dataPackage.SetHtmlFormat(_currentItem.Content);
-
 		}
 	}
 }
