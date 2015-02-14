@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
-using Windows.ApplicationModel;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
 using Inoreader.ViewModels.Details;
-using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -55,8 +53,8 @@ namespace Inoreader.ViewModels.Pages
 		{
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
-			
-			Subscriptions.LoadSubscriptions();
+
+			Subscriptions.OnNavigatedTo(navigationParameter, navigationMode, viewModelState);			
 		}
 
 		public override void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
@@ -64,7 +62,7 @@ namespace Inoreader.ViewModels.Pages
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
-			//base.OnNavigatedFrom(viewModelState, suspending);
+			Subscriptions.OnNavigatedFrom(viewModelState, suspending);			
 		}
 
 		public bool NavigateBack()

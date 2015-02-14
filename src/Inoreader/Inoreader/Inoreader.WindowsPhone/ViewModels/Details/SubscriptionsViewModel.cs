@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
 using Inoreader.Api.Models;
 using Inoreader.Models;
@@ -17,6 +18,7 @@ using Microsoft.Practices.Prism.Mvvm.Interfaces;
 
 namespace Inoreader.ViewModels.Details
 {
+	// ReSharper disable once ClassNeverInstantiated.Global
 	public class SubscriptionsViewModel : BindableBase
 	{
 		private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
@@ -46,19 +48,19 @@ namespace Inoreader.ViewModels.Details
 		public string SubscriptionsHeader
 		{
 			get { return _subscriptionsHeader; }
-			set { SetProperty(ref _subscriptionsHeader, value); }
+			private set { SetProperty(ref _subscriptionsHeader, value); }
 		}
 
 		public List<TreeItemBase> TreeItems
 		{
 			get { return _treeItems; }
-			set { SetProperty(ref _treeItems, value); }
+			private set { SetProperty(ref _treeItems, value); }
 		}
 
 		public bool IsBusy
 		{
 			get { return _isBusy; }
-			set { SetProperty(ref _isBusy, value); }
+			private set { SetProperty(ref _isBusy, value); }
 		}
 
 		#endregion
@@ -98,6 +100,8 @@ namespace Inoreader.ViewModels.Details
 			Exception error = null;
 			try
 			{
+				SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
+
 				var stopwatch = Stopwatch.StartNew();
 
 				var tags = await _apiClient.GetTagsAsync();
@@ -259,6 +263,39 @@ namespace Inoreader.ViewModels.Details
 			}
 
 			return true;
+		}
+
+		public void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
+		{
+			if (!LoadState(viewModelState))
+				LoadSubscriptions();
+		}
+
+		public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
+		{
+			if (viewModelState != null)
+				SaveState(viewModelState);
+		}
+
+		private void SaveState(Dictionary<string, object> viewModelState)
+		{
+			viewModelState["SubscriptionsHeader"] = SubscriptionsHeader;
+			viewModelState["RootItems"] = _rootItems;
+			viewModelState["IsRoot"] = _isRoot;
+			viewModelState["TreeItems"] = TreeItems;
+		}
+
+		private bool LoadState(Dictionary<string, object> viewModelState)
+		{
+			if (viewModelState == null)
+				return false;
+
+			SubscriptionsHeader = viewModelState.GetValue<string>("SubscriptionsHeader");
+			_rootItems = viewModelState.GetValue<List<TreeItemBase>>("RootItems");
+			_isRoot = viewModelState.GetValue<bool>("IsRoot");
+			TreeItems = viewModelState.GetValue<List<TreeItemBase>>("TreeItems");
+
+			return _rootItems != null && TreeItems != null;			
 		}
 	}
 }

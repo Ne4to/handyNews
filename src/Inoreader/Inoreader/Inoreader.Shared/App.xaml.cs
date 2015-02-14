@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -16,13 +17,8 @@ using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Microsoft.Practices.Unity;
 using Microsoft.ApplicationInsights;
 
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
-
 namespace Inoreader
 {
-	/// <summary>
-	/// Provides application-specific behavior to supplement the default Application class.
-	/// </summary>
 	public sealed partial class App
 	{
 		/// <summary>
@@ -67,11 +63,6 @@ namespace Inoreader
 			_container.RegisterInstance(_apiClient);
 			_container.RegisterInstance(_appSettingsService);
 			_container.RegisterInstance(TelemetryClient);			
-
-			// Set a factory for the ViewModelLocator to use the container to construct view models so their 
-			// dependencies get injected by the container
-			//ViewModelLocationProvider.
-			//ViewModelLocator.SetDefaultViewModelFactory((viewModelType) => _container.Resolve(viewModelType));
 
 			Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = _appSettingsService.DisplayCulture;
 
@@ -122,6 +113,13 @@ namespace Inoreader
 		{
 			base.OnRegisterKnownTypesForSerialization();
 
+			// Subscriptions page state
+			SessionStateService.RegisterKnownType(typeof(TreeItemBase));
+			SessionStateService.RegisterKnownType(typeof(SubscriptionItem));
+			SessionStateService.RegisterKnownType(typeof(CategoryItem));
+			SessionStateService.RegisterKnownType(typeof(List<TreeItemBase>));
+			
+			// Stream page state
 			SessionStateService.RegisterKnownType(typeof(StreamItem));
 			SessionStateService.RegisterKnownType(typeof(EmptySpaceStreamItem));
 			SessionStateService.RegisterKnownType(typeof(StreamItemCollectionState));

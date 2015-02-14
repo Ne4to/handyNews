@@ -33,7 +33,15 @@
 	<Style TargetType="TextBlock" x:Key="PageHeaderTextStyle">
 		<Setter Property="FontWeight" Value="SemiLight" />
 		<Setter Property="FontSize" Value="24" />
-		<Setter Property="Margin" Value="10" />		
+		<Setter Property="Margin" Value="5" />		
+	</Style>
+
+	<Style x:Key="EverythingReadTextBlockStyle" TargetType="TextBlock">
+		<Setter Property="Text" Value="Everything read" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="FontSize" Value="22" />
+		<Setter Property="Foreground" Value="#FF58677C" />
 	</Style>
 
 	<!-- #region Button style -->

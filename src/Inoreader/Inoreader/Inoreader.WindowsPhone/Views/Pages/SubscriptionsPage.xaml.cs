@@ -1,18 +1,37 @@
-﻿using Windows.UI.Xaml.Navigation;
+﻿using System.Collections.Generic;
+using Inoreader.Services;
 using Microsoft.Practices.Prism.Mvvm;
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
 namespace Inoreader.Views.Pages
 {
-	/// <summary>
-	/// An empty page that can be used on its own or navigated to within a Frame.
-	/// </summary>
 	public sealed partial class SubscriptionsPage : IView
 	{
+		private readonly ScrollViewerState _itemsState;
+
 		public SubscriptionsPage()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
+			_itemsState = new ScrollViewerState(TreeItemsListView);
+		}
+
+		protected override void SaveState(Dictionary<string, object> pageState)
+		{
+			base.SaveState(pageState);
+
+			if (pageState == null || _itemsState == null)
+				return;
+
+			_itemsState.Save(pageState, "TreeItemsListView_");
+		}
+
+		protected override void LoadState(object navigationParameter, Dictionary<string, object> pageState)
+		{
+			base.LoadState(navigationParameter, pageState);
+
+			if (pageState == null || _itemsState == null)
+				return;
+
+			_itemsState.Load(pageState, "TreeItemsListView_");
 		}
 	}
 }

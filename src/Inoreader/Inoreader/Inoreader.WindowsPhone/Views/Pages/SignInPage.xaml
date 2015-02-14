@@ -11,7 +11,7 @@
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
 
     <Grid>
-		<StackPanel Margin="10">
+		<StackPanel Margin="5">
 			<TextBlock x:Uid="SignInHeader" Text="Sign in" Style="{StaticResource PageHeaderTextStyle}" Margin="0" />
 			
 			<TextBox x:Uid="SignInEmailBox" Header="Email" PlaceholderText="username@gmail.com" 

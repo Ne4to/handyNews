@@ -30,7 +30,7 @@
 		<resources:SubscriptionItemTemplateSelector x:Key="SubscriptionItemTemplateSelector">
 			<resources:SubscriptionItemTemplateSelector.CategoryTemplate>
 				<DataTemplate>
-					<Grid Margin="10,0">
+					<Grid Margin="5,0">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="*" />
@@ -46,7 +46,7 @@
 
 			<resources:SubscriptionItemTemplateSelector.ItemTemplate>
 				<DataTemplate>
-					<Grid Margin="10,0">
+					<Grid Margin="5,0">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="*" />
@@ -60,6 +60,8 @@
 				</DataTemplate>
 			</resources:SubscriptionItemTemplateSelector.ItemTemplate>
 		</resources:SubscriptionItemTemplateSelector>
+
+		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="0" />
 	</Page.Resources>
 
 	<Page.BottomAppBar>
@@ -84,10 +86,13 @@
 
 		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
 		
-		<ListView Grid.Row="1" DataContext="{Binding Subscriptions}" ItemsSource="{Binding TreeItems}"
-				          ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
-				          IsItemClickEnabled="True"
-				          ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+		<ListView Grid.Row="1" 
+				  x:Name="TreeItemsListView"
+				  DataContext="{Binding Subscriptions}" 
+				  ItemsSource="{Binding TreeItems}"
+				  ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
+				  IsItemClickEnabled="True"
+				  ContinuumNavigationTransitionInfo.ExitElementContainer="True">
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem">
 					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -100,6 +105,11 @@
 				</core:EventTriggerBehavior>
 			</interactivity:Interaction.Behaviors>
 		</ListView>
+
+		<TextBlock Grid.Row="1" 
+				   x:Uid="EverythingReadBlock"
+		           Visibility="{Binding Subscriptions.TreeItems.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
+				   Style="{StaticResource EverythingReadTextBlockStyle}" />
 
 		<ProgressRing Grid.Row="1" IsActive="{Binding Subscriptions.IsBusy}" />
 	</Grid>

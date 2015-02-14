@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Windows.UI.Xaml.Navigation;
 using Inoreader.Services;
 using Microsoft.Practices.Prism.Mvvm;
 

@@ -233,7 +233,7 @@
 		<resources:StreamItemTemplateSelector x:Key="StreamItemTemplateSelector">
 			<resources:StreamItemTemplateSelector.StreamItemTemplate>
 				<DataTemplate>
-					<Border Margin="5,0,10,10" 
+					<Border Margin="5,0,5,10" 
 							BorderThickness="1" 
 							BorderBrush="{Binding IsSelected, Converter={StaticResource IsSelectedToBrushConverter}}">
 						<Grid Background="#FEFEFE">
@@ -265,7 +265,7 @@
 			</resources:StreamItemTemplateSelector.EmptySpaceTemplate>
 		</resources:StreamItemTemplateSelector>
 
-		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" />
+		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="1" />
 	</storeApps:VisualStateAwarePage.Resources>
 
 
@@ -318,12 +318,8 @@
 		</ListView>
 
 		<TextBlock Grid.Row="1" 
-				   x:Uid="EverythingReadBlock" 
-				   Text="Everything read"
-				   HorizontalAlignment="Center"
-				   VerticalAlignment="Center" 
-				   FontSize="22"
-				   Foreground="#FF58677C"
-				   Visibility="{Binding Items.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}"/>
+				   x:Uid="EverythingReadBlock"
+		           Visibility="{Binding Items.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
+				   Style="{StaticResource EverythingReadTextBlockStyle}" />
 	</Grid>
 </storeApps:VisualStateAwarePage>

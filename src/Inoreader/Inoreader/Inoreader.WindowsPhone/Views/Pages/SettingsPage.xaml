@@ -18,7 +18,7 @@
 
 		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
 
-		<StackPanel Grid.Row="1" Margin="10,0,10,10">
+		<StackPanel Grid.Row="1" Margin="5,0,5,5">
 			<ComboBox x:Uid="SettingLanguageBox" 
 				  Header="Language" 
 				  ItemsSource="{Binding Languages}" 
