@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Input;
 using Windows.UI.Xaml.Navigation;
+using Inoreader.Annotations;
 using Inoreader.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Practices.Prism.Mvvm;
+using ReactiveUI;
 
 namespace Inoreader.ViewModels.Pages
 {
@@ -16,12 +19,17 @@ namespace Inoreader.ViewModels.Pages
 
 		private readonly AppSettingsService _settingsService;
 		private readonly TelemetryClient _telemetryClient;
+		private readonly CacheManager _cacheManager;
 		private readonly string _initialDisplayCulture;
 
 		private List<Lang> _languages;
 		private Lang _selectedLang;
 		private bool _hideEmptySubscriptions;
 		private bool _needAppRestart;
+		private ulong _totalCacheSize;
+		private bool _isCacheBusy;
+
+		private ReactiveCommand<object> _clearCacheComand;
 
 		#endregion
 
@@ -59,20 +67,53 @@ namespace Inoreader.ViewModels.Pages
 			set { SetProperty(ref _needAppRestart, value); }
 		}
 
+		public ulong TotalCacheSize
+		{
+			get { return _totalCacheSize; }
+			set { SetProperty(ref _totalCacheSize, value); }
+		}
+
+		public bool IsCacheBusy
+		{
+			get { return _isCacheBusy; }
+			set { SetProperty(ref _isCacheBusy, value); }
+		}
+
 		#endregion
 
-		public SettingsPageViewModel(AppSettingsService settingsService, TelemetryClient telemetryClient)
+		public ICommand ClearCacheCommand
+		{
+			get
+			{
+				if (_clearCacheComand == null)
+				{
+					var canExecute = this.WhenAny(vm => vm.TotalCacheSize, vm => vm.IsCacheBusy, (ts, cb) => ts.Value != 0UL && !cb.Value);
+					_clearCacheComand = ReactiveCommand.Create(canExecute);
+					_clearCacheComand.Subscribe(OnClearCache);
+				}
+
+				return _clearCacheComand;
+			}
+		}
+
+		public SettingsPageViewModel([NotNull] AppSettingsService settingsService,
+			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] CacheManager cacheManager)
 		{
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
+
 			_settingsService = settingsService;
 			_telemetryClient = telemetryClient;
+			_cacheManager = cacheManager;
 			_initialDisplayCulture = _settingsService.DisplayCulture;
 		}
 
-		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
+		public override async void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
 		{
-			base.OnNavigatedTo(navigationParameter, navigationMode, viewModelState);
+			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
+			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
 			Languages = new List<Lang>(new[]
 										{
@@ -84,6 +125,19 @@ namespace Inoreader.ViewModels.Pages
 			SelectedLang = Languages.FirstOrDefault(l => l.Name == _initialDisplayCulture) ?? Languages.FirstOrDefault();
 			NeedAppRestart = false;
 			HideEmptySubscriptions = _settingsService.HideEmptySubscriptions;
+
+			IsCacheBusy = true;
+			TotalCacheSize = await _cacheManager.GetTotalCacheSizeAsync();
+			IsCacheBusy = false;
+		}
+
+		public override void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
+		{
+			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
+			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
+
+			if (!suspending && _clearCacheComand != null)
+				_clearCacheComand.Dispose();
 		}
 
 		private void OnSelectedLangChanged()
@@ -114,6 +168,16 @@ namespace Inoreader.ViewModels.Pages
 
 			_settingsService.HideEmptySubscriptions = HideEmptySubscriptions;
 			_settingsService.Save();
+		}
+
+		private async void OnClearCache(object obj)
+		{
+			IsCacheBusy = true;
+
+			await _cacheManager.ClearCacheAsync();
+			TotalCacheSize = 0UL;
+
+			IsCacheBusy = false;
 		}
 	}
 

@@ -300,7 +300,7 @@
 		</Grid.RowDefinitions>
 
 		<TextBlock Text="{Binding Title}" Style="{StaticResource PageHeaderTextStyle}" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="WordEllipsis" />
-		<ProgressBar Grid.Row="0" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+		<ProgressBar Grid.Row="0" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
 		<ListView Grid.Row="1" 
 				  x:Name="ItemsListView"

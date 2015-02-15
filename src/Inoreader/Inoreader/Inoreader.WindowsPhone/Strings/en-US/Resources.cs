@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/15/2015 03:11:45
+// 	Generated: 02/15/2015 04:03:17
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -93,6 +93,17 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("ErrorShareMessage");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "bytes"
+        /// </summary>
+        public static string FileSizeBytes
+        {
+            get
+            {
+                return resourceLoader.GetString("FileSizeBytes");
             }
         }
         

@@ -88,6 +88,7 @@
     <Compile Include="Behaviors\ItemsScrollBehavior.cs" />
     <Compile Include="Converters\BooleanToBrushConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\FileSizeToStringConverter.cs" />
     <Compile Include="Converters\FormatStringConverter.cs" />
     <Compile Include="Converters\ItemClickEventArgsToItemConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />

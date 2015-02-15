@@ -157,6 +157,9 @@
   <data name="EverythingReadBlock.Text" xml:space="preserve">
     <value>Everything read</value>
   </data>
+  <data name="FileSizeBytes" xml:space="preserve">
+    <value>bytes</value>
+  </data>
   <data name="OfflineBlock.Text" xml:space="preserve">
     <value>offline</value>
   </data>
@@ -186,6 +189,12 @@
   <data name="SettingsAppBarButton.Label" xml:space="preserve">
     <value>settings</value>
     <comment>application bar button</comment>
+  </data>
+  <data name="SettingsCacheTitle.Text" xml:space="preserve">
+    <value>cache</value>
+  </data>
+  <data name="SettingsClearCacheButton.Content" xml:space="preserve">
+    <value>clear</value>
   </data>
   <data name="SettingsRestartWarning.Text" xml:space="preserve">
     <value>Restart the application to apply the changes.</value>

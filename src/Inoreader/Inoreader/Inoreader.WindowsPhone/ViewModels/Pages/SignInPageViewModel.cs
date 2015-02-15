@@ -98,7 +98,8 @@ namespace Inoreader.ViewModels.Pages
 #if DEBUG
 		public override async void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
 		{
-			base.OnNavigatedTo(navigationParameter, navigationMode, viewModelState);
+			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
+			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
 			var uri = new Uri("ms-appx:///Assets/DebugSignInData.json");
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
@@ -112,7 +113,8 @@ namespace Inoreader.ViewModels.Pages
 
 		public override void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
 		{
-			base.OnNavigatedFrom(viewModelState, suspending);
+			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
+			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
 			if (!suspending)
 			{

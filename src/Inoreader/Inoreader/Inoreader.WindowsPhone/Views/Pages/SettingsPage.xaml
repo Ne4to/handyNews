@@ -6,9 +6,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:storeApps="using:Microsoft.Practices.Prism.StoreApps"
     xmlns:mvvm="using:Microsoft.Practices.Prism.Mvvm"
+    xmlns:converters="using:Inoreader.Converters"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
+
+	<Page.Resources>
+		<converters:FileSizeToStringConverter x:Key="FileSizeToStringConverter" />
+	</Page.Resources>
 
 	<Grid>
 		<Grid.RowDefinitions>
@@ -34,7 +39,35 @@
 				   TextWrapping="Wrap" 
 				   Foreground="IndianRed"
 				   FontSize="16"
+				   Margin="0,0,0,5"
 				   Visibility="{Binding NeedAppRestart, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="5" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="2*" />
+				</Grid.ColumnDefinitions>
+
+				<ProgressBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsCacheBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+				
+				<TextBlock Grid.Row="1" Grid.Column="0" x:Uid="SettingsCacheTitle" Text="cache" FontSize="18" VerticalAlignment="Bottom" Margin="0,0,0,13.5" />
+				<TextBlock Grid.Row="1" Grid.Column="1"
+						   FontSize="18" VerticalAlignment="Bottom" Margin="0,0,0,13.5"
+						   Text="{Binding TotalCacheSize, Converter={StaticResource FileSizeToStringConverter}}" />
+				<Button Grid.Row="1" Grid.Column="2" 
+						x:Uid="SettingsClearCacheButton" Content="clear"
+						Margin="5,0,0,0" Command="{Binding ClearCacheCommand}" />				
+				
+				<!--// IsCacheBusy
+			// TotalCacheSize-->
+			</Grid>
+			
 		</StackPanel>
-	</Grid>   
+	</Grid>
 </storeApps:VisualStateAwarePage>

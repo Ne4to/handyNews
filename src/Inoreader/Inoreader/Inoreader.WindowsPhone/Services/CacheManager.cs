@@ -91,6 +91,27 @@ namespace Inoreader.Services
 				return 0UL;
 			}
 		}
+		
+		public async Task ClearCacheAsync()
+		{
+			try
+			{
+				var cacheFolder = await _rootCacheFolder.GetFolderAsync(CacheFolderName).AsTask().ConfigureAwait(false);
+				var files = await cacheFolder.GetFilesAsync().AsTask().ConfigureAwait(false);
+				
+				foreach (var storageFile in files)
+				{
+					await storageFile.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask().ConfigureAwait(false);
+				}
+			}
+			catch (FileNotFoundException)
+			{				
+			}
+			catch (Exception ex)
+			{
+				_telemetryClient.TrackException(ex);
+			}
+		}
 
 		public Task<bool> SaveSubscriptionsAsync(List<TreeItemBase> items)
 		{
@@ -185,6 +206,5 @@ namespace Inoreader.Services
 		}
 
 		#endregion
-
 	}
 }
