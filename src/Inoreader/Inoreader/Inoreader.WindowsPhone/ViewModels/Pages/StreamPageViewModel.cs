@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
+using Inoreader.Annotations;
 using Inoreader.Api;
+using Inoreader.Api.Exceptions;
 using Inoreader.Models;
 using Inoreader.Models.States;
 using Inoreader.Services;
@@ -27,6 +30,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly ApiClient _apiClient;
 		private readonly INavigationService _navigationService;
 		private readonly TelemetryClient _telemetryClient;
+		private readonly CacheManager _cacheManager;
 		private string _streamId;
 
 		private string _title;
@@ -35,6 +39,7 @@ namespace Inoreader.ViewModels.Pages
 		private bool _currentItemRead;
 		private bool _currentItemReadEnabled;
 		private StreamItem _currentItem;
+		private bool _isOffline;
 
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
@@ -80,6 +85,12 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _currentItemReadEnabled, value); }
 		}
 
+		public bool IsOffline
+		{
+			get { return _isOffline; }
+			private set { SetProperty(ref _isOffline, value); }
+		}
+
 		#endregion
 
 		#region Commands
@@ -112,15 +123,20 @@ namespace Inoreader.ViewModels.Pages
 		#endregion
 
 
-		public StreamPageViewModel(ApiClient apiClient, INavigationService navigationService, TelemetryClient telemetryClient)
+		public StreamPageViewModel([NotNull] ApiClient apiClient,
+			[NotNull] INavigationService navigationService,
+			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] CacheManager cacheManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryClient = telemetryClient;
+			_cacheManager = cacheManager;
 
 			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
 			dataTransferManager.DataRequested += dataTransferManager_DataRequested;
@@ -162,7 +178,7 @@ namespace Inoreader.ViewModels.Pages
 				viewModelState["Items"] = Items.GetSate();
 
 			viewModelState["CurrentItemRead"] = CurrentItemRead;
-			viewModelState["CurrentItemReadEnabled"] = CurrentItemReadEnabled;			
+			viewModelState["CurrentItemReadEnabled"] = CurrentItemReadEnabled;
 		}
 
 		private bool RestoreState(Dictionary<string, object> viewModelState)
@@ -176,7 +192,7 @@ namespace Inoreader.ViewModels.Pages
 			OnPropertyChanged("CurrentItemRead");
 
 			CurrentItemReadEnabled = viewModelState.GetValue<bool>("CurrentItemReadEnabled");
-			
+
 			var itemsState = viewModelState.GetValue<StreamItemCollectionState>("Items");
 			if (itemsState == null)
 				return false;
@@ -207,25 +223,14 @@ namespace Inoreader.ViewModels.Pages
 			Exception error = null;
 			try
 			{
-				var streamItems = new StreamItemCollection(_apiClient, _streamId, _telemetryClient, b => IsBusy = b);
-				Title = await streamItems.InitAsync();
-
-				Items = streamItems;
-				_currentItem = Items.FirstOrDefault();
-
-				if (_currentItem != null)
-				{
-					_currentItem.IsSelected = true;
-					SetCurrentItemRead(!_currentItem.Unread);
-				}
-				else
-				{
-					SetCurrentItemRead(false);
-				}
-
-				CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
-				RaiseOpenWebCommandCanExecuteChanged();
-				RaiseShareCommandCanExecuteChanged();
+				IsOffline = false;
+				await LoadDataInternalAsync();
+			}
+			catch (AuthenticationApiException)
+			{
+				_apiClient.ClearSession();
+				_navigationService.Navigate(PageTokens.SignIn, null);
+				return;
 			}
 			catch (Exception ex)
 			{
@@ -237,11 +242,53 @@ namespace Inoreader.ViewModels.Pages
 				IsBusy = false;
 			}
 
-			if (error != null)
+			if (error == null) return;
+
+			IsOffline = true;
+
+			IsBusy = true;
+			var cacheData = await _cacheManager.LoadStreamAsync(_streamId);
+			IsBusy = false;
+
+			if (cacheData != null)
 			{
-				MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
-				await msgbox.ShowAsync();
+				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryClient, b => IsBusy = b);
+				_currentItem = items.FirstOrDefault(i => i.IsSelected);
+				_currentItemRead = _currentItem != null && !_currentItem.Unread;
+				CurrentItemReadEnabled = _currentItem != null;
+
+				Items = items;
 			}
+
+			MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
+			await msgbox.ShowAsync();
+		}
+
+		private async Task LoadDataInternalAsync()
+		{
+			var streamItems = new StreamItemCollection(_apiClient, _streamId, _telemetryClient, b => IsBusy = b);
+			Title = await streamItems.InitAsync();
+
+			Items = streamItems;
+			_currentItem = Items.FirstOrDefault();
+
+			if (_currentItem != null)
+			{
+				_currentItem.IsSelected = true;
+				SetCurrentItemRead(!_currentItem.Unread);
+			}
+			else
+			{
+				SetCurrentItemRead(false);
+			}
+
+			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+			RaiseOpenWebCommandCanExecuteChanged();
+			RaiseShareCommandCanExecuteChanged();
+
+			if (Items != null)
+				await _cacheManager.SaveStreamAsync(Items.GetSate());
+
 #if DEBUG
 			testData.Items.AddRange(Items.Select(i => i.Content));
 			var tt = JObject.FromObject(testData).ToString();

@@ -146,7 +146,7 @@ namespace Inoreader.Services
 			string fileName;
 			if (!_streamIndex.TryGetValue(streamId, out fileName))
 			{
-				return null;
+				return Task.FromResult<StreamItemCollectionState>(null);
 			}
 
 			return LoadAsync<StreamItemCollectionState>(fileName, _streamSerializer);

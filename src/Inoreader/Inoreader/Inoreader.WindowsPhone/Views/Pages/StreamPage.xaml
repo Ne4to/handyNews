@@ -300,6 +300,8 @@
 		</Grid.RowDefinitions>
 
 		<TextBlock Text="{Binding Title}" Style="{StaticResource PageHeaderTextStyle}" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="WordEllipsis" />
+		<details:OfflineBar Grid.Row="0"
+		                    Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
 		<ProgressBar Grid.Row="0" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
 		<ListView Grid.Row="1" 

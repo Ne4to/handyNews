@@ -38,6 +38,7 @@ namespace Inoreader.ViewModels.Details
 		private readonly CacheManager _cacheManager;
 
 		private bool _isBusy;
+		private bool _isOffline;
 		private List<TreeItemBase> _treeItems;
 		private List<TreeItemBase> _rootItems;
 		private bool _isRoot = true;
@@ -67,9 +68,7 @@ namespace Inoreader.ViewModels.Details
 		{
 			get { return _isBusy; }
 			private set { SetProperty(ref _isBusy, value); }
-		}
-
-		private bool _isOffline;
+		}		
 
 		public bool IsOffline
 		{
@@ -92,7 +91,6 @@ namespace Inoreader.ViewModels.Details
 		}
 
 		#endregion
-
 
 		public SubscriptionsViewModel([NotNull] INavigationService navigationService,
 			[NotNull] ApiClient apiClient,
