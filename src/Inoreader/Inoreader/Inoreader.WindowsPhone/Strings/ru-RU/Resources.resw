@@ -239,4 +239,7 @@
   <data name="SubscriptionsSectionHeader" xml:space="preserve">
     <value>Подписки</value>
   </data>
+  <data name="SignInOAuthWarning.Text" xml:space="preserve">
+    <value>Если для входа вы обычно используете ваш Facebook или Google аккаун: Откройте настройки профиля Inoreader и установите пароль. Используйте этот пароль вместе с именем пользователя для входа.</value>
+  </data>
 </root>

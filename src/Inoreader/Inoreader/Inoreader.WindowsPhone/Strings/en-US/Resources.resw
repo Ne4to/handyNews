@@ -249,4 +249,7 @@
   <data name="SubscriptionsSectionHeader" xml:space="preserve">
     <value>Subscriptions</value>
   </data>
+  <data name="SignInOAuthWarning.Text" xml:space="preserve">
+    <value>In case you usually login with your Google of Facebook account: Open the Inoreader profile preferences and set a password. Use this with your username to login.</value>
+  </data>
 </root>
