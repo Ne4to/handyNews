@@ -14,9 +14,9 @@
 		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" Margin="0" />
 		<Image Source="ms-appx:///Assets/AboutLogo.png" HorizontalAlignment="Center" Margin="0,10" />
 		<TextBlock x:Uid="AboutAppDescription" Text="Free client for RSS aggregator www.inoreader.com" TextWrapping="Wrap" FontSize="14" />
-		<Button x:Uid="AboutReviewButton" Content="Review" Command="{Binding ReviewCommand}" />
-		<Button x:Uid="AboutSubmitBugButton" Content="Submit a bug" Command="{Binding SubmitBugCommand}" />
-		<Button x:Uid="AboutContributeButton" Content="Contribute" Command="{Binding ContributeCommand}" />
+		<Button x:Uid="AboutReviewButton" Content="review" Command="{Binding ReviewCommand}" />
+		<Button x:Uid="AboutSubmitBugButton" Content="submit a bug" Command="{Binding SubmitBugCommand}" />
+		<Button x:Uid="AboutContributeButton" Content="contribute" Command="{Binding ContributeCommand}" />
 		<TextBlock>
 			<Run x:Uid="AboutAppVersionLabel" Text="version: " />
 			<Run Text="{Binding AppVersion}" />

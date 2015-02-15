@@ -129,15 +129,15 @@
     <value>version: </value>
   </data>
   <data name="AboutContributeButton.Content" xml:space="preserve">
-    <value>Contribute</value>
+    <value>contribute</value>
     <comment>About page</comment>
   </data>
   <data name="AboutReviewButton.Content" xml:space="preserve">
-    <value>Review</value>
+    <value>review</value>
     <comment>About page</comment>
   </data>
   <data name="AboutSubmitBugButton.Content" xml:space="preserve">
-    <value>Submit a bug</value>
+    <value>submit a bug</value>
     <comment>About page</comment>
   </data>
   <data name="AppDescription" xml:space="preserve">

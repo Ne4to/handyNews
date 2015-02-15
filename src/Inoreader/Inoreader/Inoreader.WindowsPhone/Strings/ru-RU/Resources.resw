@@ -129,15 +129,15 @@
     <value>версия: </value>
   </data>
   <data name="AboutContributeButton.Content" xml:space="preserve">
-    <value>Участие в проекте</value>
+    <value>участие в проекте</value>
     <comment>About page</comment>
   </data>
   <data name="AboutReviewButton.Content" xml:space="preserve">
-    <value>Написать отзыв</value>
+    <value>написать отзыв</value>
     <comment>About page</comment>
   </data>
   <data name="AboutSubmitBugButton.Content" xml:space="preserve">
-    <value>Сообщить об ошибке</value>
+    <value>сообщить об ошибке</value>
     <comment>About page</comment>
   </data>
   <data name="AppDescription" xml:space="preserve">
