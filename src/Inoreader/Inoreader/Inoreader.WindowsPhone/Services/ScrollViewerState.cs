@@ -35,7 +35,11 @@ namespace Inoreader.Services
 			if (pageState == null) throw new ArgumentNullException("pageState");
 
 			if (_scrollViewer == null)
-				return;
+			{
+				_scrollViewer = VisualTreeUtilities.GetVisualChild<ScrollViewer>(_element);
+				if (_scrollViewer == null)
+					return;
+			}
 
 			pageState[keyPrefix + "ScrollableWidth"] = _scrollViewer.ScrollableWidth;
 			pageState[keyPrefix + "ScrollableHeight"] = _scrollViewer.ScrollableHeight;
