@@ -30,6 +30,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly TelemetryClient _telemetryClient;
 		private readonly CacheManager _cacheManager;
 		private readonly TagsManager _tagsManager;
+		private readonly bool _showNewestFirst;
 		private string _streamId;
 
 		private string _title;
@@ -120,25 +121,27 @@ namespace Inoreader.ViewModels.Pages
 		}
 
 		#endregion
-
-
+		
 		public StreamPageViewModel([NotNull] ApiClient apiClient,
 			[NotNull] INavigationService navigationService,
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] CacheManager cacheManager, 
-			[NotNull] TagsManager tagsManager)
+			[NotNull] TagsManager tagsManager, 
+			[NotNull] AppSettingsService settingsService)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
+			if (settingsService == null) throw new ArgumentNullException("settingsService");
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryClient = telemetryClient;
 			_cacheManager = cacheManager;
 			_tagsManager = tagsManager;
+			_showNewestFirst = settingsService.ShowNewestFirst;
 
 			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
 			dataTransferManager.DataRequested += dataTransferManager_DataRequested;
@@ -215,7 +218,7 @@ namespace Inoreader.ViewModels.Pages
 				Items = new List<string>();
 			}
 		}
-		static AAA testData = new AAA();
+		static AAA testData = new AAA();		
 #endif
 
 		private async void LoadData()
@@ -268,7 +271,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private async Task LoadDataInternalAsync()
 		{
-			var streamItems = new StreamItemCollection(_apiClient, _streamId, _telemetryClient, b => IsBusy = b);
+			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, b => IsBusy = b);
 			Title = await streamItems.InitAsync();
 
 			Items = streamItems;

@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/15/2015 04:03:17
+// 	Generated: 02/15/2015 17:53:26
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -108,6 +108,28 @@ namespace Inoreader.Strings
         }
         
         /// <summary>
+        /// Localized resource similar to "newest first"
+        /// </summary>
+        public static string NewestFirstShowOrder
+        {
+            get
+            {
+                return resourceLoader.GetString("NewestFirstShowOrder");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "oldest first"
+        /// </summary>
+        public static string OldestFirstShowOrder
+        {
+            get
+            {
+                return resourceLoader.GetString("OldestFirstShowOrder");
+            }
+        }
+        
+        /// <summary>
         /// Localized resource similar to "Read all"
         /// </summary>
         public static string ReadAllSubscriptionItem
@@ -119,7 +141,7 @@ namespace Inoreader.Strings
         }
         
         /// <summary>
-        /// Localized resource similar to "System language"
+        /// Localized resource similar to "system language"
         /// </summary>
         public static string SettingsSystemLanguage
         {

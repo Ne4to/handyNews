@@ -9,6 +9,7 @@
 		public const string Contribute = "Contribute";
 		public const string ChangeDisplayCulture = "ChangeDisplayCulture";
 		public const string ChangeHideEmptySubscriptions = "ChangeHideEmptySubscriptions";
+		public const string ChangeShowOrder = "ChangeShowOrder";
 		public const string MarkAsRead = "MarkAsRead";		
 		public const string ManualRefreshSubscriptions = "ManualRefreshSubscriptions";
 		public const string ManualRefreshStream = "ManualRefreshStream";

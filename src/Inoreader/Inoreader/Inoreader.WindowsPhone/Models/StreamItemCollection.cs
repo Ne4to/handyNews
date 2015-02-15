@@ -22,13 +22,14 @@ namespace Inoreader.Models
 	{
 		private readonly ApiClient _apiClient;
 		private readonly string _streamId;
+		private readonly bool _showNewestFirst;
 		private readonly TelemetryClient _telemetryClient;
 		private readonly Action<bool> _onBusy;
 		private string _continuation;
 
 		bool _busy;
-
-		public StreamItemCollection(ApiClient apiClient, string streamId, TelemetryClient telemetryClient, Action<bool> onBusy)
+		
+		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, TelemetryClient telemetryClient, Action<bool> onBusy)
 			: base(10)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -40,6 +41,7 @@ namespace Inoreader.Models
 			_streamId = streamId;
 			_telemetryClient = telemetryClient;
 			_onBusy = onBusy;
+			_showNewestFirst = showNewestFirst;
 		}
 
 		public StreamItemCollection([NotNull] StreamItemCollectionState state, 
@@ -58,6 +60,7 @@ namespace Inoreader.Models
 			_onBusy = onBusy;
 
 			_streamId = state.StreamId;
+			_showNewestFirst = state.ShowNewestFirst;
 			_continuation = state.Continuation;
 			AddRange(state.Items);
 		}
@@ -110,7 +113,7 @@ namespace Inoreader.Models
 			{
 				var stopwatch = Stopwatch.StartNew();
 
-				stream = await _apiClient.GetStreamAsync(_streamId, count, continuation);
+				stream = await _apiClient.GetStreamAsync(_streamId, _showNewestFirst, count, continuation);
 
 				stopwatch.Stop();
 				_telemetryClient.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
@@ -215,6 +218,7 @@ namespace Inoreader.Models
 			state.StreamId = _streamId;
 			state.Continuation = _continuation;
 			state.Items = this.ToArray();
+			state.ShowNewestFirst = _showNewestFirst;
 
 			return state;
 		}

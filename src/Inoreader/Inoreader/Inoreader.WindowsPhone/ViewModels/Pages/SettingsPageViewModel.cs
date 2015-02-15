@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
+using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
 using Inoreader.Services;
@@ -28,6 +29,8 @@ namespace Inoreader.ViewModels.Pages
 		private bool _needAppRestart;
 		private ulong _totalCacheSize;
 		private bool _isCacheBusy;
+		private List<ShowOrderItem> _showOrderItems;
+		private ShowOrderItem _selectedShowOrder;
 
 		private ReactiveCommand<object> _clearCacheComand;
 
@@ -79,6 +82,20 @@ namespace Inoreader.ViewModels.Pages
 			set { SetProperty(ref _isCacheBusy, value); }
 		}
 
+		public List<ShowOrderItem> ShowOrderItems
+		{
+			get { return _showOrderItems; }
+			set { SetProperty(ref _showOrderItems, value); }
+		}
+
+		public ShowOrderItem SelectedShowOrder
+		{
+			get { return _selectedShowOrder; }
+			set { if (SetProperty(ref _selectedShowOrder, value))
+				OnSelectedShowOrderChanged();
+			}
+		}
+
 		#endregion
 
 		public ICommand ClearCacheCommand
@@ -126,6 +143,14 @@ namespace Inoreader.ViewModels.Pages
 			NeedAppRestart = false;
 			HideEmptySubscriptions = _settingsService.HideEmptySubscriptions;
 
+			ShowOrderItems = new List<ShowOrderItem>(new[]
+			{
+				new ShowOrderItem(true), 
+				new ShowOrderItem(false) 
+			});
+
+			SelectedShowOrder = ShowOrderItems.Single(s => s.Value == _settingsService.ShowNewestFirst);
+
 			IsCacheBusy = true;
 			TotalCacheSize = await _cacheManager.GetTotalCacheSizeAsync();
 			IsCacheBusy = false;
@@ -169,6 +194,20 @@ namespace Inoreader.ViewModels.Pages
 			_settingsService.HideEmptySubscriptions = HideEmptySubscriptions;
 			_settingsService.Save();
 		}
+		
+		private void OnSelectedShowOrderChanged()
+		{
+			if (SelectedShowOrder.Value != _settingsService.ShowNewestFirst)
+			{
+				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeShowOrder);
+				eventTelemetry.Properties.Add("OldValue", _settingsService.ShowNewestFirst.ToString());
+				eventTelemetry.Properties.Add("NewValue", SelectedShowOrder.Value.ToString());
+				_telemetryClient.TrackEvent(eventTelemetry);
+			}
+
+			_settingsService.ShowNewestFirst = SelectedShowOrder.Value;
+			_settingsService.Save();
+		}
 
 		private async void OnClearCache(object obj)
 		{
@@ -197,6 +236,18 @@ namespace Inoreader.ViewModels.Pages
 		{
 			Name = String.Empty;
 			Title = Strings.Resources.SettingsSystemLanguage;
+		}
+	}
+
+	public class ShowOrderItem
+	{
+		public bool Value { get; set; }
+		public string Title { get; set; }
+
+		public ShowOrderItem(bool value)
+		{
+			Value = value;
+			Title = value ? Strings.Resources.NewestFirstShowOrder : Strings.Resources.OldestFirstShowOrder;
 		}
 	}
 }

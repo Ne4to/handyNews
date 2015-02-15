@@ -160,8 +160,14 @@
   <data name="FileSizeBytes" xml:space="preserve">
     <value>bytes</value>
   </data>
+  <data name="NewestFirstShowOrder" xml:space="preserve">
+    <value>newest first</value>
+  </data>
   <data name="OfflineBlock.Text" xml:space="preserve">
     <value>offline</value>
+  </data>
+  <data name="OldestFirstShowOrder" xml:space="preserve">
+    <value>oldest first</value>
   </data>
   <data name="OpenInWebAppBarButton.Label" xml:space="preserve">
     <value>web</value>
@@ -181,10 +187,10 @@
     <comment>application bar button</comment>
   </data>
   <data name="SettingHideEmptySubscriptions.Content" xml:space="preserve">
-    <value>Hide empty subscriptions</value>
+    <value>hide empty subscriptions</value>
   </data>
   <data name="SettingLanguageBox.Header" xml:space="preserve">
-    <value>Language</value>
+    <value>language</value>
   </data>
   <data name="SettingsAppBarButton.Label" xml:space="preserve">
     <value>settings</value>
@@ -196,18 +202,21 @@
   <data name="SettingsClearCacheButton.Content" xml:space="preserve">
     <value>clear</value>
   </data>
+  <data name="SettingShowOrderBox.Header" xml:space="preserve">
+    <value>display order</value>
+  </data>
   <data name="SettingsRestartWarning.Text" xml:space="preserve">
-    <value>Restart the application to apply the changes.</value>
+    <value>restart the application to apply the changes.</value>
   </data>
   <data name="SettingsSystemLanguage" xml:space="preserve">
-    <value>System language</value>
+    <value>system language</value>
   </data>
   <data name="ShareAppBarButton.Label" xml:space="preserve">
     <value>share</value>
     <comment>application bar button</comment>
   </data>
   <data name="SignInButton.Content" xml:space="preserve">
-    <value>Sign in</value>
+    <value>sign in</value>
     <comment>Sign in page</comment>
   </data>
   <data name="SignInEmailBox.Header" xml:space="preserve">
@@ -223,18 +232,18 @@
     <comment>Sign in page</comment>
   </data>
   <data name="SignInPasswordBox.Header" xml:space="preserve">
-    <value>Password</value>
+    <value>password</value>
     <comment>Sign in page</comment>
   </data>
   <data name="SignInRememberMeBox.Content" xml:space="preserve">
-    <value>Remember me</value>
+    <value>remember me</value>
     <comment>Sign in page</comment>
   </data>
   <data name="SignOutAppBarButton.Label" xml:space="preserve">
     <value>sign out</value>
   </data>
   <data name="SignUpButton.Content" xml:space="preserve">
-    <value>Sign up</value>
+    <value>sign up</value>
     <comment>Sign in page</comment>
   </data>
   <data name="SubscriptionsSectionHeader" xml:space="preserve">

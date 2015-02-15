@@ -12,6 +12,15 @@ namespace Inoreader.Models.States
 		public string Continuation { get; set; }
 
 		[DataMember]
-		public StreamItem[] Items { get; set; } 
+		public StreamItem[] Items { get; set; }
+
+		[DataMember]
+		public bool ShowNewestFirst { get; set; }
+
+		[OnDeserializing]
+		private void SetDefaultValues(StreamingContext c)
+		{
+			ShowNewestFirst = true;
+		}
 	}
 }
