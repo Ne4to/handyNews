@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.Phone.UI.Input;
@@ -30,10 +29,14 @@ namespace Inoreader
 		readonly IUnityContainer _container = new UnityContainer();
 		readonly ApiClient _apiClient = new ApiClient();
 		readonly AppSettingsService _appSettingsService = new AppSettingsService();
+		private TagsManager _tagsManager;
+		private CacheManager _cacheManager;
 
 		public App()
 		{
-			InitializeComponent();		
+			InitializeComponent();
+
+			Suspending += App_Suspending;
 		}
 
 		protected override Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
@@ -55,7 +58,7 @@ namespace Inoreader
 		protected override async Task OnInitializeAsync(IActivatedEventArgs args)
 		{
 			await base.OnInitializeAsync(args);
-
+			
 			_container.RegisterInstance<ISessionStateService>(SessionStateService);
 			_container.RegisterInstance<INavigationService>(NavigationService);
 
@@ -64,14 +67,32 @@ namespace Inoreader
 			_container.RegisterInstance(_appSettingsService);
 			_container.RegisterInstance(TelemetryClient);
 
-			var cacheManager = new CacheManager(TelemetryClient);
-			await cacheManager.InitAsync();
-			_container.RegisterInstance(cacheManager);
+			_cacheManager = new CacheManager(TelemetryClient);
+			await _cacheManager.InitAsync();
+			_container.RegisterInstance(_cacheManager);
+
+			var tagsManagerState = await _cacheManager.LoadTagsManagerStateAsync();
+			_tagsManager = new TagsManager(tagsManagerState, _apiClient, TelemetryClient);
+			_container.RegisterInstance(_tagsManager);
+			_tagsManager.ProcessQueue();			
 
 			Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = _appSettingsService.DisplayCulture;
 
 			ViewModelLocationProvider.SetDefaultViewModelFactory(ViewModelFactory);
 			ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(ViewModelTypeResolver);
+		}
+
+		async void App_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
+		{
+			if (_tagsManager == null || _cacheManager == null)
+				return;
+
+			var deferral = e.SuspendingOperation.GetDeferral();
+
+			var state = _tagsManager.GetState();
+			await _cacheManager.SaveTagsManagerStateAsync(state);
+
+			deferral.Complete();
 		}
 
 		protected override void OnHardwareButtonsBackPressed(object sender, BackPressedEventArgs e)

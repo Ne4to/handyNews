@@ -17,6 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlDebugApp", "HtmlDebugAp
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Inoreader\Inoreader.Shared\Inoreader.Shared.projitems*{c846010f-8eec-4557-9387-f84685ae2a22}*SharedItemsImports = 4
 		Inoreader\Inoreader.Shared\Inoreader.Shared.projitems*{3b6830c0-f3f2-4388-912d-dde49190eafe}*SharedItemsImports = 13
 		Inoreader\Inoreader.Shared\Inoreader.Shared.projitems*{7acca6a9-35bc-42fa-87d0-16faf2165403}*SharedItemsImports = 4
 	EndGlobalSection

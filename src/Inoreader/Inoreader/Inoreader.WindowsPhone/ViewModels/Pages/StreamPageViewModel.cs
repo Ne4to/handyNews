@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -15,7 +14,6 @@ using Inoreader.Models;
 using Inoreader.Models.States;
 using Inoreader.Services;
 using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -31,6 +29,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly INavigationService _navigationService;
 		private readonly TelemetryClient _telemetryClient;
 		private readonly CacheManager _cacheManager;
+		private readonly TagsManager _tagsManager;
 		private string _streamId;
 
 		private string _title;
@@ -126,17 +125,20 @@ namespace Inoreader.ViewModels.Pages
 		public StreamPageViewModel([NotNull] ApiClient apiClient,
 			[NotNull] INavigationService navigationService,
 			[NotNull] TelemetryClient telemetryClient,
-			[NotNull] CacheManager cacheManager)
+			[NotNull] CacheManager cacheManager, 
+			[NotNull] TagsManager tagsManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
+			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryClient = telemetryClient;
 			_cacheManager = cacheManager;
+			_tagsManager = tagsManager;
 
 			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
 			dataTransferManager.DataRequested += dataTransferManager_DataRequested;
@@ -388,27 +390,16 @@ namespace Inoreader.ViewModels.Pages
 			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
 		}
 
-		private async void MarkAsRead(string id, bool newValue)
+		private void MarkAsRead(string id, bool newValue)
 		{
-			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsRead);
-			eventTelemetry.Properties.Add("AsRead", newValue.ToString());
-			_telemetryClient.TrackEvent(eventTelemetry);
-
-			try
+			if (newValue)
 			{
-				if (newValue)
-				{
-					await _apiClient.AddTagAsync(SpecialTags.MarkItemAsRead, id);
-				}
-				else
-				{
-					await _apiClient.RemoveTagAsync(SpecialTags.MarkItemAsRead, id);
-				}
+				_tagsManager.MarkAsRead(id);				
 			}
-			catch (Exception ex)
+			else
 			{
-				_telemetryClient.TrackException(ex);
-			}
+				_tagsManager.MarkAsUnreadTagAction(id);				
+			}		
 		}
 
 		private void SetCurrentItemRead(bool newValue)

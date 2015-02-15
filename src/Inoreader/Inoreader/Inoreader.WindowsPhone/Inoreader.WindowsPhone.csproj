@@ -106,6 +106,7 @@
     <Compile Include="Services\ICredentialService.cs" />
     <Compile Include="Services\RichTextBlockExtensions.cs" />
     <Compile Include="Services\SpecialTags.cs" />
+    <Compile Include="Services\TagsManager.cs" />
     <Compile Include="Services\VisualTreeUtilities.cs" />
     <Compile Include="Strings\en-US\Resources.cs">
       <AutoGen>True</AutoGen>

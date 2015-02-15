@@ -18,6 +18,7 @@ namespace Inoreader.Services
 		private const string CacheFolderName = "Cache";
 		private const string SubscriptionsFileName = "Subscriptions.data";
 		private const string StreamIndexFileName = "StreamIndex.data";
+		private const string TagsManagerStateFileName = "TagsManagerState.data";
 
 		#endregion
 
@@ -30,6 +31,7 @@ namespace Inoreader.Services
 		private readonly DataContractSerializer _subscriptionsSerializer;
 		private readonly DataContractSerializer _streamIndexSerializer;
 		private readonly DataContractSerializer _streamSerializer;
+		private readonly DataContractSerializer _tagsManagerStateSerializer;
 
 		#endregion
 
@@ -53,9 +55,17 @@ namespace Inoreader.Services
 			knownTypes = new[]
 			{
 				typeof(StreamItem),
-				typeof(EmptySpaceStreamItem),				
+				typeof(EmptySpaceStreamItem)			
 			};
 			_streamSerializer = new DataContractSerializer(typeof(StreamItemCollectionState), knownTypes);
+
+			knownTypes = new[]
+			{
+				typeof(TagAction),
+				typeof(MarkAsReadTagAction),				
+				typeof(MarkAsUnreadTagAction)				
+			};
+			_tagsManagerStateSerializer = new DataContractSerializer(typeof(TagsManagerState), knownTypes);
 		}
 
 		public async Task InitAsync()
@@ -150,6 +160,16 @@ namespace Inoreader.Services
 			}
 
 			return LoadAsync<StreamItemCollectionState>(fileName, _streamSerializer);
+		}
+
+		public Task<bool> SaveTagsManagerStateAsync(TagsManagerState state)
+		{
+			return SaveAsync(state, TagsManagerStateFileName, _tagsManagerStateSerializer);
+		}
+
+		public Task<TagsManagerState> LoadTagsManagerStateAsync()
+		{
+			return LoadAsync<TagsManagerState>(TagsManagerStateFileName, _tagsManagerStateSerializer);
 		}
 
 		#region Utilities
