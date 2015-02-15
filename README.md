@@ -2,7 +2,10 @@
 Free Windows Phone 8.1 client for www.inoreader.com
 
 ### Features
+- Offline mode;
 - Choose feed, group or all items to read;
+- Newest first/oldest first;
+- Unread count on the start tile;
 - Automark item as read;
 - Feed's incremental loading;
 - open a post in the browser;
