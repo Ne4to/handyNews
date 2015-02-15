@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Inoreader.Annotations;
 using Inoreader.Api;
+using Inoreader.Api.Exceptions;
 using Inoreader.Api.Models;
 using Inoreader.Models;
 using Inoreader.Services;
@@ -32,6 +35,7 @@ namespace Inoreader.ViewModels.Details
 		private readonly ApiClient _apiClient;
 		private readonly TelemetryClient _telemetryClient;
 		private readonly AppSettingsService _settingsService;
+		private readonly CacheManager _cacheManager;
 
 		private bool _isBusy;
 		private List<TreeItemBase> _treeItems;
@@ -65,6 +69,14 @@ namespace Inoreader.ViewModels.Details
 			private set { SetProperty(ref _isBusy, value); }
 		}
 
+		private bool _isOffline;
+
+		public bool IsOffline
+		{
+			get { return _isOffline; }
+			private set { SetProperty(ref _isOffline, value); }
+		}
+
 		#endregion
 
 		#region Commands
@@ -82,17 +94,23 @@ namespace Inoreader.ViewModels.Details
 		#endregion
 
 
-		public SubscriptionsViewModel(INavigationService navigationService, ApiClient apiClient, TelemetryClient telemetryClient, AppSettingsService settingsService)
+		public SubscriptionsViewModel([NotNull] INavigationService navigationService,
+			[NotNull] ApiClient apiClient,
+			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] AppSettingsService settingsService,
+			[NotNull] CacheManager cacheManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
+			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
 			_settingsService = settingsService;
+			_cacheManager = cacheManager;
 		}
 
 		public async void LoadSubscriptions()
@@ -102,87 +120,14 @@ namespace Inoreader.ViewModels.Details
 			Exception error = null;
 			try
 			{
-				SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
-
-				var stopwatch = Stopwatch.StartNew();
-
-				var tags = await _apiClient.GetTagsAsync();
-				var subscriptions = await _apiClient.GetSubscriptionsAsync();
-				var unreadCount = await _apiClient.GetUnreadCountAsync();
-
-				stopwatch.Stop();
-				_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
-
-				var unreadCountDictionary = unreadCount.UnreadCounts.ToDictionary(uk => uk.Id, uk => uk.Count);
-
-				var catsQuery = from tag in tags.Tags
-								where CategoryRegex.IsMatch(tag.Id)
-								select new CategoryItem
-								{
-									Id = tag.Id,
-									SortId = tag.SortId,
-									UnreadCount = GetUnreadCount(unreadCountDictionary, tag.Id)
-								};
-
-				var categories = catsQuery.ToList();
-
-				foreach (var categoryItem in categories)
-				{
-					var subsQuery = from s in subscriptions.Subscriptions
-									where s.Categories != null
-										  && s.Categories.Any(c => String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
-									orderby s.Title// descending 
-									select CreateSubscriptionItem(s, unreadCountDictionary);
-
-					categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
-					categoryItem.Title = (from s in subscriptions.Subscriptions
-										  from c in s.Categories
-										  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
-										  select c.Label).FirstOrDefault();
-
-					var readAllItem = new SubscriptionItem
-					{
-						Id = categoryItem.Id,
-						SortId = categoryItem.SortId,
-						IconUrl = ReadAllIconUrl,
-						Title = Strings.Resources.ReadAllSubscriptionItem,
-						UnreadCount = categoryItem.UnreadCount
-					};
-
-					categoryItem.Subscriptions.Insert(0, readAllItem);
-				}
-
-				// hide empty groups
-				categories.RemoveAll(c => c.Subscriptions.Count == 0);
-
-				var singleItems = (from s in subscriptions.Subscriptions
-								   where s.Categories == null || s.Categories.Length == 0
-								   orderby s.Title
-								   select CreateSubscriptionItem(s, unreadCountDictionary)).ToList();
-
-				var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
-				allItems.AddRange(singleItems);
-
-				var readAllRootItem = new SubscriptionItem
-				{
-					Id = String.Empty,
-					IconUrl = ReadAllIconUrl,
-					Title = Strings.Resources.ReadAllSubscriptionItem,
-					UnreadCount = allItems.Sum(s => s.UnreadCount)
-				};
-				allItems.Insert(0, readAllRootItem);
-
-				if (_settingsService.HideEmptySubscriptions)
-				{
-					HideEmpty(allItems);
-				}
-
-				_rootItems = allItems;
-
-				TreeItems = _rootItems;
-				_isRoot = true;
-
-				UpdateBadge(unreadCount);
+				IsOffline = false;
+				await LoadSubscriptionsInternalAsync();
+			}
+			catch (AuthenticationApiException)
+			{
+				_apiClient.ClearSession();
+				_navigationService.Navigate(PageTokens.SignIn, null);
+				return;
 			}
 			catch (Exception ex)
 			{
@@ -194,11 +139,111 @@ namespace Inoreader.ViewModels.Details
 				IsBusy = false;
 			}
 
-			if (error != null)
+			if (error == null) return;
+
+			IsOffline = true;
+
+			IsBusy = true;
+			var cacheData = await _cacheManager.LoadSubscriptionsAsync();
+			IsBusy = false;
+			
+			if (cacheData != null)
 			{
-				MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
-				await msgbox.ShowAsync();
+				SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
+				_rootItems = cacheData;
+				_isRoot = true;
+				TreeItems = _rootItems;
 			}
+
+			MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
+			await msgbox.ShowAsync();
+		}
+
+		private async Task LoadSubscriptionsInternalAsync()
+		{
+			SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
+
+			var stopwatch = Stopwatch.StartNew();
+
+			var tags = await _apiClient.GetTagsAsync();
+			var subscriptions = await _apiClient.GetSubscriptionsAsync();
+			var unreadCount = await _apiClient.GetUnreadCountAsync();
+
+			stopwatch.Stop();
+			_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
+
+			var unreadCountDictionary = unreadCount.UnreadCounts.ToDictionary(uk => uk.Id, uk => uk.Count);
+
+			var catsQuery = from tag in tags.Tags
+							where CategoryRegex.IsMatch(tag.Id)
+							select new CategoryItem
+							{
+								Id = tag.Id,
+								SortId = tag.SortId,
+								UnreadCount = GetUnreadCount(unreadCountDictionary, tag.Id)
+							};
+
+			var categories = catsQuery.ToList();
+
+			foreach (var categoryItem in categories)
+			{
+				var subsQuery = from s in subscriptions.Subscriptions
+								where s.Categories != null
+									  && s.Categories.Any(c => String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
+								orderby s.Title// descending 
+								select CreateSubscriptionItem(s, unreadCountDictionary);
+
+				categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
+				categoryItem.Title = (from s in subscriptions.Subscriptions
+									  from c in s.Categories
+									  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
+									  select c.Label).FirstOrDefault();
+
+				var readAllItem = new SubscriptionItem
+				{
+					Id = categoryItem.Id,
+					SortId = categoryItem.SortId,
+					IconUrl = ReadAllIconUrl,
+					Title = Strings.Resources.ReadAllSubscriptionItem,
+					UnreadCount = categoryItem.UnreadCount
+				};
+
+				categoryItem.Subscriptions.Insert(0, readAllItem);
+			}
+
+			// hide empty groups
+			categories.RemoveAll(c => c.Subscriptions.Count == 0);
+
+			var singleItems = (from s in subscriptions.Subscriptions
+							   where s.Categories == null || s.Categories.Length == 0
+							   orderby s.Title
+							   select CreateSubscriptionItem(s, unreadCountDictionary)).ToList();
+
+			var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
+			allItems.AddRange(singleItems);
+
+			var readAllRootItem = new SubscriptionItem
+			{
+				Id = String.Empty,
+				IconUrl = ReadAllIconUrl,
+				Title = Strings.Resources.ReadAllSubscriptionItem,
+				UnreadCount = allItems.Sum(s => s.UnreadCount)
+			};
+			allItems.Insert(0, readAllRootItem);
+
+			if (_settingsService.HideEmptySubscriptions)
+			{
+				HideEmpty(allItems);
+			}
+
+			_rootItems = allItems;
+
+			TreeItems = _rootItems;
+			_isRoot = true;
+
+			UpdateBadge(unreadCount);
+
+			await _cacheManager.SaveSubscriptionsAsync(_rootItems);
 		}
 
 		private void UpdateBadge(UnreadCountResponse unreadCount)
@@ -206,8 +251,8 @@ namespace Inoreader.ViewModels.Details
 			var unreadAllItem = unreadCount.UnreadCounts.FirstOrDefault(uc => uc.Id.EndsWith("/state/com.google/reading-list", StringComparison.OrdinalIgnoreCase));
 			int totalUnreadCount = unreadAllItem != null ? unreadAllItem.Count : TreeItems.Sum(ti => ti.UnreadCount);
 
-			BadgeNumericNotificationContent badgeContent = new BadgeNumericNotificationContent((uint)totalUnreadCount);			
-			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeContent.CreateNotification());			
+			BadgeNumericNotificationContent badgeContent = new BadgeNumericNotificationContent((uint)totalUnreadCount);
+			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeContent.CreateNotification());
 		}
 
 		private void HideEmpty(List<TreeItemBase> allItems)
@@ -287,7 +332,7 @@ namespace Inoreader.ViewModels.Details
 		public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
 		{
 			if (viewModelState != null)
-				SaveState(viewModelState);
+				SaveState(viewModelState);				
 		}
 
 		private void SaveState(Dictionary<string, object> viewModelState)
@@ -308,7 +353,7 @@ namespace Inoreader.ViewModels.Details
 			_isRoot = viewModelState.GetValue<bool>("IsRoot");
 			TreeItems = viewModelState.GetValue<List<TreeItemBase>>("TreeItems");
 
-			return _rootItems != null && TreeItems != null;			
+			return _rootItems != null && TreeItems != null;
 		}
 	}
 }

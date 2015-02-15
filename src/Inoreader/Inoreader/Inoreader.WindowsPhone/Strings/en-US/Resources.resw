@@ -157,6 +157,9 @@
   <data name="EverythingReadBlock.Text" xml:space="preserve">
     <value>Everything read</value>
   </data>
+  <data name="OfflineBlock.Text" xml:space="preserve">
+    <value>offline</value>
+  </data>
   <data name="OpenInWebAppBarButton.Label" xml:space="preserve">
     <value>web</value>
   </data>

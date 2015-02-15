@@ -62,7 +62,11 @@ namespace Inoreader
 			_container.RegisterType<ICredentialService, CredentialService>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_apiClient);
 			_container.RegisterInstance(_appSettingsService);
-			_container.RegisterInstance(TelemetryClient);			
+			_container.RegisterInstance(TelemetryClient);
+
+			var cacheManager = new CacheManager(TelemetryClient);
+			await cacheManager.InitAsync();
+			_container.RegisterInstance(cacheManager);
 
 			Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = _appSettingsService.DisplayCulture;
 

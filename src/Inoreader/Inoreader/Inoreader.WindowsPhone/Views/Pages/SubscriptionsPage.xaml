@@ -11,6 +11,7 @@
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:resources="using:Inoreader.Resources"
     xmlns:converters="using:Inoreader.Converters"
+    xmlns:details="using:Inoreader.Views.Details"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
@@ -84,8 +85,11 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
-		
+		<Grid>
+			<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
+			<details:OfflineBar Visibility="{Binding Subscriptions.IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
+		</Grid>
+
 		<ListView Grid.Row="1" 
 				  x:Name="TreeItemsListView"
 				  DataContext="{Binding Subscriptions}" 

@@ -48,7 +48,6 @@ namespace Inoreader.Api
 
 			var response = await _httpClient.PostAsync(@"https://www.inoreader.com/accounts/ClientLogin", content).ConfigureAwait(false);
 
-			// 401
 			if (response.StatusCode == HttpStatusCode.Unauthorized)
 				throw new AuthenticationApiException(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 
@@ -157,6 +156,9 @@ namespace Inoreader.Api
 			}
 
 			var response = await _httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+
+			if (response.StatusCode == HttpStatusCode.Unauthorized)
+				throw new AuthenticationApiException(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 
 			response.EnsureSuccessStatusCode();
 
