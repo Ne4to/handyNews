@@ -28,7 +28,9 @@ namespace Inoreader.Models
 		private string _continuation;
 
 		bool _busy;
-		
+
+		public event EventHandler LoadMoreItemsError;
+
 		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, TelemetryClient telemetryClient, Action<bool> onBusy)
 			: base(10)
 		{
@@ -44,11 +46,11 @@ namespace Inoreader.Models
 			_showNewestFirst = showNewestFirst;
 		}
 
-		public StreamItemCollection([NotNull] StreamItemCollectionState state, 
+		public StreamItemCollection([NotNull] StreamItemCollectionState state,
 			[NotNull] ApiClient apiClient,
-			[NotNull] TelemetryClient telemetryClient, 
+			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] Action<bool> onBusy)
-			: base (state.Items.Length)
+			: base(state.Items.Length)
 		{
 			if (state == null) throw new ArgumentNullException("state");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -176,6 +178,15 @@ namespace Inoreader.Models
 				NotifyOfInsertedItems(baseIndex, items.Length);
 
 				return new LoadMoreItemsResult { Count = (uint)items.Length };
+			}
+			catch (Exception ex)
+			{
+				_telemetryClient.TrackException(ex);
+
+				if (LoadMoreItemsError != null)
+					LoadMoreItemsError(this, EventArgs.Empty);
+
+				return new LoadMoreItemsResult { Count = 0 };
 			}
 			finally
 			{

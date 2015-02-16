@@ -204,6 +204,7 @@ namespace Inoreader.ViewModels.Pages
 
 			_currentItem = itemsState.Items.FirstOrDefault(i => i.IsSelected);
 			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryClient, b => IsBusy = b);
+			Items.LoadMoreItemsError += (sender, args) => IsOffline = true;
 
 			return true;
 		}
@@ -272,6 +273,7 @@ namespace Inoreader.ViewModels.Pages
 		private async Task LoadDataInternalAsync()
 		{
 			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, b => IsBusy = b);
+			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;				
 			Title = await streamItems.InitAsync();
 
 			Items = streamItems;

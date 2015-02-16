@@ -127,6 +127,7 @@
   </data>
   <data name="AboutAppVersionLabel.Text" xml:space="preserve">
     <value>version: </value>
+    <comment>About page</comment>
   </data>
   <data name="AboutContributeButton.Content" xml:space="preserve">
     <value>contribute</value>
@@ -150,33 +151,42 @@
   </data>
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Error</value>
+    <comment>error dialog title</comment>
   </data>
   <data name="ErrorShareMessage" xml:space="preserve">
     <value>Nothing to share</value>
+    <comment>error share message</comment>
   </data>
   <data name="EverythingReadBlock.Text" xml:space="preserve">
     <value>Everything read</value>
+    <comment>center screen message</comment>
   </data>
   <data name="FileSizeBytes" xml:space="preserve">
     <value>bytes</value>
+    <comment>file size in bytes</comment>
   </data>
   <data name="NewestFirstShowOrder" xml:space="preserve">
     <value>newest first</value>
+    <comment>Settings - read newest first </comment>
   </data>
   <data name="OfflineBlock.Text" xml:space="preserve">
     <value>offline</value>
+    <comment>offline mode notification</comment>
   </data>
   <data name="OldestFirstShowOrder" xml:space="preserve">
     <value>oldest first</value>
+    <comment>Settings - read oldest first</comment>
   </data>
   <data name="OpenInWebAppBarButton.Label" xml:space="preserve">
     <value>web</value>
+    <comment>application bar button</comment>
   </data>
   <data name="PageHeaderTitle.Text" xml:space="preserve">
     <value>Inoreader Free</value>
   </data>
   <data name="ReadAllSubscriptionItem" xml:space="preserve">
     <value>Read all</value>
+    <comment>"Read all" item in the subscriptions list</comment>
   </data>
   <data name="RefreshAppBarButton.Label" xml:space="preserve">
     <value>refresh</value>
@@ -188,9 +198,11 @@
   </data>
   <data name="SettingHideEmptySubscriptions.Content" xml:space="preserve">
     <value>hide empty subscriptions</value>
+    <comment>settings - hide empty subscriptions checkbox</comment>
   </data>
   <data name="SettingLanguageBox.Header" xml:space="preserve">
     <value>language</value>
+    <comment>settings - language</comment>
   </data>
   <data name="SettingsAppBarButton.Label" xml:space="preserve">
     <value>settings</value>
@@ -198,18 +210,23 @@
   </data>
   <data name="SettingsCacheTitle.Text" xml:space="preserve">
     <value>cache</value>
+    <comment>settings - cache size label</comment>
   </data>
   <data name="SettingsClearCacheButton.Content" xml:space="preserve">
     <value>clear</value>
+    <comment>settings - clear cache button</comment>
   </data>
   <data name="SettingShowOrderBox.Header" xml:space="preserve">
     <value>display order</value>
+    <comment>settings - newest first/oldest first setting label</comment>
   </data>
   <data name="SettingsRestartWarning.Text" xml:space="preserve">
     <value>restart the application to apply the changes.</value>
+    <comment>settings - restart app warning</comment>
   </data>
   <data name="SettingsSystemLanguage" xml:space="preserve">
     <value>system language</value>
+    <comment>settings - default language title</comment>
   </data>
   <data name="ShareAppBarButton.Label" xml:space="preserve">
     <value>share</value>
@@ -241,6 +258,7 @@
   </data>
   <data name="SignOutAppBarButton.Label" xml:space="preserve">
     <value>sign out</value>
+    <comment>application bar button</comment>
   </data>
   <data name="SignUpButton.Content" xml:space="preserve">
     <value>sign up</value>
@@ -248,8 +266,10 @@
   </data>
   <data name="SubscriptionsSectionHeader" xml:space="preserve">
     <value>Subscriptions</value>
+    <comment>Subscriptions page header</comment>
   </data>
   <data name="SignInOAuthWarning.Text" xml:space="preserve">
     <value>In case you usually login with your Google of Facebook account: Open the Inoreader profile preferences and set a password. Use this with your username to login.</value>
+    <comment>Sign in page - Google and Facebook login instruction</comment>
   </data>
 </root>
