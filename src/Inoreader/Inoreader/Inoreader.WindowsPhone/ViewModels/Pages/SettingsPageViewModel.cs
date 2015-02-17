@@ -136,7 +136,8 @@ namespace Inoreader.ViewModels.Pages
 										{
 											new Lang(),
 											new Lang("en-US"),
-											new Lang("ru-RU")
+											new Lang("ru-RU"),
+											new Lang("pt-BR")
 										});
 
 			SelectedLang = Languages.FirstOrDefault(l => l.Name == _initialDisplayCulture) ?? Languages.FirstOrDefault();

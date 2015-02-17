@@ -199,6 +199,9 @@
       <LastGenOutput>ApplicationInsights.config</LastGenOutput>
     </None>
     <None Include="Package.StoreAssociation.xml" />
+    <PRIResource Include="Strings\pt-BR\Resources.resw">
+      <CustomToolNamespace>Inoreader.Strings</CustomToolNamespace>
+    </PRIResource>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Resources\Styles.xaml">
