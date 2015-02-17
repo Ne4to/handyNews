@@ -139,7 +139,6 @@ namespace Inoreader.ViewModels.Pages
 				_telemetryClient.TrackMetric(TemetryMetrics.SignInResponseTime, stopwatch.Elapsed.TotalSeconds);
 				_telemetryClient.TrackEvent(TelemetryEvents.SignIn);
 				
-
 				if (RememberMe)
 				{
 					_credentialService.Save(Email, Password);
@@ -150,7 +149,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);				
 			}
 			finally
 			{

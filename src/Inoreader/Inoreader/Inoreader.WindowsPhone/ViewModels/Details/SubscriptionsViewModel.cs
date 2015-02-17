@@ -130,7 +130,7 @@ namespace Inoreader.ViewModels.Details
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 			}
 			finally
 			{

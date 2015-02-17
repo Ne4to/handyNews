@@ -241,7 +241,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 			}
 			finally
 			{

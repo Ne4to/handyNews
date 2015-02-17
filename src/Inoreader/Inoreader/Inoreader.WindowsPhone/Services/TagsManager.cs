@@ -84,7 +84,7 @@ namespace Inoreader.Services
 					_queue.Enqueue(action);
 				}
 
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 			}
 			finally
 			{

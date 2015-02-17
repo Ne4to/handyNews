@@ -97,7 +97,7 @@ namespace Inoreader.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 				return 0UL;
 			}
 		}
@@ -119,7 +119,7 @@ namespace Inoreader.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 			}
 		}
 
@@ -196,7 +196,7 @@ namespace Inoreader.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 				return false;
 			}
 		}
@@ -220,7 +220,7 @@ namespace Inoreader.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 				return null;
 			}
 		}

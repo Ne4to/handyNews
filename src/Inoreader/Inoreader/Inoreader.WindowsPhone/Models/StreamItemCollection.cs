@@ -14,6 +14,7 @@ using Inoreader.Annotations;
 using Inoreader.Api;
 using Inoreader.Api.Models;
 using Inoreader.Models.States;
+using Inoreader.Services;
 using Microsoft.ApplicationInsights;
 
 namespace Inoreader.Models
@@ -181,7 +182,7 @@ namespace Inoreader.Models
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryClient.TrackExceptionFull(ex);
 
 				if (LoadMoreItemsError != null)
 					LoadMoreItemsError(this, EventArgs.Empty);
