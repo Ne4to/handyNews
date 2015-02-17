@@ -170,8 +170,12 @@ namespace Inoreader.ViewModels.Details
 			stopwatch.Stop();
 			_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
 
-			var unreadCountDictionary = unreadCount.UnreadCounts.ToDictionary(uk => uk.Id, uk => uk.Count);
-
+			var unreadCountDictionary = new Dictionary<string, int>();
+			foreach (var unreadcount in unreadCount.UnreadCounts)
+			{
+				unreadCountDictionary[unreadcount.Id] = unreadcount.Count;
+			}
+			
 			var catsQuery = from tag in tags.Tags
 							where CategoryRegex.IsMatch(tag.Id)
 							select new CategoryItem
