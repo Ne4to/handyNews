@@ -42,6 +42,8 @@ namespace Inoreader.ViewModels.Details
 		private List<TreeItemBase> _treeItems;
 		private List<TreeItemBase> _rootItems;
 		private bool _isRoot = true;
+		private string _categoryId;
+		private string _subscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
 
 		private ICommand _itemClickCommand;
 		private ICommand _refreshCommand;
@@ -49,8 +51,6 @@ namespace Inoreader.ViewModels.Details
 		#endregion
 
 		#region Properties
-
-		private string _subscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
 
 		public string SubscriptionsHeader
 		{
@@ -68,7 +68,7 @@ namespace Inoreader.ViewModels.Details
 		{
 			get { return _isBusy; }
 			private set { SetProperty(ref _isBusy, value); }
-		}		
+		}
 
 		public bool IsOffline
 		{
@@ -144,13 +144,26 @@ namespace Inoreader.ViewModels.Details
 			IsBusy = true;
 			var cacheData = await _cacheManager.LoadSubscriptionsAsync();
 			IsBusy = false;
-			
+
 			if (cacheData != null)
 			{
-				SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
 				_rootItems = cacheData;
-				_isRoot = true;
-				TreeItems = _rootItems;
+
+				var cat = cacheData.OfType<CategoryItem>()
+					.FirstOrDefault(c => !_isRoot && String.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
+
+				if (cat != null)
+				{
+					SubscriptionsHeader = cat.Title;
+					_isRoot = false;
+					TreeItems = new List<TreeItemBase>(cat.Subscriptions);
+				}
+				else
+				{
+					SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
+					_isRoot = true;
+					TreeItems = _rootItems;
+				}
 			}
 
 			MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
@@ -159,8 +172,6 @@ namespace Inoreader.ViewModels.Details
 
 		private async Task LoadSubscriptionsInternalAsync()
 		{
-			SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
-
 			var stopwatch = Stopwatch.StartNew();
 
 			var tags = await _apiClient.GetTagsAsync();
@@ -175,7 +186,7 @@ namespace Inoreader.ViewModels.Details
 			{
 				unreadCountDictionary[unreadcount.Id] = unreadcount.Count;
 			}
-			
+
 			var catsQuery = from tag in tags.Tags
 							where CategoryRegex.IsMatch(tag.Id)
 							select new CategoryItem
@@ -240,8 +251,22 @@ namespace Inoreader.ViewModels.Details
 
 			_rootItems = allItems;
 
-			TreeItems = _rootItems;
-			_isRoot = true;
+
+			var cat = _rootItems.OfType<CategoryItem>()
+				.FirstOrDefault(c => !_isRoot && String.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
+
+			if (cat != null)
+			{
+				SubscriptionsHeader = cat.Title;
+				TreeItems = new List<TreeItemBase>(cat.Subscriptions);
+				_isRoot = false;
+			}
+			else
+			{
+				SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
+				TreeItems = _rootItems;
+				_isRoot = true;
+			}
 
 			UpdateBadge(unreadCount);
 
@@ -297,6 +322,7 @@ namespace Inoreader.ViewModels.Details
 				SubscriptionsHeader = categoryItem.Title;
 				TreeItems = new List<TreeItemBase>(categoryItem.Subscriptions);
 				_isRoot = false;
+				_categoryId = categoryItem.Id;
 			}
 			else
 			{
@@ -334,7 +360,7 @@ namespace Inoreader.ViewModels.Details
 		public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
 		{
 			if (viewModelState != null)
-				SaveState(viewModelState);				
+				SaveState(viewModelState);
 		}
 
 		private void SaveState(Dictionary<string, object> viewModelState)
@@ -343,6 +369,7 @@ namespace Inoreader.ViewModels.Details
 			viewModelState["RootItems"] = _rootItems;
 			viewModelState["IsRoot"] = _isRoot;
 			viewModelState["TreeItems"] = TreeItems;
+			viewModelState["CategoryId"] = _categoryId;
 		}
 
 		private bool LoadState(Dictionary<string, object> viewModelState)
@@ -354,8 +381,51 @@ namespace Inoreader.ViewModels.Details
 			_rootItems = viewModelState.GetValue<List<TreeItemBase>>("RootItems");
 			_isRoot = viewModelState.GetValue<bool>("IsRoot");
 			TreeItems = viewModelState.GetValue<List<TreeItemBase>>("TreeItems");
+			_categoryId = viewModelState.GetValue<string>("CategoryId");
+
+			SilentRefreshCount(TreeItems, _rootItems);
 
 			return _rootItems != null && TreeItems != null;
+		}
+
+		private async void SilentRefreshCount(List<TreeItemBase> treeItems, List<TreeItemBase> rootItems)
+		{
+			if (treeItems == null && rootItems == null)
+				return;
+
+			try
+			{
+				var unreadCount = await _apiClient.GetUnreadCountAsync();
+				foreach (var unreadcount in unreadCount.UnreadCounts)
+				{
+					if (treeItems != null)
+						UpdateUnreadCountInTree(treeItems, unreadcount.Id, unreadcount.Count);
+
+					if (rootItems != null)
+						UpdateUnreadCountInTree(rootItems, unreadcount.Id, unreadcount.Count);
+				}
+			}
+			catch (Exception ex)
+			{
+				_telemetryClient.TrackExceptionFull(ex);
+			}
+		}
+
+		private static void UpdateUnreadCountInTree(List<TreeItemBase> tree, string id, int count)
+		{
+			var item = tree.FirstOrDefault(ti => String.Equals(ti.Id, id, StringComparison.OrdinalIgnoreCase));
+			if (item == null)
+			{
+				var q = from c in tree.OfType<CategoryItem>()
+						from ch in c.Subscriptions
+						where String.Equals(ch.Id, id, StringComparison.OrdinalIgnoreCase)
+						select ch;
+
+				item = q.FirstOrDefault();
+			}
+
+			if (item != null)
+				item.UnreadCount = count;
 		}
 	}
 }

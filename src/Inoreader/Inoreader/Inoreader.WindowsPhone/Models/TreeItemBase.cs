@@ -3,8 +3,10 @@ using System.Runtime.Serialization;
 namespace Inoreader.Models
 {
 	[DataContract]
-	public abstract class TreeItemBase
+	public abstract class TreeItemBase : BindableBaseEx
 	{
+		private int _unreadCount;
+
 		[DataMember]
 		public string Id { get; set; }
 
@@ -15,6 +17,10 @@ namespace Inoreader.Models
 		public string Title { get; set; }
 
 		[DataMember]
-		public int UnreadCount { get; set; }
+		public int UnreadCount
+		{
+			get { return _unreadCount; }
+			set { SetProperty(ref _unreadCount, value); }
+		}
 	}
 }
