@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.UI.Notifications;
 using Windows.UI.Popups;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
@@ -109,6 +110,13 @@ namespace Inoreader.ViewModels.Details
 			_telemetryClient = telemetryClient;
 			_settingsService = settingsService;
 			_cacheManager = cacheManager;
+
+			Application.Current.Resuming += Application_Resuming;
+		}
+
+		void Application_Resuming(object sender, object e)
+		{
+			SilentRefreshCount(TreeItems, _rootItems);
 		}
 
 		public async void LoadSubscriptions()
@@ -359,6 +367,9 @@ namespace Inoreader.ViewModels.Details
 
 		public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
 		{
+			if (!suspending)
+				Application.Current.Resuming -= Application_Resuming;
+
 			if (viewModelState != null)
 				SaveState(viewModelState);
 		}
