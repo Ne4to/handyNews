@@ -14,7 +14,7 @@
 		<StackPanel Margin="5">
 			<TextBlock x:Uid="SignInHeader" Text="Sign in" Style="{StaticResource PageHeaderTextStyle}" Margin="0" />
 			
-			<TextBox x:Uid="SignInEmailBox" Header="Email" PlaceholderText="username@gmail.com" 
+			<TextBox x:Uid="SignInEmailBox" Header="user name" PlaceholderText="username" 
 					 Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 					 Margin="0,10,0,0" />
 			<PasswordBox x:Uid="SignInPasswordBox" Header="password" IsPasswordRevealButtonEnabled="True" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

@@ -1,0 +1,18 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+*.db
+/src/Inoreader/HtmlDebugApp/bin
+/src/Inoreader/HtmlDebugApp/obj
+*.user
+/src/Inoreader/Inoreader/Inoreader.Windows/bin/Debug
+/src/Inoreader/Inoreader/Inoreader.Windows/obj
+/src/Inoreader/Inoreader/Inoreader.WindowsPhone/AppPackages
+/src/Inoreader/Inoreader/Inoreader.WindowsPhone/bin
+/src/Inoreader/Inoreader/Inoreader.WindowsPhone/obj
+/src/Inoreader/Inoreader.Api/bin
+/src/Inoreader/Inoreader.Api/obj
+/src/Inoreader/packages
+*.suo
+*.DotSettings

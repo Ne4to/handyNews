@@ -216,7 +216,7 @@
     <value>войти</value>
   </data>
   <data name="SignInEmailBox.Header" xml:space="preserve">
-    <value>Email</value>
+    <value>имя пользователя</value>
   </data>
   <data name="SignInEmailBox.PlaceholderText" xml:space="preserve">
     <value>username@ya.ru</value>

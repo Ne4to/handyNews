@@ -237,7 +237,7 @@
     <comment>Sign in page</comment>
   </data>
   <data name="SignInEmailBox.Header" xml:space="preserve">
-    <value>Email</value>
+    <value>nome de usuário</value>
     <comment>Sign in page</comment>
   </data>
   <data name="SignInEmailBox.PlaceholderText" xml:space="preserve">
