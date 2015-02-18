@@ -352,6 +352,13 @@ namespace Inoreader.ViewModels.Pages
 
 				_currentItem = item;
 				_currentItem.IsSelected = true;
+
+				if (!item.NeedSetReadExplicitly && item.Unread)
+				{
+					item.Unread = false;
+					MarkAsRead(item.Id, true);
+				}
+
 				SetCurrentItemRead(!_currentItem.Unread);
 
 				CurrentItemReadEnabled = _currentItem != null;
