@@ -90,7 +90,9 @@ namespace Inoreader.Models
 								 Published = UnixTimeStampToDateTime(it.published),
 								 Title = it.title,
 								 Content = it.summary.content,
-								 WebUri = GetWebUri(it)
+								 WebUri = GetWebUri(it),
+								 Starred = it.categories != null
+										   && it.categories.Any(c => c.EndsWith("/state/com.google/starred", StringComparison.OrdinalIgnoreCase))
 							 };
 			return itemsQuery;
 		}

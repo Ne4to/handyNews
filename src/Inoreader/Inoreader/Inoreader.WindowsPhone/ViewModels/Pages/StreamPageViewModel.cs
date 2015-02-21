@@ -17,7 +17,6 @@ using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
-using Newtonsoft.Json.Linq;
 
 namespace Inoreader.ViewModels.Pages
 {
@@ -38,6 +37,8 @@ namespace Inoreader.ViewModels.Pages
 		private bool _isBusy;
 		private bool _currentItemRead;
 		private bool _currentItemReadEnabled;
+		private bool _currentItemStarred;
+		private bool _currentItemStarredEnabled;
 		private StreamItem _currentItem;
 		private bool _isOffline;
 
@@ -85,6 +86,22 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _currentItemReadEnabled, value); }
 		}
 
+		public bool CurrentItemStarred
+		{
+			get { return _currentItemStarred; }
+			set
+			{
+				if (SetProperty(ref _currentItemStarred, value))
+					OnCurrentItemStarredChanged(value);
+			}
+		}
+
+		public bool CurrentItemStarredEnabled
+		{
+			get { return _currentItemStarredEnabled; }
+			set { SetProperty(ref _currentItemStarredEnabled, value); }
+		}
+
 		public bool IsOffline
 		{
 			get { return _isOffline; }
@@ -121,12 +138,12 @@ namespace Inoreader.ViewModels.Pages
 		}
 
 		#endregion
-		
+
 		public StreamPageViewModel([NotNull] ApiClient apiClient,
 			[NotNull] INavigationService navigationService,
 			[NotNull] TelemetryClient telemetryClient,
-			[NotNull] CacheManager cacheManager, 
-			[NotNull] TagsManager tagsManager, 
+			[NotNull] CacheManager cacheManager,
+			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -184,6 +201,8 @@ namespace Inoreader.ViewModels.Pages
 
 			viewModelState["CurrentItemRead"] = CurrentItemRead;
 			viewModelState["CurrentItemReadEnabled"] = CurrentItemReadEnabled;
+			viewModelState["CurrentItemStarred"] = CurrentItemStarred;
+			viewModelState["CurrentItemStarredEnabled"] = CurrentItemStarredEnabled;
 		}
 
 		private bool RestoreState(Dictionary<string, object> viewModelState)
@@ -198,6 +217,11 @@ namespace Inoreader.ViewModels.Pages
 
 			CurrentItemReadEnabled = viewModelState.GetValue<bool>("CurrentItemReadEnabled");
 
+			_currentItemStarred = viewModelState.GetValue<bool>("CurrentItemStarred");
+			OnPropertyChanged("CurrentItemStarred");
+
+			CurrentItemStarredEnabled = viewModelState.GetValue<bool>("CurrentItemStarredEnabled");
+
 			var itemsState = viewModelState.GetValue<StreamItemCollectionState>("Items");
 			if (itemsState == null)
 				return false;
@@ -208,19 +232,6 @@ namespace Inoreader.ViewModels.Pages
 
 			return true;
 		}
-
-#if DEBUG
-		class AAA
-		{
-			public List<string> Items { get; set; }
-
-			public AAA()
-			{
-				Items = new List<string>();
-			}
-		}
-		static AAA testData = new AAA();		
-#endif
 
 		private async void LoadData()
 		{
@@ -262,6 +273,8 @@ namespace Inoreader.ViewModels.Pages
 				_currentItem = items.FirstOrDefault(i => i.IsSelected);
 				_currentItemRead = _currentItem != null && !_currentItem.Unread;
 				CurrentItemReadEnabled = _currentItem != null;
+				_currentItemStarred = _currentItem != null && _currentItem.Starred;
+				CurrentItemStarredEnabled = _currentItem != null;
 
 				Items = items;
 			}
@@ -273,7 +286,7 @@ namespace Inoreader.ViewModels.Pages
 		private async Task LoadDataInternalAsync()
 		{
 			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, b => IsBusy = b);
-			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;				
+			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			Title = await streamItems.InitAsync();
 
 			Items = streamItems;
@@ -283,23 +296,21 @@ namespace Inoreader.ViewModels.Pages
 			{
 				_currentItem.IsSelected = true;
 				SetCurrentItemRead(!_currentItem.Unread);
+				SetCurrentItemStarred(_currentItem.Starred);
 			}
 			else
 			{
 				SetCurrentItemRead(false);
+				SetCurrentItemStarred(false);
 			}
 
 			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+			CurrentItemStarredEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
 			RaiseOpenWebCommandCanExecuteChanged();
 			RaiseShareCommandCanExecuteChanged();
 
 			if (Items != null)
 				await _cacheManager.SaveStreamAsync(Items.GetSate());
-
-#if DEBUG
-			testData.Items.AddRange(Items.Select(i => i.Content));
-			var tt = JObject.FromObject(testData).ToString();
-#endif
 		}
 
 		private void RaiseOpenWebCommandCanExecuteChanged()
@@ -321,6 +332,7 @@ namespace Inoreader.ViewModels.Pages
 			if (firstItem is EmptySpaceStreamItem)
 			{
 				CurrentItemReadEnabled = false;
+				CurrentItemStarredEnabled = false;
 				return;
 			}
 
@@ -336,8 +348,10 @@ namespace Inoreader.ViewModels.Pages
 			_currentItem = firstItem;
 			_currentItem.IsSelected = true;
 			SetCurrentItemRead(!_currentItem.Unread);
+			SetCurrentItemStarred(_currentItem.Starred);
 
-			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+			CurrentItemReadEnabled = _currentItem != null;
+			CurrentItemStarredEnabled = _currentItem != null;
 			RaiseOpenWebCommandCanExecuteChanged();
 			RaiseShareCommandCanExecuteChanged();
 		}
@@ -360,14 +374,17 @@ namespace Inoreader.ViewModels.Pages
 				}
 
 				SetCurrentItemRead(!_currentItem.Unread);
+				SetCurrentItemStarred(_currentItem.Starred);
 
 				CurrentItemReadEnabled = _currentItem != null;
+				CurrentItemStarredEnabled = _currentItem != null;
 				RaiseOpenWebCommandCanExecuteChanged();
 				RaiseShareCommandCanExecuteChanged();
 			}
 			else
 			{
 				CurrentItemReadEnabled = false;
+				CurrentItemStarredEnabled = false;
 			}
 		}
 
@@ -406,18 +423,36 @@ namespace Inoreader.ViewModels.Pages
 		{
 			if (newValue)
 			{
-				_tagsManager.MarkAsRead(id);				
+				_tagsManager.MarkAsRead(id);
 			}
 			else
 			{
-				_tagsManager.MarkAsUnreadTagAction(id);				
-			}		
+				_tagsManager.MarkAsUnreadTagAction(id);
+			}
+		}
+
+		private void MarkAsStarred(string id, bool newValue)
+		{
+			if (newValue)
+			{
+				_tagsManager.AddToStarred(id);
+			}
+			else
+			{
+				_tagsManager.RemoveFromStarred(id);
+			}
 		}
 
 		private void SetCurrentItemRead(bool newValue)
 		{
 			_currentItemRead = newValue;
 			OnPropertyChanged("CurrentItemRead");
+		}
+
+		private void SetCurrentItemStarred(bool newValue)
+		{
+			_currentItemStarred = newValue;
+			OnPropertyChanged("CurrentItemStarred");
 		}
 
 		private void OnCurrentItemReadChanged(bool newValue)
@@ -438,6 +473,25 @@ namespace Inoreader.ViewModels.Pages
 				_currentItem.NeedSetReadExplicitly = true;
 				SetCurrentItemRead(false);
 				MarkAsRead(_currentItem.Id, false);
+			}
+		}
+
+		private void OnCurrentItemStarredChanged(bool newValue)
+		{
+			if (_currentItem == null || _currentItem is EmptySpaceStreamItem)
+				return;
+
+			if (newValue)
+			{
+				_currentItem.Starred = true;				
+				SetCurrentItemStarred(true);
+				MarkAsStarred(_currentItem.Id, true);
+			}
+			else
+			{
+				_currentItem.Starred = false;				
+				SetCurrentItemStarred(false);
+				MarkAsStarred(_currentItem.Id, false);
 			}
 		}
 

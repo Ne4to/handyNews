@@ -52,7 +52,7 @@ namespace Inoreader.Services
 
 		public void MarkAsRead(string id)
 		{
-			var item = new MarkAsReadTagAction()
+			var item = new MarkAsReadTagAction
 			{
 				Id = id
 			};
@@ -63,7 +63,29 @@ namespace Inoreader.Services
 
 		public void MarkAsUnreadTagAction(string id)
 		{
-			var item = new MarkAsUnreadTagAction()
+			var item = new MarkAsUnreadTagAction
+			{
+				Id = id
+			};
+
+			_queue.Enqueue(item);
+			ProcessQueue();
+		}
+
+		public void AddToStarred(string id)
+		{
+			var item = new MarkAsStarredTagAction
+			{
+				Id = id
+			};
+
+			_queue.Enqueue(item);
+			ProcessQueue();
+		}
+
+		public void RemoveFromStarred(string id)
+		{
+			var item = new MarkAsUnstarredTagAction
 			{
 				Id = id
 			};
@@ -144,6 +166,38 @@ namespace Inoreader.Services
 			telemetryClient.TrackEvent(eventTelemetry);
 
 			return apiClient.RemoveTagAsync(SpecialTags.MarkItemAsRead, Id);
+		}
+	}
+
+	[DataContract]
+	public class MarkAsStarredTagAction : TagAction
+	{
+		[DataMember]
+		public string Id { get; set; }
+
+		public override Task ExecuteAsync(ApiClient apiClient, TelemetryClient telemetryClient)
+		{
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsStarred);
+			eventTelemetry.Properties.Add("Starred", true.ToString());
+			telemetryClient.TrackEvent(eventTelemetry);
+
+			return apiClient.AddTagAsync(SpecialTags.MarkItemAsStarred, Id);
+		}
+	}
+
+	[DataContract]
+	public class MarkAsUnstarredTagAction : TagAction
+	{
+		[DataMember]
+		public string Id { get; set; }
+
+		public override Task ExecuteAsync(ApiClient apiClient, TelemetryClient telemetryClient)
+		{
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsStarred);
+			eventTelemetry.Properties.Add("Starred", false.ToString());
+			telemetryClient.TrackEvent(eventTelemetry);
+
+			return apiClient.RemoveTagAsync(SpecialTags.MarkItemAsStarred, Id);
 		}
 	}
 }

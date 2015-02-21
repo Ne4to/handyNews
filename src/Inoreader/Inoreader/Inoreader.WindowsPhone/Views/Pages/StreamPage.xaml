@@ -6,13 +6,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:storeApps="using:Microsoft.Practices.Prism.StoreApps"
     xmlns:mvvm="using:Microsoft.Practices.Prism.Mvvm"
-    xmlns:services="using:Inoreader.Services"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:behaviors="using:Inoreader.Behaviors"
     xmlns:resources="using:Inoreader.Resources"
     xmlns:details="using:Inoreader.Views.Details"
     xmlns:converters="using:Inoreader.Converters"
+    xmlns:controls="using:Inoreader.Views.Controls"
+    xmlns:services="using:Inoreader.Services"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
@@ -233,29 +234,53 @@
 		<resources:StreamItemTemplateSelector x:Key="StreamItemTemplateSelector">
 			<resources:StreamItemTemplateSelector.StreamItemTemplate>
 				<DataTemplate>
-					<Border Margin="5,0,5,10" 
-							BorderThickness="1" 
+					<Border Margin="0,0,0,5" 
+							BorderThickness="0,1" 
 							BorderBrush="{Binding IsSelected, Converter={StaticResource IsSelectedToBrushConverter}}">
 						<Grid Background="#FEFEFE">
 							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="4" />
+								<ColumnDefinition Width="6" />
 								<ColumnDefinition Width="*" />
 							</Grid.ColumnDefinitions>
 
-							<Grid Background="{Binding Unread, Converter={StaticResource UnreadToBrushConverter}}">
-
-							</Grid>
+							<Grid Background="{Binding Unread, Converter={StaticResource UnreadToBrushConverter}}" />
 
 							<StackPanel Margin="5" Grid.Column="1">
-								<TextBlock Text="{Binding Title}"
-								           FontSize="14" TextWrapping="WrapWholeWords" />
-								<TextBlock Text="{Binding Published, Converter={StaticResource SmartDateToStringConverter}}"
-								           FontSize="11"
-								           FontWeight="SemiLight" />
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition />
+										<ColumnDefinition Width="Auto" />
+									</Grid.ColumnDefinitions>
 
-								<RichTextBlock services:RichTextBlockExtensions.HtmlContent="{Binding Content}" IsTextSelectionEnabled="False" />
+									<TextBlock Text="{Binding Title}"
+											   FontSize="14" 
+											   TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="2" />
+									
+									<TextBlock Grid.Column="1" 
+											   Text="{Binding Published, Converter={StaticResource SmartDateToStringConverter}}"
+											   FontSize="11"
+											   FontWeight="SemiLight" />
+								</Grid>
+
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition />
+										<ColumnDefinition Width="20" />
+									</Grid.ColumnDefinitions>
+
+									<!--<TextBlock Text="{Binding ShortPlainText}" TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="2" />-->
+									<RichTextBlock services:RichTextBlockExtensions.HtmlContent="{Binding Content}" IsTextSelectionEnabled="False" />
+									
+									<controls:FilledStarControl Grid.Column="1" 
+																Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
+																Width="15" 
+																Height="15" 
+																HorizontalAlignment="Right" 
+																VerticalAlignment="Top" />
+								</Grid>								
 							</StackPanel>
-						</Grid></Border>
+						</Grid>
+					</Border>
 				</DataTemplate>
 			</resources:StreamItemTemplateSelector.StreamItemTemplate>
 			<resources:StreamItemTemplateSelector.EmptySpaceTemplate>
@@ -276,6 +301,12 @@
 								Icon="Read" 
 								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}"
 								IsEnabled="{Binding CurrentItemReadEnabled}" />
+
+			<AppBarToggleButton x:Uid="SetStarAppBarButton"
+								Label="star"
+								Icon="Favorite"
+								IsChecked="{Binding CurrentItemStarred, Mode=TwoWay}"
+								IsEnabled="{Binding CurrentItemStarredEnabled}"/>
 
 			<AppBarButton x:Uid="OpenInWebAppBarButton"
 						  Icon="World"

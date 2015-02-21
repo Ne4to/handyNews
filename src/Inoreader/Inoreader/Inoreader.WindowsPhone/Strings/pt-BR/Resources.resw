@@ -284,4 +284,8 @@
     <value>exibir</value>
     <comment>Settings - view - combobox header</comment>
   </data>
+  <data name="SetStarAppBarButton.Label" xml:space="preserve">
+    <value>estrela</value>
+    <comment>application bar button</comment>
+  </data>
 </root>

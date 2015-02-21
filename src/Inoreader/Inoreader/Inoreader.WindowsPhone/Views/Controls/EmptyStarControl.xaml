@@ -1,0 +1,17 @@
+﻿<UserControl
+    x:Class="Inoreader.Views.Controls.EmptyStarControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="15"
+    d:DesignWidth="15">
+    
+    <Grid>
+		<Path Stretch="Uniform" 
+			  StrokeThickness="1"
+			  Stroke="#33537F" 			  
+			  Data="M384.884,0L475.738,293.347 769.768,293.347 531.899,474.653 622.753,768 384.884,586.693 147.015,768 237.869,474.653 0,293.347 294.03,293.347z" />
+	</Grid>
+</UserControl>

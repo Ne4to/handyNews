@@ -133,6 +133,12 @@
     <Compile Include="Models\StreamItemCollection.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
+    <Compile Include="Views\Controls\EmptyStarControl.xaml.cs">
+      <DependentUpon>EmptyStarControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\FilledStarControl.xaml.cs">
+      <DependentUpon>FilledStarControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Controls\SwipeControl.cs" />
     <Compile Include="Views\Details\EmptySpaceItem.xaml.cs">
       <DependentUpon>EmptySpaceItem.xaml</DependentUpon>
@@ -217,6 +223,14 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Controls\EmptyStarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\FilledStarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Details\EmptySpaceItem.xaml">
       <SubType>Designer</SubType>
