@@ -103,7 +103,9 @@
     <Compile Include="Services\Extensions.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CredentialService.cs" />
+    <Compile Include="Services\HtmlParser.cs" />
     <Compile Include="Services\ICredentialService.cs" />
+    <Compile Include="Services\NetworkManager.cs" />
     <Compile Include="Services\RichTextBlockExtensions.cs" />
     <Compile Include="Services\SpecialTags.cs" />
     <Compile Include="Services\TagsManager.cs" />

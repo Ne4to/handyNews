@@ -22,15 +22,24 @@ namespace Inoreader.Services
 		private readonly ConcurrentQueue<TagAction> _queue;
 		private int _currentBusy = 0;
 
-		public TagsManager(TagsManagerState state, [NotNull] ApiClient apiClient, [NotNull] TelemetryClient telemetryClient)
+		public TagsManager(TagsManagerState state, [NotNull] ApiClient apiClient, [NotNull] TelemetryClient telemetryClient,
+			[NotNull] NetworkManager networkManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (networkManager == null) throw new ArgumentNullException("networkManager");
 
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
 
 			_queue = state != null ? new ConcurrentQueue<TagAction>(state.Actions) : new ConcurrentQueue<TagAction>();
+			networkManager.NetworkChanged += networkManager_NetworkChanged;
+		}
+
+		void networkManager_NetworkChanged(object sender, NetworkChangedEventArgs e)
+		{
+			if (e.Connected)
+				ProcessQueue();	
 		}
 
 		public TagsManagerState GetState()

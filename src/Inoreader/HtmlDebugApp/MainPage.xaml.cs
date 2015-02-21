@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using Inoreader.Services;
 using Newtonsoft.Json.Linq;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
@@ -64,6 +65,12 @@ namespace HtmlDebugApp
 			var data = JObject.Parse(strData).ToObject<AAA>();
 
 			ListView.ItemsSource = data.Items;
+
+			foreach (var html in data.Items)
+			{
+				var x = html;
+				var y = HtmlParser.GetPlainText(x, 200);
+			}
 		}
 	}
 

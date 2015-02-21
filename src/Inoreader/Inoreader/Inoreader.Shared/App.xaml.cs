@@ -63,6 +63,7 @@ namespace Inoreader
 			_container.RegisterInstance<INavigationService>(NavigationService);
 
 			_container.RegisterType<ICredentialService, CredentialService>(new ContainerControlledLifetimeManager());
+			_container.RegisterType<NetworkManager>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_apiClient);
 			_container.RegisterInstance(_appSettingsService);
 			_container.RegisterInstance(TelemetryClient);
@@ -72,7 +73,7 @@ namespace Inoreader
 			_container.RegisterInstance(_cacheManager);
 
 			var tagsManagerState = await _cacheManager.LoadTagsManagerStateAsync();
-			_tagsManager = new TagsManager(tagsManagerState, _apiClient, TelemetryClient);
+			_tagsManager = new TagsManager(tagsManagerState, _apiClient, TelemetryClient, _container.Resolve<NetworkManager>());
 			_container.RegisterInstance(_tagsManager);
 			_tagsManager.ProcessQueue();			
 

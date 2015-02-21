@@ -86,6 +86,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Inoreader\Inoreader.WindowsPhone\Services\HtmlParser.cs">
+      <Link>HtmlParser.cs</Link>
+    </Compile>
     <Compile Include="..\Inoreader\Inoreader.WindowsPhone\Services\RichTextBlockExtensions.cs">
       <Link>RichTextBlockExtensions.cs</Link>
     </Compile>

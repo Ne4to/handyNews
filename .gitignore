@@ -16,3 +16,4 @@
 /src/Inoreader/packages
 *.suo
 *.DotSettings
+/src/Inoreader/Inoreader/Inoreader.WindowsPhone/BundleArtifacts
