@@ -91,6 +91,7 @@
     <Compile Include="Converters\FileSizeToStringConverter.cs" />
     <Compile Include="Converters\FormatStringConverter.cs" />
     <Compile Include="Converters\ItemClickEventArgsToItemConverter.cs" />
+    <Compile Include="Converters\MinusConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
     <Compile Include="Converters\ZeroCountToVisibilityConverter.cs" />
     <Compile Include="Models\BindableBaseEx.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Models\StreamItemCollection.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
+    <Compile Include="Views\Controls\SwipeControl.cs" />
     <Compile Include="Views\Details\EmptySpaceItem.xaml.cs">
       <DependentUpon>EmptySpaceItem.xaml</DependentUpon>
     </Compile>
@@ -210,6 +212,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Details\EmptySpaceItem.xaml">
       <SubType>Designer</SubType>
