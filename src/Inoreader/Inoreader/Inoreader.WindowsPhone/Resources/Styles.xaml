@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Inoreader.Converters">
 
-	<converters:FormatStringConverter x:Key="GeneralDateFormatStringConverter" StringFormat="g" />
+	<converters:SmartDateToStringConverter x:Key="SmartDateToStringConverter" />
 	<converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 	<converters:ItemClickEventArgsToItemConverter x:Key="ItemClickEventArgsToItemConverter" />
 	<converters:BooleanToBrushConverter TrueBrush="#82A8FF" FalseBrush="Transparent" x:Key="UnreadToBrushConverter" />

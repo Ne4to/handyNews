@@ -43,5 +43,16 @@ namespace Inoreader.Services
 
 			telemetryClient.TrackException(exceptionTelemetry);
 		}
+
+		public static DateTime GetBeginWeekDate(this DateTime date, DayOfWeek startOfWeek = DayOfWeek.Monday)
+		{
+			int diff = date.DayOfWeek - startOfWeek;
+			if (diff < 0)
+			{
+				diff += 7;
+			}
+
+			return date.AddDays(-1 * diff).Date;
+		}
 	}
 }

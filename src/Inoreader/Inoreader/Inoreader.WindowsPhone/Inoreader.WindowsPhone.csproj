@@ -92,6 +92,7 @@
     <Compile Include="Converters\FormatStringConverter.cs" />
     <Compile Include="Converters\ItemClickEventArgsToItemConverter.cs" />
     <Compile Include="Converters\MinusConverter.cs" />
+    <Compile Include="Converters\SmartDateToStringConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
     <Compile Include="Converters\ZeroCountToVisibilityConverter.cs" />
     <Compile Include="Models\BindableBaseEx.cs" />
