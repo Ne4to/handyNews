@@ -272,4 +272,16 @@
     <value>Caso você realize o login com sua conta do Google ou do Facebook: Abra as preferências do perfil no Inoreader e defina uma senha. Utilize esta senha com o seu nome de usuário.</value>
     <comment>Sign in page - Google and Facebook login instruction</comment>
   </data>
+  <data name="StreamViewExpanded" xml:space="preserve">
+    <value>visão expandida</value>
+    <comment>Settings - view - expanded title</comment>
+  </data>
+  <data name="StreamViewList" xml:space="preserve">
+    <value>visualização em lista</value>
+    <comment>Settings - view - list title</comment>
+  </data>
+  <data name="SettingsStreamViewBox.Header" xml:space="preserve">
+    <value>exibir</value>
+    <comment>Settings - view - combobox header</comment>
+  </data>
 </root>

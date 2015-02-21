@@ -242,4 +242,16 @@
   <data name="SignInOAuthWarning.Text" xml:space="preserve">
     <value>Если для входа вы обычно используете ваш Facebook или Google аккаун: Откройте настройки профиля Inoreader и установите пароль. Используйте этот пароль вместе с именем пользователя для входа.</value>
   </data>
+  <data name="StreamViewExpanded" xml:space="preserve">
+    <value>расширенный режим</value>
+    <comment>Settings - view - expanded title</comment>
+  </data>
+  <data name="StreamViewList" xml:space="preserve">
+    <value>режим списка</value>
+    <comment>Settings - view - list title</comment>
+  </data>
+  <data name="SettingsStreamViewBox.Header" xml:space="preserve">
+    <value>вид</value>
+    <comment>Settings - view - combobox header</comment>
+  </data>
 </root>

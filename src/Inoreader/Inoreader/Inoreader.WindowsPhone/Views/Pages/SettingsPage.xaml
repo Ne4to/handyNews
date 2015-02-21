@@ -24,29 +24,31 @@
 		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
 
 		<StackPanel Grid.Row="1" Margin="5,0,5,5">
-			<ComboBox x:Uid="SettingLanguageBox" 
-				  Header="language" 
-				  ItemsSource="{Binding Languages}" 
-				  SelectedItem="{Binding SelectedLang, Mode=TwoWay}"
-				  DisplayMemberPath="Title" />
+			<ComboBox x:Uid="SettingLanguageBox"
+					  Header="language" 
+					  ItemsSource="{Binding Languages}" 
+					  SelectedItem="{Binding SelectedLang, Mode=TwoWay}"
+					  DisplayMemberPath="Title" />
 
 			<TextBlock x:Uid="SettingsRestartWarning" 
-				   Text="restart the application to apply the changes." 
-				   TextWrapping="Wrap" 
-				   Foreground="IndianRed"
-				   FontSize="16"
-				   Margin="0,0,0,5"
-				   Visibility="{Binding NeedAppRestart, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+					   Text="restart the application to apply the changes."
+			           Margin="0,0,0,5" Style="{StaticResource InfoTextStyle}" />
 
 			<CheckBox x:Uid="SettingHideEmptySubscriptions" 
 					  Content="hide empty subscriptions"
 					  IsChecked="{Binding HideEmptySubscriptions, Mode=TwoWay}" />
 
+			<ComboBox x:Uid="SettingsStreamViewBox"
+					  Header="view"
+					  ItemsSource="{Binding StreamViewItems}"
+					  SelectedItem="{Binding SelectedStreamView, Mode=TwoWay}"
+					  DisplayMemberPath="Title" />
+			
 			<ComboBox x:Uid="SettingShowOrderBox" 
-				  Header="display order" 
-				  ItemsSource="{Binding ShowOrderItems}" 
-				  SelectedItem="{Binding SelectedShowOrder, Mode=TwoWay}"
-				  DisplayMemberPath="Title" />			
+					  Header="display order" 
+					  ItemsSource="{Binding ShowOrderItems}" 
+					  SelectedItem="{Binding SelectedShowOrder, Mode=TwoWay}"
+					  DisplayMemberPath="Title" />			
 
 			<Grid>
 				<Grid.RowDefinitions>

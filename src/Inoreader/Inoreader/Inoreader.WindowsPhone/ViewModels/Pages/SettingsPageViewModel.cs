@@ -26,11 +26,12 @@ namespace Inoreader.ViewModels.Pages
 		private List<Lang> _languages;
 		private Lang _selectedLang;
 		private bool _hideEmptySubscriptions;
-		private bool _needAppRestart;
 		private ulong _totalCacheSize;
 		private bool _isCacheBusy;
 		private List<ShowOrderItem> _showOrderItems;
 		private ShowOrderItem _selectedShowOrder;
+		private List<StreamViewItem> _streamViewItems;
+		private StreamViewItem _selectedStreamView;
 
 		private ReactiveCommand<object> _clearCacheComand;
 
@@ -64,12 +65,6 @@ namespace Inoreader.ViewModels.Pages
 			}
 		}
 
-		public bool NeedAppRestart
-		{
-			get { return _needAppRestart; }
-			set { SetProperty(ref _needAppRestart, value); }
-		}
-
 		public ulong TotalCacheSize
 		{
 			get { return _totalCacheSize; }
@@ -91,8 +86,26 @@ namespace Inoreader.ViewModels.Pages
 		public ShowOrderItem SelectedShowOrder
 		{
 			get { return _selectedShowOrder; }
-			set { if (SetProperty(ref _selectedShowOrder, value))
-				OnSelectedShowOrderChanged();
+			set
+			{
+				if (SetProperty(ref _selectedShowOrder, value))
+					OnSelectedShowOrderChanged();
+			}
+		}
+
+		public List<StreamViewItem> StreamViewItems
+		{
+			get { return _streamViewItems; }
+			set { SetProperty(ref _streamViewItems, value); }
+		}
+
+		public StreamViewItem SelectedStreamView
+		{
+			get { return _selectedStreamView; }
+			set
+			{
+				if (SetProperty(ref _selectedStreamView, value))
+					OnSelectedStreamViewChanged();
 			}
 		}
 
@@ -141,7 +154,6 @@ namespace Inoreader.ViewModels.Pages
 										});
 
 			SelectedLang = Languages.FirstOrDefault(l => l.Name == _initialDisplayCulture) ?? Languages.FirstOrDefault();
-			NeedAppRestart = false;
 			HideEmptySubscriptions = _settingsService.HideEmptySubscriptions;
 
 			ShowOrderItems = new List<ShowOrderItem>(new[]
@@ -151,6 +163,14 @@ namespace Inoreader.ViewModels.Pages
 			});
 
 			SelectedShowOrder = ShowOrderItems.Single(s => s.Value == _settingsService.ShowNewestFirst);
+
+			StreamViewItems = new List<StreamViewItem>(new[]
+			{
+				new StreamViewItem(StreamView.ExpandedView), 
+				new StreamViewItem(StreamView.ListView)
+			});
+
+			SelectedStreamView = StreamViewItems.Single(s => s.View == _settingsService.StreamView);
 
 			IsCacheBusy = true;
 			TotalCacheSize = await _cacheManager.GetTotalCacheSizeAsync();
@@ -177,9 +197,7 @@ namespace Inoreader.ViewModels.Pages
 			}
 
 			_settingsService.DisplayCulture = SelectedLang.Name;
-			_settingsService.Save();
-
-			NeedAppRestart = SelectedLang.Name != _initialDisplayCulture;
+			_settingsService.Save();			
 		}
 
 		private void OnHideEmptySubscriptionsChanged()
@@ -195,7 +213,7 @@ namespace Inoreader.ViewModels.Pages
 			_settingsService.HideEmptySubscriptions = HideEmptySubscriptions;
 			_settingsService.Save();
 		}
-		
+
 		private void OnSelectedShowOrderChanged()
 		{
 			if (SelectedShowOrder.Value != _settingsService.ShowNewestFirst)
@@ -207,6 +225,20 @@ namespace Inoreader.ViewModels.Pages
 			}
 
 			_settingsService.ShowNewestFirst = SelectedShowOrder.Value;
+			_settingsService.Save();
+		}
+
+		private void OnSelectedStreamViewChanged()
+		{
+			if (SelectedStreamView.View != _settingsService.StreamView)
+			{
+				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeStreamView);
+				eventTelemetry.Properties.Add("OldValue", _settingsService.StreamView.ToString());
+				eventTelemetry.Properties.Add("NewValue", SelectedStreamView.View.ToString());
+				_telemetryClient.TrackEvent(eventTelemetry);
+			}
+
+			_settingsService.StreamView = SelectedStreamView.View;
 			_settingsService.Save();
 		}
 
@@ -223,8 +255,8 @@ namespace Inoreader.ViewModels.Pages
 
 	public class Lang
 	{
-		public string Name { get; set; }
-		public string Title { get; set; }
+		public string Name { get; private set; }
+		public string Title { get; private set; }
 
 		public Lang(string name)
 		{
@@ -242,13 +274,40 @@ namespace Inoreader.ViewModels.Pages
 
 	public class ShowOrderItem
 	{
-		public bool Value { get; set; }
-		public string Title { get; set; }
+		public bool Value { get; private set; }
+		public string Title { get; private set; }
 
 		public ShowOrderItem(bool value)
 		{
 			Value = value;
 			Title = value ? Strings.Resources.NewestFirstShowOrder : Strings.Resources.OldestFirstShowOrder;
+		}
+	}
+
+	public class StreamViewItem
+	{
+		public StreamView View { get; private set; }
+		public string Title { get; private set; }
+
+		public StreamViewItem(StreamView view)
+		{
+			View = view;
+			Title = GetTitle(view);
+		}
+
+		private string GetTitle(StreamView view)
+		{
+			switch (view)
+			{
+				case StreamView.ExpandedView:
+					return Strings.Resources.StreamViewExpanded;
+
+				case StreamView.ListView:
+					return Strings.Resources.StreamViewList;
+
+				default:
+					return view.ToString("G");
+			}
 		}
 	}
 }

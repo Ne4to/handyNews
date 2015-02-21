@@ -20,8 +20,10 @@
 			<PasswordBox x:Uid="SignInPasswordBox" Header="password" IsPasswordRevealButtonEnabled="True" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 			<CheckBox x:Uid="SignInRememberMeBox" Content="remember me" IsChecked="{Binding RememberMe, Mode=TwoWay}" Visibility="Collapsed" />
 			<Button x:Uid="SignInButton" Content="sign in" Command="{Binding SignInCommand}" />
+			<TextBlock x:Uid="SignInOAuthWarning" 
+					   Style="{StaticResource InfoTextStyle}"
+					   Text="In case you usually login with your Google of Facebook account: Open the Inoreader profile preferences and set a password. Use this with your username to login." />
 			<HyperlinkButton x:Uid="SignUpButton" Content="sign up" HorizontalAlignment="Left" Foreground="#FF0099EB" FontSize="18.14" NavigateUri="http://www.inoreader.com/" />
-			<TextBlock x:Uid="SignInOAuthWarning" Text="In case you usually login with your Google of Facebook account: Open the Inoreader profile preferences and set a password. Use this with your username to login." TextWrapping="WrapWholeWords" Foreground="Gray" />
 		</StackPanel>
 		
 		<ProgressRing IsActive="{Binding IsBusy}" />

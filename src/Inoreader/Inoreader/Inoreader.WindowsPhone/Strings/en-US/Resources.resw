@@ -272,4 +272,16 @@
     <value>In case you usually login with your Google of Facebook account: Open the Inoreader profile preferences and set a password. Use this with your username to login.</value>
     <comment>Sign in page - Google and Facebook login instruction</comment>
   </data>
+  <data name="StreamViewExpanded" xml:space="preserve">
+    <value>expanded view</value>
+    <comment>Settings - view - expanded title</comment>
+  </data>
+  <data name="StreamViewList" xml:space="preserve">
+    <value>list view</value>
+    <comment>Settings - view - list title</comment>
+  </data>
+  <data name="SettingsStreamViewBox.Header" xml:space="preserve">
+    <value>view</value>
+    <comment>Settings - view - combobox header</comment>
+  </data>
 </root>

@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/18/2015 20:05:41
+// 	Generated: 02/21/2015 15:46:57
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -159,6 +159,28 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("SubscriptionsSectionHeader");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "expanded view"
+        /// </summary>
+        public static string StreamViewExpanded
+        {
+            get
+            {
+                return resourceLoader.GetString("StreamViewExpanded");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "list view"
+        /// </summary>
+        public static string StreamViewList
+        {
+            get
+            {
+                return resourceLoader.GetString("StreamViewList");
             }
         }
     }
