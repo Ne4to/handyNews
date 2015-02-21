@@ -24,7 +24,7 @@
             <m3:ShowOn Tile="wide310x150Logo" />
           </m3:ShowNameOnTiles>
         </m3:DefaultTile>
-        <m3:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#D4EBF2" />
+        <m3:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#33537F" />
       </m3:VisualElements>
     </Application>
   </Applications>

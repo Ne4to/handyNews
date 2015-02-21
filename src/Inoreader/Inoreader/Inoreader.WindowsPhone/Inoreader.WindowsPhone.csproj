@@ -85,8 +85,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Behaviors\DataContextPresenter.cs" />
     <Compile Include="Behaviors\ItemsScrollBehavior.cs" />
     <Compile Include="Converters\BooleanToBrushConverter.cs" />
+    <Compile Include="Converters\BooleanToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\FileSizeToStringConverter.cs" />
     <Compile Include="Converters\FormatStringConverter.cs" />
@@ -139,7 +141,16 @@
     <Compile Include="Views\Controls\FilledStarControl.xaml.cs">
       <DependentUpon>FilledStarControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\ReadControl.xaml.cs">
+      <DependentUpon>ReadControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\StarControl.xaml.cs">
+      <DependentUpon>StarControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Controls\SwipeControl.cs" />
+    <Compile Include="Views\Controls\UnreadControl.xaml.cs">
+      <DependentUpon>UnreadControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Details\EmptySpaceItem.xaml.cs">
       <DependentUpon>EmptySpaceItem.xaml</DependentUpon>
     </Compile>
@@ -229,6 +240,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\FilledStarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\ReadControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\StarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\UnreadControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

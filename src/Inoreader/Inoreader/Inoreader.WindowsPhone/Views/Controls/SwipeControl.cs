@@ -10,6 +10,8 @@ namespace Inoreader.Views.Controls
 {
 	public sealed class SwipeControl : ContentControl
 	{
+		private const double ExecuteThreshold = 0.28D;
+
 		enum ExecuteCommand
 		{
 			None,
@@ -79,7 +81,7 @@ namespace Inoreader.Views.Controls
 		}
 
 		public static readonly DependencyProperty RightContentTemplateProperty = DependencyProperty.Register(
-			"RightContentTemplate", typeof(DataTemplate), typeof(SwipeControl), new PropertyMetadata(default(DataTemplate)));
+			"RightContentTemplate", typeof(DataTemplate), typeof(SwipeControl), new PropertyMetadata(default(DataTemplate)));		
 
 		public DataTemplate RightContentTemplate
 		{
@@ -94,6 +96,7 @@ namespace Inoreader.Views.Controls
 			Loaded += SwipeControl_Loaded;
 			SizeChanged += SwipeControl_SizeChanged;
 
+			//ManipulationStarting
 			ManipulationStarted += SwipeControl_ManipulationStarted;
 			ManipulationDelta += SwipeControl_ManipulationDelta;
 			ManipulationCompleted += SwipeControl_ManipulationCompleted;
@@ -101,12 +104,21 @@ namespace Inoreader.Views.Controls
 
 		void SwipeControl_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
 		{
+			var canExecute = (LeftCommand != null && LeftCommand.CanExecute(DataContext)) 
+							|| (RightCommand != null && RightCommand.CanExecute(DataContext));
+
+			if (!canExecute)
+			{
+				//e.Complete();
+				//return;	
+			}
+			
 			VisualStateManager.GoToState(this, "LeftTranslationState", false);
 			VisualStateManager.GoToState(this, "CenterTranslationState", false);
 			VisualStateManager.GoToState(this, "RightTranslationState", false);
 
 			var x = e.Cumulative.Translation.X;
-			UpdateValues(x);
+			UpdateValues(x);			
 		}
 
 		void SwipeControl_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
@@ -125,22 +137,22 @@ namespace Inoreader.Views.Controls
 			if (_rightRoot.Clip != null)
 				((TranslateTransform)_rightRoot.Clip.Transform).X = Math.Max(ActualWidth + x, 0D);
 
-			if (x > ActualWidth * 0.35D)
+			if (x > ActualWidth * ExecuteThreshold)
 			{
 				_leftActionTransform.X = 15D;
 				_executeCommand = ExecuteCommand.Left;
 			}
 			else
 			{
-				if (x < ActualWidth * -0.35D)
+				if (x < ActualWidth * -ExecuteThreshold)
 				{
 					_rightActionTransform.X = -15D;
 					_executeCommand = ExecuteCommand.Right;
 				}
 				else
 				{
-					_leftActionTransform.X = x * 0.35D;
-					_rightActionTransform.X = x * 0.35D;
+					_leftActionTransform.X = x * ExecuteThreshold;
+					_rightActionTransform.X = x * ExecuteThreshold;
 					_executeCommand = ExecuteCommand.None;
 				}
 			}
@@ -172,7 +184,7 @@ namespace Inoreader.Views.Controls
 			}
 
 			if (executeCommand != null)
-				executeCommand.Execute(null);
+				executeCommand.Execute(DataContext);
 		}
 
 		void SwipeControl_Loaded(object sender, RoutedEventArgs e)

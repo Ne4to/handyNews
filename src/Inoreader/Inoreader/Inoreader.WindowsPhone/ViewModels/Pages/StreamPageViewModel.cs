@@ -47,6 +47,8 @@ namespace Inoreader.ViewModels.Pages
 		private DelegateCommand _openWebCommand;
 		private ICommand _refreshCommand;
 		private DelegateCommand _shareCommand;
+		private ICommand _readItemCommand;
+		private ICommand _starItemCommand;
 
 		#endregion
 
@@ -135,6 +137,16 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand ShareCommand
 		{
 			get { return _shareCommand ?? (_shareCommand = new DelegateCommand(OnShare, CanShare)); }
+		}
+		
+		public ICommand ReadItemCommand
+		{
+			get { return _readItemCommand ?? (_readItemCommand = new DelegateCommand<object>(OnReadItem)); }
+		}
+
+		public ICommand StarItemCommand
+		{
+			get { return _starItemCommand ?? (_starItemCommand = new DelegateCommand<object>(OnStarItem)); }
 		}
 
 		#endregion
@@ -417,6 +429,36 @@ namespace Inoreader.ViewModels.Pages
 		private bool CanShare()
 		{
 			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+		}
+
+		private void OnReadItem(object o)
+		{
+			var item = o as StreamItem;
+			if (item == null || item is EmptySpaceStreamItem)
+				return;
+
+			item.Unread = !item.Unread;
+			MarkAsRead(item.Id, !item.Unread);
+
+			if (item == _currentItem)
+			{
+				SetCurrentItemRead(!item.Unread);
+			}
+		}
+
+		private void OnStarItem(object o)
+		{
+			var item = o as StreamItem;
+			if (item == null || item is EmptySpaceStreamItem)
+				return;
+
+			item.Starred = !item.Starred;
+			MarkAsStarred(item.Id, item.Starred);
+
+			if (item == _currentItem)
+			{
+				SetCurrentItemStarred(item.Starred);
+			}
 		}
 
 		private void MarkAsRead(string id, bool newValue)

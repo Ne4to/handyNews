@@ -6,17 +6,15 @@
 
 	<converters:MinusConverter x:Key="MinusConverter" />
 
-	<!--<Color x:Key="DefaultColor">#D4D6DB</Color>-->
-	<Color x:Key="DefaultColor">Transparent</Color>
+	<Color x:Key="DefaultColor">#FEFEFE</Color>
 	<SolidColorBrush x:Key="DefaultBrush" Color="{StaticResource DefaultColor}" />
 
 	<Color x:Key="TranslationColor">#3F9EE2</Color>
 	<SolidColorBrush x:Key="SwipeControlTranslationBackgroundBrush" Color="{StaticResource TranslationColor}" />
 
-	<!--<Brush x:Key="LeftColor">DarkRed</Brush>-->
-	<Color x:Key="LeftColor">#E01C06</Color>
+	<Color x:Key="LeftColor">#33537F</Color>
 	<SolidColorBrush x:Key="SwipeControlLeftBackgroundBrush" Color="{StaticResource LeftColor}" />
-	<Color x:Key="RightColor">Green</Color>
+	<Color x:Key="RightColor">#33537F</Color>
 	<SolidColorBrush x:Key="SwipeControlRightBackgroundBrush" Color="{StaticResource RightColor}" />
 
 	<Style TargetType="controls:SwipeControl">

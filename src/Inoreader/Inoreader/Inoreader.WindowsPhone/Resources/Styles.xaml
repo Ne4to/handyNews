@@ -5,6 +5,7 @@
 
 	<converters:SmartDateToStringConverter x:Key="SmartDateToStringConverter" />
 	<converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	<converters:BooleanToInverseVisibilityConverter x:Key="BooleanToInverseVisibilityConverter" />
 	<converters:ItemClickEventArgsToItemConverter x:Key="ItemClickEventArgsToItemConverter" />
 	<converters:BooleanToBrushConverter TrueBrush="#82A8FF" FalseBrush="Transparent" x:Key="UnreadToBrushConverter" />
 	<converters:BooleanToBrushConverter TrueBrush="#82A8FF" FalseBrush="Transparent" x:Key="IsSelectedToBrushConverter" />

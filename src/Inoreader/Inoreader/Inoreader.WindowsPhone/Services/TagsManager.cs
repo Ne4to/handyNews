@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +19,8 @@ namespace Inoreader.Services
 		private readonly ApiClient _apiClient;
 		private readonly TelemetryClient _telemetryClient;
 
-		private readonly ConcurrentQueue<TagAction> _queue;
+		private readonly LinkedList<TagAction> _queue;
+		private readonly object _queueLock = new object();
 		private int _currentBusy = 0;
 
 		public TagsManager(TagsManagerState state, [NotNull] ApiClient apiClient, [NotNull] TelemetryClient telemetryClient,
@@ -32,7 +33,7 @@ namespace Inoreader.Services
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
 
-			_queue = state != null ? new ConcurrentQueue<TagAction>(state.Actions) : new ConcurrentQueue<TagAction>();
+			_queue = state != null ? new LinkedList<TagAction>(state.Actions) : new LinkedList<TagAction>();
 			networkManager.NetworkChanged += networkManager_NetworkChanged;
 		}
 
@@ -44,10 +45,26 @@ namespace Inoreader.Services
 
 		public TagsManagerState GetState()
 		{
+			TagAction[] actions;
+			lock (_queueLock)
+			{
+				actions = _queue.ToArray();
+			}
+
 			return new TagsManagerState
 			{
-				Actions = _queue.ToArray()
+				Actions = actions
 			};
+		}
+
+		private void AddItem(TagAction item)
+		{
+			lock (_queueLock)
+			{
+				_queue.AddLast(item);
+			}
+
+			ProcessQueue();
 		}
 
 		public void MarkAsRead(string id)
@@ -57,8 +74,7 @@ namespace Inoreader.Services
 				Id = id
 			};
 
-			_queue.Enqueue(item);
-			ProcessQueue();
+			AddItem(item);
 		}
 
 		public void MarkAsUnreadTagAction(string id)
@@ -68,8 +84,7 @@ namespace Inoreader.Services
 				Id = id
 			};
 
-			_queue.Enqueue(item);
-			ProcessQueue();
+			AddItem(item);
 		}
 
 		public void AddToStarred(string id)
@@ -79,8 +94,7 @@ namespace Inoreader.Services
 				Id = id
 			};
 
-			_queue.Enqueue(item);
-			ProcessQueue();
+			AddItem(item);
 		}
 
 		public void RemoveFromStarred(string id)
@@ -90,8 +104,23 @@ namespace Inoreader.Services
 				Id = id
 			};
 
-			_queue.Enqueue(item);
-			ProcessQueue();
+			AddItem(item);
+		}
+
+		private TagAction GetNext()
+		{
+			TagAction result = null;
+
+			lock (_queueLock)
+			{
+				if (_queue.Count != 0)
+				{
+					result = _queue.First.Value;
+					_queue.RemoveFirst();
+				}
+			}
+
+			return result;
 		}
 
 		public async void ProcessQueue()
@@ -103,8 +132,12 @@ namespace Inoreader.Services
 
 			try
 			{
-				while (_queue.TryDequeue(out action))
+				while (true)
 				{
+					action = GetNext();
+					if (action == null)
+						return;
+
 					await action.ExecuteAsync(_apiClient, _telemetryClient).ConfigureAwait(false);
 				}
 			}
@@ -112,7 +145,10 @@ namespace Inoreader.Services
 			{
 				if (action != null)
 				{
-					_queue.Enqueue(action);
+					lock (_queueLock)
+					{
+						_queue.AddFirst(action);
+					}					
 				}
 
 				_telemetryClient.TrackExceptionFull(ex);

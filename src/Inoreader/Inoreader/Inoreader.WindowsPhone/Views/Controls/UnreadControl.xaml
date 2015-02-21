@@ -1,0 +1,16 @@
+﻿<UserControl
+    x:Class="Inoreader.Views.Controls.UnreadControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"    
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    
+    <Grid>
+		<Path Stretch="Uniform" 
+			  Fill="White" 			  
+			  Data="M0.007000024,0L42.667,0 21.31645,13.445 0.0078422055,0.00053136618 21.336851,17.709139 42.667,0 42.533497,25.4072 42.368797,25.3552 42.530998,25.447 0.0072022048,25.447 0.20773478,25.332199 0,25.4072z" />
+	</Grid>
+</UserControl>
