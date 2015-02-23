@@ -12,6 +12,7 @@ namespace Inoreader.Services
 		public bool HideEmptySubscriptions { get; set; }
 		public bool ShowNewestFirst { get; set; }
 		public StreamView StreamView { get; set; }
+		public double FontSize { get; set; }
 
 		public AppSettingsService()
 		{
@@ -19,6 +20,7 @@ namespace Inoreader.Services
 			HideEmptySubscriptions = true;
 			ShowNewestFirst = true;
 			StreamView = StreamView.ExpandedView;
+			FontSize = 11D;
 
 			Load();
 		}
@@ -33,6 +35,7 @@ namespace Inoreader.Services
 			HideEmptySubscriptions = container.GetValue("HideEmptySubscriptions", true);
 			ShowNewestFirst = container.GetValue("ShowNewestFirst", true);
 			StreamView = (StreamView)container.GetValue("StreamView", (int)StreamView.ExpandedView);
+			FontSize = container.GetValue("FontSize", 11D);
 		}
 
 		public void Save()
@@ -42,6 +45,7 @@ namespace Inoreader.Services
 			container.Values["HideEmptySubscriptions"] = HideEmptySubscriptions;
 			container.Values["ShowNewestFirst"] = ShowNewestFirst;
 			container.Values["StreamView"] = (int)StreamView;
+			container.Values["FontSize"] = FontSize;
 		}
 	}
 

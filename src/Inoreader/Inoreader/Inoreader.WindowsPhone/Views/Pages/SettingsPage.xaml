@@ -48,7 +48,14 @@
 					  Header="display order" 
 					  ItemsSource="{Binding ShowOrderItems}" 
 					  SelectedItem="{Binding SelectedShowOrder, Mode=TwoWay}"
-					  DisplayMemberPath="Title" />			
+					  DisplayMemberPath="Title" />
+
+			<Slider Header="font size" HorizontalAlignment="Stretch" 
+					x:Name="SettingsFontSizeSlider"
+					Minimum="11" Maximum="22" Value="{Binding FontSize, Mode=TwoWay}" />
+			<TextBlock TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="3" 
+					   FontSize="{Binding ElementName=SettingsFontSizeSlider, Path=Value}"
+					   Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas malesuada odio nec hendrerit scelerisque. Sed turpis nulla, fermentum ac tortor nec, ultrices vestibulum risus. Sed suscipit, orci nec dapibus ornare, sapien enim interdum risus, vel faucibus odio ex a nunc. Aenean consectetur aliquam efficitur. Ut libero ipsum, convallis sed mattis nec, gravida eget purus. Aliquam ut est quis neque vulputate fermentum. Donec ut enim at dolor pretium bibendum non nec urna. Nullam viverra pulvinar sapien, ut bibendum nibh pretium in. Cras accumsan, leo non pulvinar sollicitudin, leo nulla vulputate felis, in lacinia justo risus at orci. Integer at enim vel magna malesuada cursus at ut risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum interdum lacus quis dapibus hendrerit. Pellentesque quam massa, pellentesque a nisi vel, porttitor commodo dui. Integer varius metus a molestie luctus. Suspendisse potenti." />
 
 			<Grid>
 				<Grid.RowDefinitions>

@@ -288,4 +288,8 @@
     <value>estrela</value>
     <comment>application bar button</comment>
   </data>
+  <data name="SettingsFontSizeSlider.Header" xml:space="preserve">
+    <value>tamanho da fonte</value>
+    <comment>Settings - font size slider header</comment>
+  </data>
 </root>

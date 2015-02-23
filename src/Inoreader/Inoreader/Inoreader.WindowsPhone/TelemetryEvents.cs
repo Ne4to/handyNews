@@ -10,6 +10,7 @@
 		public const string ChangeDisplayCulture = "ChangeDisplayCulture";
 		public const string ChangeHideEmptySubscriptions = "ChangeHideEmptySubscriptions";
 		public const string ChangeShowOrder = "ChangeShowOrder";
+		public const string ChangeFontSize = "ChangeFontSize";
 		public const string ChangeStreamView = "ChangeStreamView";
 		public const string MarkAsRead = "MarkAsRead";
 		public const string MarkAsStarred = "MarkAsStarred";		

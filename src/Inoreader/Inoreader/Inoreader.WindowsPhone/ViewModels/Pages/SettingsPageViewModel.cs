@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
-using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
 using Inoreader.Services;
@@ -32,6 +31,7 @@ namespace Inoreader.ViewModels.Pages
 		private ShowOrderItem _selectedShowOrder;
 		private List<StreamViewItem> _streamViewItems;
 		private StreamViewItem _selectedStreamView;
+		private double _fontSize;
 
 		private ReactiveCommand<object> _clearCacheComand;
 
@@ -48,21 +48,13 @@ namespace Inoreader.ViewModels.Pages
 		public Lang SelectedLang
 		{
 			get { return _selectedLang; }
-			set
-			{
-				if (SetProperty(ref _selectedLang, value))
-					OnSelectedLangChanged();
-			}
+			set { SetProperty(ref _selectedLang, value); }
 		}
 
 		public bool HideEmptySubscriptions
 		{
 			get { return _hideEmptySubscriptions; }
-			set
-			{
-				if (SetProperty(ref _hideEmptySubscriptions, value))
-					OnHideEmptySubscriptionsChanged();
-			}
+			set { SetProperty(ref _hideEmptySubscriptions, value); }
 		}
 
 		public ulong TotalCacheSize
@@ -86,11 +78,7 @@ namespace Inoreader.ViewModels.Pages
 		public ShowOrderItem SelectedShowOrder
 		{
 			get { return _selectedShowOrder; }
-			set
-			{
-				if (SetProperty(ref _selectedShowOrder, value))
-					OnSelectedShowOrderChanged();
-			}
+			set { SetProperty(ref _selectedShowOrder, value); }
 		}
 
 		public List<StreamViewItem> StreamViewItems
@@ -102,11 +90,13 @@ namespace Inoreader.ViewModels.Pages
 		public StreamViewItem SelectedStreamView
 		{
 			get { return _selectedStreamView; }
-			set
-			{
-				if (SetProperty(ref _selectedStreamView, value))
-					OnSelectedStreamViewChanged();
-			}
+			set { SetProperty(ref _selectedStreamView, value); }
+		}
+
+		public double FontSize
+		{
+			get { return _fontSize; }
+			set { SetProperty(ref _fontSize, value); }
 		}
 
 		#endregion
@@ -171,6 +161,7 @@ namespace Inoreader.ViewModels.Pages
 			});
 
 			SelectedStreamView = StreamViewItems.Single(s => s.View == _settingsService.StreamView);
+			FontSize = _settingsService.FontSize;
 
 			IsCacheBusy = true;
 			TotalCacheSize = await _cacheManager.GetTotalCacheSizeAsync();
@@ -182,64 +173,81 @@ namespace Inoreader.ViewModels.Pages
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
+			SaveLang();
+			SaveHideEmptySubscriptions();
+			SaveStreamView();
+			SaveShowOrder();
+			SaveFontSize();
+
+			_settingsService.Save();
+
 			if (!suspending && _clearCacheComand != null)
 				_clearCacheComand.Dispose();
 		}
 
-		private void OnSelectedLangChanged()
+		private void SaveLang()
 		{
-			if (_initialDisplayCulture != SelectedLang.Name)
-			{
-				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeDisplayCulture);
-				eventTelemetry.Properties.Add("OldValue", _initialDisplayCulture);
-				eventTelemetry.Properties.Add("NewValue", SelectedLang.Name);
-				_telemetryClient.TrackEvent(eventTelemetry);
-			}
+			if (_settingsService.DisplayCulture == SelectedLang.Name)
+				return;
+
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeDisplayCulture);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.DisplayCulture);
+			eventTelemetry.Properties.Add("NewValue", SelectedLang.Name);
+			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.DisplayCulture = SelectedLang.Name;
-			_settingsService.Save();			
 		}
 
-		private void OnHideEmptySubscriptionsChanged()
+		private void SaveHideEmptySubscriptions()
 		{
-			if (HideEmptySubscriptions != _settingsService.HideEmptySubscriptions)
-			{
-				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeHideEmptySubscriptions);
-				eventTelemetry.Properties.Add("OldValue", _settingsService.HideEmptySubscriptions.ToString());
-				eventTelemetry.Properties.Add("NewValue", HideEmptySubscriptions.ToString());
-				_telemetryClient.TrackEvent(eventTelemetry);
-			}
+			if (HideEmptySubscriptions == _settingsService.HideEmptySubscriptions)
+				return;
+
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeHideEmptySubscriptions);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.HideEmptySubscriptions.ToString());
+			eventTelemetry.Properties.Add("NewValue", HideEmptySubscriptions.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.HideEmptySubscriptions = HideEmptySubscriptions;
-			_settingsService.Save();
 		}
 
-		private void OnSelectedShowOrderChanged()
+		private void SaveStreamView()
 		{
-			if (SelectedShowOrder.Value != _settingsService.ShowNewestFirst)
-			{
-				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeShowOrder);
-				eventTelemetry.Properties.Add("OldValue", _settingsService.ShowNewestFirst.ToString());
-				eventTelemetry.Properties.Add("NewValue", SelectedShowOrder.Value.ToString());
-				_telemetryClient.TrackEvent(eventTelemetry);
-			}
+			if (SelectedStreamView.View == _settingsService.StreamView)
+				return;
 
-			_settingsService.ShowNewestFirst = SelectedShowOrder.Value;
-			_settingsService.Save();
-		}
-
-		private void OnSelectedStreamViewChanged()
-		{
-			if (SelectedStreamView.View != _settingsService.StreamView)
-			{
-				var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeStreamView);
-				eventTelemetry.Properties.Add("OldValue", _settingsService.StreamView.ToString());
-				eventTelemetry.Properties.Add("NewValue", SelectedStreamView.View.ToString());
-				_telemetryClient.TrackEvent(eventTelemetry);
-			}
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeStreamView);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.StreamView.ToString());
+			eventTelemetry.Properties.Add("NewValue", SelectedStreamView.View.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.StreamView = SelectedStreamView.View;
-			_settingsService.Save();
+		}
+
+		private void SaveShowOrder()
+		{
+			if (SelectedShowOrder.Value == _settingsService.ShowNewestFirst)
+				return;
+
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeShowOrder);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.ShowNewestFirst.ToString());
+			eventTelemetry.Properties.Add("NewValue", SelectedShowOrder.Value.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
+			
+			_settingsService.ShowNewestFirst = SelectedShowOrder.Value;
+		}
+
+		private void SaveFontSize()
+		{
+			if (Math.Abs(FontSize - _settingsService.FontSize) < 0.1D)
+				return;
+
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeFontSize);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.FontSize.ToString());
+			eventTelemetry.Properties.Add("NewValue", FontSize.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
+
+			_settingsService.FontSize = FontSize;
 		}
 
 		private async void OnClearCache(object obj)

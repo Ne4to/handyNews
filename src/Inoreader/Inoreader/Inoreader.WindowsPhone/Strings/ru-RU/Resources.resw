@@ -258,4 +258,8 @@
     <value>избранное</value>
     <comment>application bar button</comment>
   </data>
+  <data name="SettingsFontSizeSlider.Header" xml:space="preserve">
+    <value>размер шрифта</value>
+    <comment>Settings - font size slider header</comment>
+  </data>
 </root>
