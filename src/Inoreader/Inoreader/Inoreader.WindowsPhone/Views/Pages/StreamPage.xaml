@@ -300,6 +300,7 @@
 													</interactivity:Interaction.Behaviors>
 												</RichTextBlock>
 
+												<!-- TODO move click event handler to whole list view item, including header -->
 												<controls:StreamListViewControl Grid.Column="0" 
 																				HtmlContent="{Binding Content}" 
 																				Visibility="{Binding Source={StaticResource DataContextPresenter}, 

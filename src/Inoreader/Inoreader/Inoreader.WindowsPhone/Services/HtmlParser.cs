@@ -9,12 +9,15 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
 using Microsoft.ApplicationInsights;
+using Microsoft.Practices.ServiceLocation;
 
 namespace Inoreader.Services
 {
 	public class HtmlParser
 	{
 		private static readonly TelemetryClient _telemetry = new TelemetryClient();
+		private static double _fontSize = 11D;
+		private static double _fontMultiplier = 1D;
 
 		private const double FontSizeH1 = 28D;
 		private const double FontSizeH2 = 24D;
@@ -30,6 +33,9 @@ namespace Inoreader.Services
 
 			try
 			{
+				_fontSize = ServiceLocator.Current.GetInstance<AppSettingsService>().FontSize;
+				_fontMultiplier = _fontSize / 11D;
+
 				var strings = GetStrings(html);
 				var lexemes = GetLexemes(strings);
 
@@ -42,7 +48,7 @@ namespace Inoreader.Services
 					var literalLexeme = lexeme as LiteralLexeme;
 					if (literalLexeme != null)
 					{
-						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text });
+						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _fontSize });
 						continue;
 					}
 
@@ -126,7 +132,7 @@ namespace Inoreader.Services
 
 			if (String.Equals(startL.Name, "li", StringComparison.OrdinalIgnoreCase))
 			{
-				inlines.Add(new Run() { Text = "• " });
+				inlines.Add(new Run() { Text = "• ", FontSize = _fontSize });
 			}
 
 			if (String.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
@@ -145,7 +151,7 @@ namespace Inoreader.Services
 					if (literalLexeme != null)
 					{
 						var hyperlink = new Hyperlink { NavigateUri = navigateUri };
-						hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text });
+						hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _fontSize });
 						inlines.Add(hyperlink);
 						return;
 					}
@@ -188,7 +194,7 @@ namespace Inoreader.Services
 				if (literalLexeme != null)
 				{
 					var item = new Bold();
-					item.Inlines.Add(new Run { Text = literalLexeme.Text });
+					item.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _fontSize });
 					inlines.Add(item);
 				}
 				return;
@@ -207,11 +213,11 @@ namespace Inoreader.Services
 				var literalLexeme = lexeme as LiteralLexeme;
 				if (literalLexeme != null)
 				{
-					var item = new Run { Text = literalLexeme.Text };
+					var item = new Run { Text = literalLexeme.Text, FontSize = _fontSize };
 
 					double? customFontSize = GetFontSize(strParams);
 					if (customFontSize.HasValue)
-						item.FontSize = customFontSize.Value;
+						item.FontSize = customFontSize.Value * _fontMultiplier;
 
 					if (strParams.Italic)
 						item.FontStyle = FontStyle.Italic;

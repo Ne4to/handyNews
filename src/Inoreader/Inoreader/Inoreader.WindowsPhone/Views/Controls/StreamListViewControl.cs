@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
+using Inoreader.Services;
+using Microsoft.Practices.ServiceLocation;
 
 // The Templated Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234235
 
@@ -31,6 +26,8 @@ namespace Inoreader.Views.Controls
 			this.DefaultStyleKey = typeof(StreamListViewControl);
 			this.IsTapEnabled = true;
 			Tapped += StreamListViewControl_Tapped;
+
+			FontSize = ServiceLocator.Current.GetInstance<AppSettingsService>().FontSize;
 		}
 
 		void StreamListViewControl_Tapped(object sender, TappedRoutedEventArgs e)

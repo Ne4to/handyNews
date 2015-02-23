@@ -15,6 +15,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Microsoft.Practices.Unity;
 using Microsoft.ApplicationInsights;
+using Microsoft.Practices.ServiceLocation;
 
 namespace Inoreader
 {
@@ -78,6 +79,9 @@ namespace Inoreader
 			_tagsManager.ProcessQueue();			
 
 			Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = _appSettingsService.DisplayCulture;
+
+			var unityServiceLocator = new UnityServiceLocator(_container);
+			ServiceLocator.SetLocatorProvider(() => unityServiceLocator);
 
 			ViewModelLocationProvider.SetDefaultViewModelFactory(ViewModelFactory);
 			ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(ViewModelTypeResolver);
