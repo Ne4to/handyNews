@@ -8,11 +8,14 @@ using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
+using Microsoft.ApplicationInsights;
 
 namespace Inoreader.Services
 {
 	public class HtmlParser
 	{
+		private static readonly TelemetryClient _telemetry = new TelemetryClient();
+
 		private const double FontSizeH1 = 28D;
 		private const double FontSizeH2 = 24D;
 		private const double FontSizeH3 = 20D;
@@ -25,83 +28,91 @@ namespace Inoreader.Services
 			if (html == null)
 				return new Paragraph();
 
-			var strings = GetStrings(html);
-			var lexemes = GetLexemes(strings);
-
-			var paragraph = new Paragraph();
-
-			for (int lexemeIndex = 0; lexemeIndex < lexemes.Length; lexemeIndex++)
+			try
 			{
-				var lexeme = lexemes[lexemeIndex];
+				var strings = GetStrings(html);
+				var lexemes = GetLexemes(strings);
 
-				var literalLexeme = lexeme as LiteralLexeme;
-				if (literalLexeme != null)
-				{
-					paragraph.Inlines.Add(new Run { Text = literalLexeme.Text });
-					continue;
-				}
+				var paragraph = new Paragraph();
 
-				var tagLexeme = (HtmlTagLexeme)lexeme;
-				if (String.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
+				for (int lexemeIndex = 0; lexemeIndex < lexemes.Length; lexemeIndex++)
 				{
-					paragraph.Inlines.Add(new LineBreak());
-					continue;
-				}
+					var lexeme = lexemes[lexemeIndex];
 
-				if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
-				{
-					var src = tagLexeme.Attributes["src"];
-					if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
+					var literalLexeme = lexeme as LiteralLexeme;
+					if (literalLexeme != null)
+					{
+						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text });
 						continue;
-
-					string widthStr;
-					int width = 0;
-					if (tagLexeme.Attributes.TryGetValue("width", out widthStr))
-					{
-						Int32.TryParse(widthStr, out width);
 					}
 
-					string heightStr;
-					int height = 0;
-					if (tagLexeme.Attributes.TryGetValue("height", out heightStr))
+					var tagLexeme = (HtmlTagLexeme)lexeme;
+					if (String.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
 					{
-						Int32.TryParse(heightStr, out height);
+						paragraph.Inlines.Add(new LineBreak());
+						continue;
 					}
 
-					var image = new Image
+					if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
 					{
-						Source = new BitmapImage(new Uri(src))
-					};
+						var src = tagLexeme.Attributes["src"];
+						if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
+							continue;
 
-					if (width != 0)
-						image.Width = width;
+						string widthStr;
+						int width = 0;
+						if (tagLexeme.Attributes.TryGetValue("width", out widthStr))
+						{
+							Int32.TryParse(widthStr, out width);
+						}
 
-					if (height != 0)
-						image.Height = height;
+						string heightStr;
+						int height = 0;
+						if (tagLexeme.Attributes.TryGetValue("height", out heightStr))
+						{
+							Int32.TryParse(heightStr, out height);
+						}
 
-					var inlineUiContainer = new InlineUIContainer
+						var image = new Image
+						{
+							Source = new BitmapImage(new Uri(src))
+						};
+
+						if (width != 0)
+							image.Width = width;
+
+						if (height != 0)
+							image.Height = height;
+
+						var inlineUiContainer = new InlineUIContainer
+						{
+							Child = image
+						};
+
+						paragraph.Inlines.Add(inlineUiContainer);
+						paragraph.Inlines.Add(new LineBreak());
+						continue;
+					}
+
+					if (tagLexeme.IsOpen && !tagLexeme.IsClose)
 					{
-						Child = image
-					};
-
-					paragraph.Inlines.Add(inlineUiContainer);
-					paragraph.Inlines.Add(new LineBreak());
-					continue;
+						var closeIndex = GetCloseIndex(lexemeIndex, lexemes);
+						if (closeIndex != -1)
+						{
+							var strParams = new StringParameters();
+							AddBeginEnd(paragraph.Inlines, lexemes, lexemeIndex, closeIndex, strParams);
+							lexemeIndex = closeIndex;
+						}
+					}
 				}
 
-				if (tagLexeme.IsOpen && !tagLexeme.IsClose)
-				{
-					var closeIndex = GetCloseIndex(lexemeIndex, lexemes);
-					if (closeIndex != -1)
-					{
-						var strParams = new StringParameters();
-						AddBeginEnd(paragraph.Inlines, lexemes, lexemeIndex, closeIndex, strParams);
-						lexemeIndex = closeIndex;
-					}
-				}
+				return paragraph;
 			}
-
-			return paragraph;
+			catch (Exception e)
+			{
+				_telemetry.TrackException(e);
+				return new Paragraph();
+			}
 		}
 
 		private static void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex, StringParameters strParams)
@@ -440,26 +451,37 @@ namespace Inoreader.Services
 
 		public static string GetPlainText(string html, int maxLength)
 		{
-			var x = HtmlUtilities.ConvertToText(html);
-			var builder = new StringBuilder(x);
-			builder.Replace('\r', ' ');
-			builder.Replace('\n', ' ');
-			builder.Replace('\t', ' ');
+			if (html == null)
+				return null;
 
-			int currentLength;
-			int newLength;
-
-			do
+			try
 			{
-				currentLength = builder.Length;
-				builder.Replace("  ", " ");
-				newLength = builder.Length;
-			} while (currentLength != newLength);
+				var x = HtmlUtilities.ConvertToText(html);
+				var builder = new StringBuilder(x);
+				builder.Replace('\r', ' ');
+				builder.Replace('\n', ' ');
+				builder.Replace('\t', ' ');
 
-			if (newLength < maxLength)
-				return builder.ToString().Trim();
+				int currentLength;
+				int newLength;
 
-			return builder.ToString().Substring(0, maxLength).Trim();
+				do
+				{
+					currentLength = builder.Length;
+					builder.Replace("  ", " ");
+					newLength = builder.Length;
+				} while (currentLength != newLength);
+
+				if (newLength < maxLength)
+					return builder.ToString().Trim();
+
+				return builder.ToString().Substring(0, maxLength).Trim();
+			}
+			catch (Exception e)
+			{
+				_telemetry.TrackException(e);
+				return null;
+			}
 		}
 	}
 

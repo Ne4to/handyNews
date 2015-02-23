@@ -17,11 +17,15 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
-	
+
 	<storeApps:VisualStateAwarePage.Resources>
 
 		<behaviors:DataContextPresenter DataContext="{Binding}" 
 										x:Key="DataContextPresenter" />
+
+		<converters:StreamViewToVisibilityConverter x:Key="StreamViewToVisibilityConverter" />
+		<services:StreamView x:Key="StreamListView">ListView</services:StreamView>
+		<services:StreamView x:Key="StreamExpandedView">ExpandedView</services:StreamView>
 
 		<FontFamily x:Key="ContentControlThemeFontFamily">Segoe WP</FontFamily>
 		<x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
@@ -276,8 +280,32 @@
 													<ColumnDefinition Width="20" />
 												</Grid.ColumnDefinitions>
 
-												<TextBlock Text="{Binding ShortPlainText}" TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="2" />
-												<!--<RichTextBlock services:RichTextBlockExtensions.HtmlContent="{Binding Content}" IsTextSelectionEnabled="False" />-->
+												<!--<TextBlock Text="{Binding ShortPlainText}" 
+														   TextWrapping="WrapWholeWords" 
+														   TextTrimming="WordEllipsis" 
+														   MaxLines="2"
+														   Visibility="{Binding Source={StaticResource DataContextPresenter}, 
+																Path=DataContext.CurrentView, 
+																Converter={StaticResource StreamViewToVisibilityConverter}, 
+																ConverterParameter={StaticResource StreamListView}}" />-->
+
+												<RichTextBlock Grid.Column="0"
+															   IsTextSelectionEnabled="False"
+															   Visibility="{Binding Source={StaticResource DataContextPresenter}, 
+																		Path=DataContext.CurrentView, 
+																		Converter={StaticResource StreamViewToVisibilityConverter}, 
+																		ConverterParameter={StaticResource StreamExpandedView}}">
+													<interactivity:Interaction.Behaviors>
+														<behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding Content}" />
+													</interactivity:Interaction.Behaviors>
+												</RichTextBlock>
+
+												<controls:StreamListViewControl Grid.Column="0" 
+																				HtmlContent="{Binding Content}" 
+																				Visibility="{Binding Source={StaticResource DataContextPresenter}, 
+																							Path=DataContext.CurrentView, 
+																							Converter={StaticResource StreamViewToVisibilityConverter}, 
+																							ConverterParameter={StaticResource StreamListView}}" />
 
 												<controls:StarControl Grid.Column="1" 
 																Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -310,7 +338,7 @@
 							<DataTemplate>
 								<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
 									<TextBlock Text="star" Margin="0,0,5,0" FontSize="16" Foreground="White" />
-									
+
 									<controls:FilledStarControl Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
 																Width="15" 
 																Height="15" />
@@ -333,7 +361,7 @@
 
 		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="1" />
 	</storeApps:VisualStateAwarePage.Resources>
-	
+
 	<Page.BottomAppBar>
 		<CommandBar>
 			<AppBarToggleButton x:Uid="SetReadAppBarButton"

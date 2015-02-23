@@ -86,15 +86,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Behaviors\DataContextPresenter.cs" />
+    <Compile Include="Behaviors\DependencyPropertyChangedHelper.cs" />
     <Compile Include="Behaviors\ItemsScrollBehavior.cs" />
+    <Compile Include="Behaviors\RichTextBlockHtmlBehavior.cs" />
     <Compile Include="Converters\BooleanToBrushConverter.cs" />
     <Compile Include="Converters\BooleanToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\DebugConverter.cs" />
     <Compile Include="Converters\FileSizeToStringConverter.cs" />
     <Compile Include="Converters\FormatStringConverter.cs" />
+    <Compile Include="Converters\HtmlToShortPlainTextConverter.cs" />
     <Compile Include="Converters\ItemClickEventArgsToItemConverter.cs" />
     <Compile Include="Converters\MinusConverter.cs" />
     <Compile Include="Converters\SmartDateToStringConverter.cs" />
+    <Compile Include="Converters\StreamViewToVisibilityConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
     <Compile Include="Converters\ZeroCountToVisibilityConverter.cs" />
     <Compile Include="Models\BindableBaseEx.cs" />
@@ -147,6 +152,7 @@
     <Compile Include="Views\Controls\StarControl.xaml.cs">
       <DependentUpon>StarControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\StreamListViewControl.cs" />
     <Compile Include="Views\Controls\SwipeControl.cs" />
     <Compile Include="Views\Controls\UnreadControl.xaml.cs">
       <DependentUpon>UnreadControl.xaml</DependentUpon>

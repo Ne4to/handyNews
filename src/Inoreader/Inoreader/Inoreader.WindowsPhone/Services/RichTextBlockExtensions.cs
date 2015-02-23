@@ -30,7 +30,8 @@ namespace Inoreader.Services
 		private static void HtmlContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			var richTextBlock = d as RichTextBlock;
-			if (richTextBlock != null)
+
+			if (richTextBlock != null && richTextBlock.Visibility == Visibility.Visible)
 			{
 				richTextBlock.Blocks.Clear();
 				var paragraph = HtmlParser.GetParagraph(e.NewValue as String);

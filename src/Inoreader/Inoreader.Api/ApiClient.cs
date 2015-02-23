@@ -125,7 +125,7 @@ namespace Inoreader.Api
 
 		public Task<StreamResponse> GetStreamAsync(string id, bool showNewestFirst = true, int count = 20, string continuation = null)
 		{
-			var uri = String.Format("https://www.inoreader.com/reader/api/0/stream/contents/{0}?n={1}&xt=user/-/state/com.google/read&output=json&r={2}", id, count, showNewestFirst ? "n" : "o");
+			var uri = String.Format("https://www.inoreader.com/reader/api/0/stream/contents/{0}?n={1}&xt=user/-/state/com.google/read&output=json&r={2}", WebUtility.UrlEncode(id), count, showNewestFirst ? "n" : "o");
 			
 			if (continuation != null)
 				uri += "&c=" + continuation;
@@ -135,13 +135,13 @@ namespace Inoreader.Api
 
 		public Task AddTagAsync(string tag, string itemId)
 		{
-			var uri = String.Format("https://www.inoreader.com/reader/api/0/edit-tag?a={0}&i={1}", tag, itemId);
+			var uri = String.Format("https://www.inoreader.com/reader/api/0/edit-tag?a={0}&i={1}",  WebUtility.UrlEncode(tag),  WebUtility.UrlEncode(itemId));
 			return GetNoResultAsync(uri);
 		}
 
 		public Task RemoveTagAsync(string tag, string itemId)
 		{
-			var uri = String.Format("https://www.inoreader.com/reader/api/0/edit-tag?r={0}&i={1}", tag, itemId);
+			var uri = String.Format("https://www.inoreader.com/reader/api/0/edit-tag?r={0}&i={1}",  WebUtility.UrlEncode(tag),  WebUtility.UrlEncode(itemId));
 			return GetNoResultAsync(uri);
 		}
 
