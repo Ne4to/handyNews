@@ -266,4 +266,14 @@
     <value>отметить все как прочитанное</value>
     <comment>application bar button</comment>
   </data>
+  <data name="DialogCommandNo" xml:space="preserve">
+    <value>нет</value>
+  </data>
+  <data name="DialogCommandYes" xml:space="preserve">
+    <value>да</value>
+  </data>
+  <data name="MarkAllAsReadDialogContent" xml:space="preserve">
+    <value>Вы хотите отметить все как прочитанное?
+Это нельзя отменить!</value>
+  </data>
 </root>

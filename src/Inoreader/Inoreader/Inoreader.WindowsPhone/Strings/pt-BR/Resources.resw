@@ -296,4 +296,14 @@
     <value>marcar tudo como lido</value>
     <comment>application bar button</comment>
   </data>
+  <data name="DialogCommandNo" xml:space="preserve">
+    <value>não</value>
+  </data>
+  <data name="DialogCommandYes" xml:space="preserve">
+    <value>sim</value>
+  </data>
+  <data name="MarkAllAsReadDialogContent" xml:space="preserve">
+    <value>Você quer marcar tudo como lido?
+Isto não pode ser desfeito!</value>
+  </data>
 </root>

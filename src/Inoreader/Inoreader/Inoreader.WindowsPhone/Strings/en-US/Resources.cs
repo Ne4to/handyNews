@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/24/2015 00:29:07
+// 	Generated: 02/24/2015 01:00:15
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -181,6 +181,40 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("StreamViewList");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "no"
+        /// </summary>
+        public static string DialogCommandNo
+        {
+            get
+            {
+                return resourceLoader.GetString("DialogCommandNo");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "yes"
+        /// </summary>
+        public static string DialogCommandYes
+        {
+            get
+            {
+                return resourceLoader.GetString("DialogCommandYes");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "Do you want to mark all as read?
+        ///This cannot be undone!"
+        /// </summary>
+        public static string MarkAllAsReadDialogContent
+        {
+            get
+            {
+                return resourceLoader.GetString("MarkAllAsReadDialogContent");
             }
         }
     }

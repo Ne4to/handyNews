@@ -146,7 +146,7 @@ namespace Inoreader.ViewModels.Pages
 		{
 			get { return _shareCommand ?? (_shareCommand = new DelegateCommand(OnShare, CanShare)); }
 		}
-		
+
 		public ICommand ReadItemCommand
 		{
 			get { return _readItemCommand ?? (_readItemCommand = new DelegateCommand<object>(OnReadItem)); }
@@ -474,13 +474,19 @@ namespace Inoreader.ViewModels.Pages
 				SetCurrentItemStarred(item.Starred);
 			}
 		}
-		
+
 		private async void OnMarkAllAsRead()
 		{
 			if (Items == null)
 				return;
+			
+			var dlg = new MessageDialog(Strings.Resources.MarkAllAsReadDialogContent);
+			dlg.Commands.Add(new UICommand(Strings.Resources.DialogCommandYes) { Id = 1 });
+			dlg.Commands.Add(new UICommand(Strings.Resources.DialogCommandNo) { Id = 0 });
+			var x = await dlg.ShowAsync();
 
-			// TODO ask user
+			if ((int)x.Id != 1)
+				return;
 
 			Exception error = null;
 			try
@@ -571,13 +577,13 @@ namespace Inoreader.ViewModels.Pages
 
 			if (newValue)
 			{
-				_currentItem.Starred = true;				
+				_currentItem.Starred = true;
 				SetCurrentItemStarred(true);
 				MarkAsStarred(_currentItem.Id, true);
 			}
 			else
 			{
-				_currentItem.Starred = false;				
+				_currentItem.Starred = false;
 				SetCurrentItemStarred(false);
 				MarkAsStarred(_currentItem.Id, false);
 			}

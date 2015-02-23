@@ -296,4 +296,14 @@
     <value>mark all as read</value>
     <comment>application bar button</comment>
   </data>
+  <data name="DialogCommandNo" xml:space="preserve">
+    <value>no</value>
+  </data>
+  <data name="DialogCommandYes" xml:space="preserve">
+    <value>yes</value>
+  </data>
+  <data name="MarkAllAsReadDialogContent" xml:space="preserve">
+    <value>Do you want to mark all as read?
+This cannot be undone!</value>
+  </data>
 </root>
