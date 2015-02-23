@@ -27,6 +27,17 @@ namespace Inoreader.Models
 		private readonly TelemetryClient _telemetryClient;
 		private readonly Action<bool> _onBusy;
 		private string _continuation;
+		private int _streamTimestamp;
+
+		public string StreamId
+		{
+			get { return _streamId; }
+		}
+
+		public int StreamTimestamp
+		{
+			get { return _streamTimestamp; }
+		}
 
 		bool _busy;
 
@@ -65,6 +76,7 @@ namespace Inoreader.Models
 			_streamId = state.StreamId;
 			_showNewestFirst = state.ShowNewestFirst;
 			_continuation = state.Continuation;
+			_streamTimestamp = state.StreamTimestamp;
 			AddRange(state.Items);
 		}
 
@@ -119,6 +131,7 @@ namespace Inoreader.Models
 				var stopwatch = Stopwatch.StartNew();
 
 				stream = await _apiClient.GetStreamAsync(_streamId, _showNewestFirst, count, continuation);
+				_streamTimestamp = stream.updated;
 
 				stopwatch.Stop();
 				_telemetryClient.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
@@ -233,6 +246,7 @@ namespace Inoreader.Models
 			state.Continuation = _continuation;
 			state.Items = this.ToArray();
 			state.ShowNewestFirst = _showNewestFirst;
+			state.StreamTimestamp = _streamTimestamp;
 
 			return state;
 		}

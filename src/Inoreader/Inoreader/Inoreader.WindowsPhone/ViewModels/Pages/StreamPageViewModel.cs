@@ -50,6 +50,7 @@ namespace Inoreader.ViewModels.Pages
 		private DelegateCommand _shareCommand;
 		private ICommand _readItemCommand;
 		private ICommand _starItemCommand;
+		private ICommand _markAllAsReadCommand;
 
 		#endregion
 
@@ -154,6 +155,11 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand StarItemCommand
 		{
 			get { return _starItemCommand ?? (_starItemCommand = new DelegateCommand<object>(OnStarItem)); }
+		}
+
+		public ICommand MarkAllAsReadCommand
+		{
+			get { return _markAllAsReadCommand ?? (_markAllAsReadCommand = new DelegateCommand(OnMarkAllAsRead)); }
 		}
 
 		#endregion
@@ -467,6 +473,38 @@ namespace Inoreader.ViewModels.Pages
 			{
 				SetCurrentItemStarred(item.Starred);
 			}
+		}
+		
+		private async void OnMarkAllAsRead()
+		{
+			if (Items == null)
+				return;
+
+			// TODO ask user
+
+			Exception error = null;
+			try
+			{
+				_telemetryClient.TrackEvent(TelemetryEvents.MarkAllAsRead);
+				await _apiClient.MarkAllAsReadAsync(Items.StreamId, Items.StreamTimestamp);
+
+				foreach (var item in Items)
+				{
+					item.Unread = false;
+				}
+
+				SetCurrentItemRead(true);
+			}
+			catch (Exception ex)
+			{
+				error = ex;
+				_telemetryClient.TrackException(ex);
+			}
+
+			if (error == null) return;
+
+			MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
+			await msgbox.ShowAsync();
 		}
 
 		private void MarkAsRead(string id, bool newValue)

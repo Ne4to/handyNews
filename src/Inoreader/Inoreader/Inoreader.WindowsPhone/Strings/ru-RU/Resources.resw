@@ -262,4 +262,8 @@
     <value>размер шрифта</value>
     <comment>Settings - font size slider header</comment>
   </data>
+  <data name="MarkAllAsReadAppBarButton.Label" xml:space="preserve">
+    <value>отметить все как прочитанное</value>
+    <comment>application bar button</comment>
+  </data>
 </root>

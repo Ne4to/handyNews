@@ -17,6 +17,9 @@ namespace Inoreader.Models.States
 		[DataMember]
 		public bool ShowNewestFirst { get; set; }
 
+		[DataMember]
+		public int StreamTimestamp { get; set; }
+
 		[OnDeserializing]
 		private void SetDefaultValues(StreamingContext c)
 		{

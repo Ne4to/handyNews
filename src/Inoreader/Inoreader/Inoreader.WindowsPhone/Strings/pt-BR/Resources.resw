@@ -292,4 +292,8 @@
     <value>tamanho da fonte</value>
     <comment>Settings - font size slider header</comment>
   </data>
+  <data name="MarkAllAsReadAppBarButton.Label" xml:space="preserve">
+    <value>marcar tudo como lido</value>
+    <comment>application bar button</comment>
+  </data>
 </root>

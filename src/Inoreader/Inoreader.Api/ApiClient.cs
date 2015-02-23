@@ -144,6 +144,12 @@ namespace Inoreader.Api
 			var uri = String.Format("https://www.inoreader.com/reader/api/0/edit-tag?r={0}&i={1}",  WebUtility.UrlEncode(tag),  WebUtility.UrlEncode(itemId));
 			return GetNoResultAsync(uri);
 		}
+		
+		public Task MarkAllAsReadAsync(string streamId, int streamTimestamp)
+		{
+			var uri = String.Format("https://www.inoreader.com/reader/api/0/mark-all-as-read?s={0}&ts={1}", WebUtility.UrlEncode(streamId), streamTimestamp);
+			return GetNoResultAsync(uri);
+		}
 
 		private async Task<T> GetAsync<T>(string requestUri)
 		{

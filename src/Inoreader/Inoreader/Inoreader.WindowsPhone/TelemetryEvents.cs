@@ -16,6 +16,7 @@
 		public const string MarkAsStarred = "MarkAsStarred";		
 		public const string ManualRefreshSubscriptions = "ManualRefreshSubscriptions";
 		public const string ManualRefreshStream = "ManualRefreshStream";
+		public const string MarkAllAsRead = "MarkAllAsRead";
 		public const string OpenItemInWeb = "OpenItemInWeb";
 		public const string LoadSubscriptionsFromCache = "Cache.LoadSubscriptions";
 		public const string LoadStreamFromCache = "Cache.LoadStream";
