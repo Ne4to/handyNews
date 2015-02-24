@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.Phone.UI.Input;
+using Windows.Storage;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -16,6 +17,7 @@ using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Microsoft.Practices.Unity;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
+using Newtonsoft.Json.Linq;
 
 namespace Inoreader
 {
@@ -28,7 +30,7 @@ namespace Inoreader
 
 		// New up the singleton container that will be used for type resolution in the app
 		readonly IUnityContainer _container = new UnityContainer();
-		readonly ApiClient _apiClient = new ApiClient();
+		private ApiClient _apiClient;
 		readonly AppSettingsService _appSettingsService = new AppSettingsService();
 		private TagsManager _tagsManager;
 		private CacheManager _cacheManager;
@@ -65,9 +67,18 @@ namespace Inoreader
 
 			_container.RegisterType<ICredentialService, CredentialService>(new ContainerControlledLifetimeManager());
 			_container.RegisterType<NetworkManager>(new ContainerControlledLifetimeManager());
-			_container.RegisterInstance(_apiClient);
 			_container.RegisterInstance(_appSettingsService);
 			_container.RegisterInstance(TelemetryClient);
+
+			var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
+			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
+			var strData = await FileIO.ReadTextAsync(file);
+			var data = JObject.Parse(strData);
+
+			var appId = data["AppId"].ToString();
+			var appKey = data["AppKey"].ToString();
+			_apiClient = new ApiClient(appId, appKey);
+			_container.RegisterInstance(_apiClient);
 
 			_cacheManager = new CacheManager(TelemetryClient);
 			await _cacheManager.InitAsync();

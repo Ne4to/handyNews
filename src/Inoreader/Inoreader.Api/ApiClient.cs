@@ -20,10 +20,12 @@ namespace Inoreader.Api
 			get { return String.IsNullOrEmpty(_sessionStore.Auth); }
 		}
 
-		public ApiClient()
+		public ApiClient(string appId, string appKey)
 		{
 			var httpClientHandler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
 			_httpClient = new HttpClient(httpClientHandler);
+			_httpClient.DefaultRequestHeaders.Add("AppId", appId);
+			_httpClient.DefaultRequestHeaders.Add("AppKey", appKey);
 			_httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue()
 			{
 				NoCache = true

@@ -226,6 +226,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ApplicationInsights.config</LastGenOutput>
     </None>
+    <Content Include="Assets\ApiAuth.json" />
     <None Include="Package.StoreAssociation.xml" />
     <PRIResource Include="Strings\pt-BR\Resources.resw">
       <CustomToolNamespace>Inoreader.Strings</CustomToolNamespace>
