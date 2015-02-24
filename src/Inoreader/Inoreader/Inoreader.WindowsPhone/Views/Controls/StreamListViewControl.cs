@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml;
+﻿using Windows.ApplicationModel;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Inoreader.Services;
@@ -21,12 +22,33 @@ namespace Inoreader.Views.Controls
 			set { SetValue(HtmlContentProperty, value); }
 		}
 
+		public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
+			"Title", typeof (object), typeof (StreamListViewControl), new PropertyMetadata(default(object)));
+
+		public object Title
+		{
+			get { return (object) GetValue(TitleProperty); }
+			set { SetValue(TitleProperty, value); }
+		}
+
+		public static readonly DependencyProperty PublishedProperty = DependencyProperty.Register(
+			"Published", typeof (object), typeof (StreamListViewControl), new PropertyMetadata(default(object)));
+
+		public object Published
+		{
+			get { return (object) GetValue(PublishedProperty); }
+			set { SetValue(PublishedProperty, value); }
+		}
+
 		public StreamListViewControl()
 		{
 			this.DefaultStyleKey = typeof(StreamListViewControl);
+			
+			if (DesignMode.DesignModeEnabled)
+				return;
+
 			this.IsTapEnabled = true;
 			Tapped += StreamListViewControl_Tapped;
-
 			FontSize = ServiceLocator.Current.GetInstance<AppSettingsService>().FontSize;
 		}
 

@@ -17,11 +17,15 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
-	
+
 	<storeApps:VisualStateAwarePage.Resources>
 
 		<behaviors:DataContextPresenter DataContext="{Binding}" 
 										x:Key="DataContextPresenter" />
+
+		<converters:StreamViewToVisibilityConverter x:Key="StreamViewToVisibilityConverter" />
+		<services:StreamView x:Key="StreamListView">ListView</services:StreamView>
+		<services:StreamView x:Key="StreamExpandedView">ExpandedView</services:StreamView>
 
 		<FontFamily x:Key="ContentControlThemeFontFamily">Segoe WP</FontFamily>
 		<x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
@@ -236,7 +240,7 @@
 			</Setter>
 		</Style>
 
-		<resources:StreamItemTemplateSelector x:Key="StreamItemTemplateSelector">
+		<resources:StreamItemTemplateSelector x:Key="StreamItemExpandedViewTemplateSelector">
 			<resources:StreamItemTemplateSelector.StreamItemTemplate>
 				<DataTemplate>
 					<controls:SwipeControl LeftCommand="{Binding DataContext.ReadItemCommand, Source={StaticResource DataContextPresenter}}" 
@@ -276,8 +280,12 @@
 													<ColumnDefinition Width="20" />
 												</Grid.ColumnDefinitions>
 
-												<TextBlock Text="{Binding ShortPlainText}" TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="2" />
-												<!--<RichTextBlock services:RichTextBlockExtensions.HtmlContent="{Binding Content}" IsTextSelectionEnabled="False" />-->
+												<RichTextBlock Grid.Column="0"
+															   IsTextSelectionEnabled="False">
+													<interactivity:Interaction.Behaviors>
+														<behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding Content}" />
+													</interactivity:Interaction.Behaviors>
+												</RichTextBlock>
 
 												<controls:StarControl Grid.Column="1" 
 																Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -287,6 +295,8 @@
 																VerticalAlignment="Top" />
 											</Grid>
 										</StackPanel>
+
+										<!--<controls:StreamListViewControl Grid.Column="1" HtmlContent="{Binding Content}" />-->
 									</Grid>
 								</Border>
 							</DataTemplate>
@@ -310,7 +320,69 @@
 							<DataTemplate>
 								<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
 									<TextBlock Text="star" Margin="0,0,5,0" FontSize="16" Foreground="White" />
-									
+
+									<controls:FilledStarControl Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
+																Width="15" 
+																Height="15" />
+
+									<controls:EmptyStarControl Visibility="{Binding Starred, Converter={StaticResource BooleanToInverseVisibilityConverter}}"
+																Width="15" 
+																Height="15" />
+								</StackPanel>
+							</DataTemplate>
+						</controls:SwipeControl.RightContentTemplate>
+					</controls:SwipeControl>
+				</DataTemplate>
+			</resources:StreamItemTemplateSelector.StreamItemTemplate>
+			<resources:StreamItemTemplateSelector.EmptySpaceTemplate>
+				<DataTemplate>
+					<details:EmptySpaceItem />
+				</DataTemplate>
+			</resources:StreamItemTemplateSelector.EmptySpaceTemplate>
+		</resources:StreamItemTemplateSelector>
+
+		<resources:StreamItemTemplateSelector x:Key="StreamItemListViewTemplateSelector">
+			<resources:StreamItemTemplateSelector.StreamItemTemplate>
+				<DataTemplate>
+					<controls:SwipeControl LeftCommand="{Binding DataContext.ReadItemCommand, Source={StaticResource DataContextPresenter}}" 
+										   RightCommand="{Binding DataContext.StarItemCommand, Source={StaticResource DataContextPresenter}}">
+						<controls:SwipeControl.ContentTemplate>
+							<DataTemplate>
+								<Border BorderThickness="0,1" 
+										BorderBrush="{Binding IsSelected, Converter={StaticResource IsSelectedToBrushConverter}}">
+									<Grid>
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="6" />
+											<ColumnDefinition Width="*" />
+										</Grid.ColumnDefinitions>
+
+										<Grid Background="{Binding Unread, Converter={StaticResource UnreadToBrushConverter}}" />
+
+										<controls:StreamListViewControl Grid.Column="1" Margin="5" HtmlContent="{Binding Content}" Title="{Binding Title}" Published="{Binding Published}" />										
+									</Grid>
+								</Border>
+							</DataTemplate>
+						</controls:SwipeControl.ContentTemplate>
+						<controls:SwipeControl.LeftContentTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+									<controls:UnreadControl Visibility="{Binding Unread, Converter={StaticResource BooleanToVisibilityConverter}}"
+																Width="15" 
+																Height="15" />
+
+									<controls:ReadControl Visibility="{Binding Unread, Converter={StaticResource BooleanToInverseVisibilityConverter}}"
+																Width="15" 
+																Height="15" />
+
+									<TextBlock Text="read" FontSize="16" Foreground="White" Margin="5,0,0,0" />
+								</StackPanel>
+							</DataTemplate>
+						</controls:SwipeControl.LeftContentTemplate>
+						<controls:SwipeControl.RightContentTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+									<TextBlock Text="star" Margin="0,0,5,0" FontSize="16" Foreground="White" />
+
 									<controls:FilledStarControl Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
 																Width="15" 
 																Height="15" />
@@ -333,7 +405,7 @@
 
 		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="1" />
 	</storeApps:VisualStateAwarePage.Resources>
-	
+
 	<Page.BottomAppBar>
 		<CommandBar>
 			<AppBarToggleButton x:Uid="SetReadAppBarButton"
@@ -360,6 +432,10 @@
 							  Icon="ReShare"
 							  Label="share"
 							  Command="{Binding ShareCommand}"/>
+
+				<AppBarButton x:Uid="MarkAllAsReadAppBarButton" 
+							  Label="mark all as read"
+							  Command="{Binding MarkAllAsReadCommand}"/>
 			</CommandBar.SecondaryCommands>
 		</CommandBar>
 	</Page.BottomAppBar>
@@ -379,7 +455,7 @@
 				  x:Name="ItemsListView"
 				  ItemsSource="{Binding Items}" 
 				  ItemContainerStyle="{StaticResource ListViewItemStyle1}"
-				  ItemTemplateSelector="{StaticResource StreamItemTemplateSelector}" 
+				  ItemTemplateSelector="{StaticResource StreamItemExpandedViewTemplateSelector}" 
 				  IsItemClickEnabled="True">
 			<interactivity:Interaction.Behaviors>
 				<behaviors:ItemsScrollBehavior Command="{Binding ItemsScrollCommand}" />
@@ -394,6 +470,19 @@
 				   x:Uid="EverythingReadBlock"
 		           Visibility="{Binding Items.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
 				   Style="{StaticResource EverythingReadTextBlockStyle}" />
+
+		<VisualStateManager.VisualStateGroups>
+			<VisualStateGroup>
+				<VisualState x:Name="ExpandedViewState" />
+				<VisualState x:Name="ListViewState">
+					<Storyboard>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemsListView" Storyboard.TargetProperty="ItemTemplateSelector">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource StreamItemListViewTemplateSelector}" />
+						</ObjectAnimationUsingKeyFrames>
+					</Storyboard>
+				</VisualState>
+			</VisualStateGroup>
+		</VisualStateManager.VisualStateGroups>
 	</Grid>
 </storeApps:VisualStateAwarePage>
 

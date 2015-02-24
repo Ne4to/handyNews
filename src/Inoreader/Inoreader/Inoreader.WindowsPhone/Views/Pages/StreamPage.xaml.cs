@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Navigation;
 using Inoreader.Services;
 using Microsoft.Practices.Prism.Mvvm;
+using Microsoft.Practices.ServiceLocation;
 
 namespace Inoreader.Views.Pages
 {
@@ -13,7 +16,18 @@ namespace Inoreader.Views.Pages
 			InitializeComponent();
 			_itemsState = new ScrollViewerState(ItemsListView);
 		}
-		
+
+		protected override void OnNavigatedTo(NavigationEventArgs e)
+		{
+			base.OnNavigatedTo(e);
+
+			var appSettingsService = ServiceLocator.Current.GetInstance<AppSettingsService>();
+			if (appSettingsService.StreamView == StreamView.ListView)
+			{
+				var x = VisualStateManager.GoToState(this, "ListViewState", false);
+			}
+		}
+
 		protected override void SaveState(Dictionary<string, object> pageState)
 		{
 			base.SaveState(pageState);
