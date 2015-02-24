@@ -71,8 +71,11 @@ namespace Inoreader.Services
 					return;
 			}
 
-			var canSetHorizontalOffset = Math.Abs(_scrollViewer.ScrollableWidth - _scrollableWidth) < Tolerance;
-			var canSetVerticalOffset = Math.Abs(_scrollViewer.ScrollableHeight - _scrollableHeight) < Tolerance;
+			//var canSetHorizontalOffset = Math.Abs(_scrollViewer.ScrollableWidth - _scrollableWidth) < Tolerance;
+			//var canSetVerticalOffset = Math.Abs(_scrollViewer.ScrollableHeight - _scrollableHeight) < Tolerance;
+
+			var canSetHorizontalOffset = _horizontalOffset <= _scrollViewer.ScrollableWidth;
+			var canSetVerticalOffset = _verticalOffset <= _scrollViewer.ScrollableHeight;
 
 			if (canSetHorizontalOffset && !_horizontalSet)
 			{

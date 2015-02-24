@@ -185,7 +185,7 @@ namespace Inoreader.Services
 			eventTelemetry.Properties.Add("AsRead", true.ToString());
 			telemetryClient.TrackEvent(eventTelemetry);
 
-			return apiClient.AddTagAsync(SpecialTags.MarkItemAsRead, Id);
+			return apiClient.AddTagAsync(SpecialTags.Read, Id);
 		}
 	}
 
@@ -201,7 +201,7 @@ namespace Inoreader.Services
 			eventTelemetry.Properties.Add("AsRead", false.ToString());
 			telemetryClient.TrackEvent(eventTelemetry);
 
-			return apiClient.RemoveTagAsync(SpecialTags.MarkItemAsRead, Id);
+			return apiClient.RemoveTagAsync(SpecialTags.Read, Id);
 		}
 	}
 
@@ -217,7 +217,7 @@ namespace Inoreader.Services
 			eventTelemetry.Properties.Add("Starred", true.ToString());
 			telemetryClient.TrackEvent(eventTelemetry);
 
-			return apiClient.AddTagAsync(SpecialTags.MarkItemAsStarred, Id);
+			return apiClient.AddTagAsync(SpecialTags.Starred, Id);
 		}
 	}
 
@@ -233,7 +233,7 @@ namespace Inoreader.Services
 			eventTelemetry.Properties.Add("Starred", false.ToString());
 			telemetryClient.TrackEvent(eventTelemetry);
 
-			return apiClient.RemoveTagAsync(SpecialTags.MarkItemAsStarred, Id);
+			return apiClient.RemoveTagAsync(SpecialTags.Starred, Id);
 		}
 	}
 }

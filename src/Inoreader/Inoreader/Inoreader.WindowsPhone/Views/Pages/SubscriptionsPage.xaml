@@ -69,6 +69,7 @@
 		<!--ClosedDisplayMode="Minimal"-->
 		<CommandBar>
 			<CommandBar.PrimaryCommands>
+				<AppBarButton Icon="Favorite" x:Uid="StarsAppBarButton" Label="stars" Command="{Binding StarsCommand}" />
 				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding Subscriptions.RefreshCommand}" />
 			</CommandBar.PrimaryCommands>
 			<CommandBar.SecondaryCommands>

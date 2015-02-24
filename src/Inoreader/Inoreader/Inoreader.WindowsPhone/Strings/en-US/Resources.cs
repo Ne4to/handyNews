@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/24/2015 01:00:15
+// 	Generated: 02/25/2015 00:25:47
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -215,6 +215,17 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("MarkAllAsReadDialogContent");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "Stars"
+        /// </summary>
+        public static string StartPageHeader
+        {
+            get
+            {
+                return resourceLoader.GetString("StartPageHeader");
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
+using Inoreader.Services;
 using Inoreader.ViewModels.Details;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -19,6 +20,7 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _settingsPageCommand;
 		private ICommand _aboutPageCommand;
 		private ICommand _signOutCommand;
+		private ICommand _starsCommand;
 
 		public SubscriptionsViewModel Subscriptions { get; private set; }
 
@@ -35,6 +37,11 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand SignOutCommand
 		{
 			get { return _signOutCommand ?? (_signOutCommand = new DelegateCommand(OnSignOut)); }
+		}
+
+		public ICommand StarsCommand
+		{
+			get { return _starsCommand ?? (_starsCommand = new DelegateCommand(OnStars)); }
 		}
 
 		public SubscriptionsPageViewModel(IUnityContainer container, INavigationService navigationService, ApiClient apiClient)
@@ -84,6 +91,11 @@ namespace Inoreader.ViewModels.Pages
 		{
 			_apiClient.ClearSession();
 			_navigationService.Navigate(PageTokens.SignIn, null);			
+		}
+
+		private void OnStars()
+		{
+			_navigationService.Navigate(PageTokens.Stream, SpecialTags.Starred);
 		}
 	}
 }

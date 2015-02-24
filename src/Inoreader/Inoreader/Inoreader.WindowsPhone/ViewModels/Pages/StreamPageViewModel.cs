@@ -31,6 +31,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly TagsManager _tagsManager;
 		private readonly bool _showNewestFirst;
 		private string _streamId;
+		private bool _isStarsList;
 
 		private string _title;
 		private StreamItemCollection _items;
@@ -51,7 +52,7 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _readItemCommand;
 		private ICommand _starItemCommand;
 		private ICommand _markAllAsReadCommand;
-
+		
 		#endregion
 
 		#region Properties
@@ -196,6 +197,7 @@ namespace Inoreader.ViewModels.Pages
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
 			_streamId = (string)navigationParameter;
+			_isStarsList = _streamId == SpecialTags.Starred;
 
 			if (!RestoreState(viewModelState))
 				LoadData();
@@ -314,6 +316,8 @@ namespace Inoreader.ViewModels.Pages
 			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, b => IsBusy = b);
 			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			Title = await streamItems.InitAsync();
+			if (_isStarsList)
+				Title = Strings.Resources.StartPageHeader;
 
 			Items = streamItems;
 			_currentItem = Items.FirstOrDefault();
@@ -362,7 +366,7 @@ namespace Inoreader.ViewModels.Pages
 				return;
 			}
 
-			if (!firstItem.NeedSetReadExplicitly && firstItem.Unread && CurrentView == StreamView.ExpandedView)
+			if (!firstItem.NeedSetReadExplicitly && firstItem.Unread && CurrentView == StreamView.ExpandedView && !_isStarsList)
 			{
 				firstItem.Unread = false;
 				MarkAsRead(firstItem.Id, true);
@@ -393,7 +397,7 @@ namespace Inoreader.ViewModels.Pages
 				_currentItem = item;
 				_currentItem.IsSelected = true;
 
-				if (!item.NeedSetReadExplicitly && item.Unread)
+				if (!item.NeedSetReadExplicitly && item.Unread && !_isStarsList)
 				{
 					item.Unread = false;
 					MarkAsRead(item.Id, true);

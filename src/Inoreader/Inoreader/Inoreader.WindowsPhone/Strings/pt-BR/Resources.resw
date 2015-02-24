@@ -306,4 +306,11 @@
     <value>Você quer marcar tudo como lido?
 Isto não pode ser desfeito!</value>
   </data>
+  <data name="StarsAppBarButton.Label" xml:space="preserve">
+    <value>estrelas</value>
+    <comment>application bar button</comment>
+  </data>
+  <data name="StartPageHeader" xml:space="preserve">
+    <value>Estrelas</value>
+  </data>
 </root>

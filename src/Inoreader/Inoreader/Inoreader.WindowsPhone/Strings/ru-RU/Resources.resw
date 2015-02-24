@@ -276,4 +276,11 @@
     <value>Вы хотите отметить все как прочитанное?
 Это нельзя отменить!</value>
   </data>
+  <data name="StarsAppBarButton.Label" xml:space="preserve">
+    <value>избранное</value>
+    <comment>application bar button</comment>
+  </data>
+  <data name="StartPageHeader" xml:space="preserve">
+    <value>Избранное</value>
+  </data>
 </root>

@@ -306,4 +306,11 @@
     <value>Do you want to mark all as read?
 This cannot be undone!</value>
   </data>
+  <data name="StarsAppBarButton.Label" xml:space="preserve">
+    <value>stars</value>
+    <comment>application bar button</comment>
+  </data>
+  <data name="StartPageHeader" xml:space="preserve">
+    <value>Stars</value>
+  </data>
 </root>
