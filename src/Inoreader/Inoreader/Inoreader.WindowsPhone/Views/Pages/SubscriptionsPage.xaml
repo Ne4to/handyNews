@@ -88,6 +88,8 @@
 		<Grid>
 			<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
 			<details:OfflineBar Visibility="{Binding Subscriptions.IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+			<ProgressBar Visibility="{Binding Subscriptions.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 		</Grid>
 
 		<ListView Grid.Row="1" 
@@ -113,8 +115,6 @@
 		<TextBlock Grid.Row="1" 
 				   x:Uid="EverythingReadBlock"
 		           Visibility="{Binding Subscriptions.TreeItems.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
-				   Style="{StaticResource EverythingReadTextBlockStyle}" />
-
-		<ProgressRing Grid.Row="1" IsActive="{Binding Subscriptions.IsBusy}" />
+				   Style="{StaticResource EverythingReadTextBlockStyle}" />		
 	</Grid>
 </storeApps:VisualStateAwarePage>

@@ -116,7 +116,7 @@ namespace Inoreader.ViewModels.Details
 
 		void Application_Resuming(object sender, object e)
 		{
-			SilentRefreshCount(TreeItems, _rootItems);
+			LoadSubscriptions();
 		}
 
 		public async void LoadSubscriptions()
@@ -394,49 +394,9 @@ namespace Inoreader.ViewModels.Details
 			TreeItems = viewModelState.GetValue<List<TreeItemBase>>("TreeItems");
 			_categoryId = viewModelState.GetValue<string>("CategoryId");
 
-			SilentRefreshCount(TreeItems, _rootItems);
+			LoadSubscriptions();			
 
 			return _rootItems != null && TreeItems != null;
-		}
-
-		private async void SilentRefreshCount(List<TreeItemBase> treeItems, List<TreeItemBase> rootItems)
-		{
-			if (treeItems == null && rootItems == null)
-				return;
-
-			try
-			{
-				var unreadCount = await _apiClient.GetUnreadCountAsync();
-				foreach (var unreadcount in unreadCount.UnreadCounts)
-				{
-					if (treeItems != null)
-						UpdateUnreadCountInTree(treeItems, unreadcount.Id, unreadcount.Count);
-
-					if (rootItems != null)
-						UpdateUnreadCountInTree(rootItems, unreadcount.Id, unreadcount.Count);
-				}
-			}
-			catch (Exception ex)
-			{
-				_telemetryClient.TrackExceptionFull(ex);
-			}
-		}
-
-		private static void UpdateUnreadCountInTree(List<TreeItemBase> tree, string id, int count)
-		{
-			var item = tree.FirstOrDefault(ti => String.Equals(ti.Id, id, StringComparison.OrdinalIgnoreCase));
-			if (item == null)
-			{
-				var q = from c in tree.OfType<CategoryItem>()
-						from ch in c.Subscriptions
-						where String.Equals(ch.Id, id, StringComparison.OrdinalIgnoreCase)
-						select ch;
-
-				item = q.FirstOrDefault();
-			}
-
-			if (item != null)
-				item.UnreadCount = count;
 		}
 	}
 }
