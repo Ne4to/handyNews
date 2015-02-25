@@ -20,6 +20,9 @@ namespace Inoreader.Models.States
 		[DataMember]
 		public int StreamTimestamp { get; set; }
 
+		[DataMember]
+		public bool Fault { get; set; }
+
 		[OnDeserializing]
 		private void SetDefaultValues(StreamingContext c)
 		{

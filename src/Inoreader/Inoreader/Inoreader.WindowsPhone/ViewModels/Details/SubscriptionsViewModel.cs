@@ -361,8 +361,8 @@ namespace Inoreader.ViewModels.Details
 
 		public void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
 		{
-			if (!LoadState(viewModelState))
-				LoadSubscriptions();
+			LoadState(viewModelState);
+			LoadSubscriptions();
 		}
 
 		public void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
@@ -393,8 +393,6 @@ namespace Inoreader.ViewModels.Details
 			_isRoot = viewModelState.GetValue<bool>("IsRoot");
 			TreeItems = viewModelState.GetValue<List<TreeItemBase>>("TreeItems");
 			_categoryId = viewModelState.GetValue<string>("CategoryId");
-
-			LoadSubscriptions();			
 
 			return _rootItems != null && TreeItems != null;
 		}

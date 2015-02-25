@@ -32,7 +32,7 @@ namespace Inoreader.Behaviors
 		void richTextBlock_Loaded(object sender, RoutedEventArgs e)
 		{
 			var richTextBlock = (RichTextBlock)AssociatedObject;
-			if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string)
+			if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string && richTextBlock.Blocks.Count == 0)
 			{
 				var paragraph = HtmlParser.GetParagraph((string)HtmlContent);
 				richTextBlock.Blocks.Add(paragraph);

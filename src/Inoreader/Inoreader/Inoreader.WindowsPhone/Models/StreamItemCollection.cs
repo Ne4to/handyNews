@@ -28,6 +28,7 @@ namespace Inoreader.Models
 		private readonly Action<bool> _onBusy;
 		private string _continuation;
 		private int _streamTimestamp;
+		private bool _fault;
 
 		public string StreamId
 		{
@@ -77,6 +78,7 @@ namespace Inoreader.Models
 			_showNewestFirst = state.ShowNewestFirst;
 			_continuation = state.Continuation;
 			_streamTimestamp = state.StreamTimestamp;
+			_fault = state.Fault;
 			AddRange(state.Items);
 		}
 
@@ -154,7 +156,7 @@ namespace Inoreader.Models
 
 		public bool HasMoreItems
 		{
-			get { return !String.IsNullOrEmpty(_continuation); }
+			get { return !String.IsNullOrEmpty(_continuation) && !_fault; }
 		}
 
 		public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
@@ -197,6 +199,7 @@ namespace Inoreader.Models
 			}
 			catch (Exception ex)
 			{
+				_fault = true;
 				_telemetryClient.TrackExceptionFull(ex);
 
 				if (LoadMoreItemsError != null)
@@ -247,6 +250,7 @@ namespace Inoreader.Models
 			state.Items = this.ToArray();
 			state.ShowNewestFirst = _showNewestFirst;
 			state.StreamTimestamp = _streamTimestamp;
+			state.Fault = _fault;
 
 			return state;
 		}

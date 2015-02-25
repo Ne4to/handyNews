@@ -294,9 +294,7 @@
 																HorizontalAlignment="Right" 
 																VerticalAlignment="Top" />
 											</Grid>
-										</StackPanel>
-
-										<!--<controls:StreamListViewControl Grid.Column="1" HtmlContent="{Binding Content}" />-->
+										</StackPanel>										
 									</Grid>
 								</Border>
 							</DataTemplate>
