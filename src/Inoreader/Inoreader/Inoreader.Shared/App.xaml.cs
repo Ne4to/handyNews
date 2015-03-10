@@ -67,6 +67,7 @@ namespace Inoreader
 
 			_container.RegisterType<ICredentialService, CredentialService>(new ContainerControlledLifetimeManager());
 			_container.RegisterType<NetworkManager>(new ContainerControlledLifetimeManager());
+			_container.RegisterType<TileManager>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_appSettingsService);
 			_container.RegisterInstance(TelemetryClient);
 

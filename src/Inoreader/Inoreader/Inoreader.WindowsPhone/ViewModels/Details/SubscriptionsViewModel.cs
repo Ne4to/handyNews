@@ -37,6 +37,7 @@ namespace Inoreader.ViewModels.Details
 		private readonly TelemetryClient _telemetryClient;
 		private readonly AppSettingsService _settingsService;
 		private readonly CacheManager _cacheManager;
+		private readonly TileManager _tileManager;
 
 		private bool _isBusy;
 		private bool _isOffline;
@@ -97,19 +98,22 @@ namespace Inoreader.ViewModels.Details
 			[NotNull] ApiClient apiClient,
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] AppSettingsService settingsService,
-			[NotNull] CacheManager cacheManager)
+			[NotNull] CacheManager cacheManager,
+			[NotNull] TileManager tileManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
+			if (tileManager == null) throw new ArgumentNullException("tileManager");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
 			_settingsService = settingsService;
 			_cacheManager = cacheManager;
+			_tileManager = tileManager;
 
 			Application.Current.Resuming += Application_Resuming;
 		}
@@ -277,17 +281,21 @@ namespace Inoreader.ViewModels.Details
 			}
 
 			UpdateBadge(unreadCount);
+			var unreadAllItem = unreadCount.UnreadCounts.FirstOrDefault(uc => uc.Id.EndsWith("/state/com.google/reading-list", StringComparison.OrdinalIgnoreCase));
+			int totalUnreadCount = unreadAllItem != null ? unreadAllItem.Count : TreeItems.Sum(ti => ti.UnreadCount);
+			_tileManager.UpdateAsync(totalUnreadCount);
 
 			await _cacheManager.SaveSubscriptionsAsync(_rootItems);
 		}
 
 		private void UpdateBadge(UnreadCountResponse unreadCount)
 		{
-			var unreadAllItem = unreadCount.UnreadCounts.FirstOrDefault(uc => uc.Id.EndsWith("/state/com.google/reading-list", StringComparison.OrdinalIgnoreCase));
-			int totalUnreadCount = unreadAllItem != null ? unreadAllItem.Count : TreeItems.Sum(ti => ti.UnreadCount);
+			//var unreadAllItem = unreadCount.UnreadCounts.FirstOrDefault(uc => uc.Id.EndsWith("/state/com.google/reading-list", StringComparison.OrdinalIgnoreCase));
+			//int totalUnreadCount = unreadAllItem != null ? unreadAllItem.Count : TreeItems.Sum(ti => ti.UnreadCount);
 
-			BadgeNumericNotificationContent badgeContent = new BadgeNumericNotificationContent((uint)totalUnreadCount);
-			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeContent.CreateNotification());
+			//BadgeNumericNotificationContent badgeContent = new BadgeNumericNotificationContent((uint)totalUnreadCount);
+			//BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeContent.CreateNotification());
+			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
 		}
 
 		private void HideEmpty(List<TreeItemBase> allItems)

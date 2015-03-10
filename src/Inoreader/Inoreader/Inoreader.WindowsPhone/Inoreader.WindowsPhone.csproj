@@ -118,6 +118,7 @@
     <Compile Include="Services\RichTextBlockExtensions.cs" />
     <Compile Include="Services\SpecialTags.cs" />
     <Compile Include="Services\TagsManager.cs" />
+    <Compile Include="Services\TileManager.cs" />
     <Compile Include="Services\VisualTreeUtilities.cs" />
     <Compile Include="Strings\en-US\Resources.cs">
       <AutoGen>True</AutoGen>
@@ -151,6 +152,15 @@
     </Compile>
     <Compile Include="Views\Controls\StarControl.xaml.cs">
       <DependentUpon>StarControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\StartTileSquare.xaml.cs">
+      <DependentUpon>StartTileSquare.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\StartTileSquareSmall.xaml.cs">
+      <DependentUpon>StartTileSquareSmall.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\StartTileWide.xaml.cs">
+      <DependentUpon>StartTileWide.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\StreamListViewControl.cs" />
     <Compile Include="Views\Controls\SwipeControl.cs" />
@@ -255,6 +265,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\StarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\StartTileSquare.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\StartTileSquareSmall.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\StartTileWide.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
