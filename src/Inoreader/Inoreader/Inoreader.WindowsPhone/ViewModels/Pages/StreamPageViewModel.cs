@@ -455,6 +455,7 @@ namespace Inoreader.ViewModels.Pages
 			if (item == null || item is EmptySpaceStreamItem)
 				return;
 
+			item.NeedSetReadExplicitly = !item.Unread;
 			item.Unread = !item.Unread;
 			MarkAsRead(item.Id, !item.Unread);
 
