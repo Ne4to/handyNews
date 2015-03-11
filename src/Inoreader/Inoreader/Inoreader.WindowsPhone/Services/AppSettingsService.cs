@@ -1,5 +1,6 @@
 ﻿using System;
 using Windows.Storage;
+using Windows.UI.Xaml;
 
 namespace Inoreader.Services
 {
@@ -17,7 +18,7 @@ namespace Inoreader.Services
 
 		private const double PageHeaderFontSizeMult = 24D / DefaultFontSize;
 		private const double SubscriptionTreeItemFontSizeMult = 18D / DefaultFontSize;
-		
+
 		private const string SettingsContainerName = "AppSettings";
 		private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.LocalSettings;
 
@@ -25,6 +26,7 @@ namespace Inoreader.Services
 		public bool HideEmptySubscriptions { get; set; }
 		public bool ShowNewestFirst { get; set; }
 		public StreamView StreamView { get; set; }
+		public TextAlignment TextAlignment { get; set; }
 		public double FontSize { get; set; }
 
 		public double StreamTitleFontSize
@@ -84,6 +86,7 @@ namespace Inoreader.Services
 			ShowNewestFirst = true;
 			StreamView = StreamView.ExpandedView;
 			FontSize = 11D;
+			TextAlignment = TextAlignment.Justify;
 
 			Load();
 		}
@@ -99,6 +102,7 @@ namespace Inoreader.Services
 			ShowNewestFirst = container.GetValue("ShowNewestFirst", true);
 			StreamView = (StreamView)container.GetValue("StreamView", (int)StreamView.ExpandedView);
 			FontSize = container.GetValue("FontSize", 11D);
+			TextAlignment = (TextAlignment)container.GetValue("TextAlignment", (int)TextAlignment.Justify);
 		}
 
 		public void Save()
@@ -109,6 +113,7 @@ namespace Inoreader.Services
 			container.Values["ShowNewestFirst"] = ShowNewestFirst;
 			container.Values["StreamView"] = (int)StreamView;
 			container.Values["FontSize"] = FontSize;
+			container.Values["TextAlignment"] = (int)TextAlignment;
 		}
 	}
 

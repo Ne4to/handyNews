@@ -313,4 +313,7 @@ Isto não pode ser desfeito!</value>
   <data name="StartPageHeader" xml:space="preserve">
     <value>Estrelas</value>
   </data>
+  <data name="SettingTextJustification.Content" xml:space="preserve">
+    <value>justificação de texto</value>
+  </data>
 </root>

@@ -313,4 +313,7 @@ This cannot be undone!</value>
   <data name="StartPageHeader" xml:space="preserve">
     <value>Stars</value>
   </data>
+  <data name="SettingTextJustification.Content" xml:space="preserve">
+    <value>text justification</value>
+  </data>
 </root>

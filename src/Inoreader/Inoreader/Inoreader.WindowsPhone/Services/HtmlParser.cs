@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Windows.ApplicationModel;
 using Windows.Data.Html;
 using Windows.System;
 using Windows.UI.Text;
@@ -11,7 +10,6 @@ using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
 using Inoreader.Annotations;
 using Microsoft.ApplicationInsights;
-using Microsoft.Practices.ServiceLocation;
 
 namespace Inoreader.Services
 {
@@ -40,6 +38,7 @@ namespace Inoreader.Services
 				var lexemes = GetLexemes(strings);
 
 				var paragraph = new Paragraph();
+				paragraph.TextAlignment = _appSettings.TextAlignment;
 
 				for (int lexemeIndex = 0; lexemeIndex < lexemes.Length; lexemeIndex++)
 				{
@@ -47,8 +46,8 @@ namespace Inoreader.Services
 
 					var literalLexeme = lexeme as LiteralLexeme;
 					if (literalLexeme != null)
-					{
-						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
+					{						
+						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize});
 						continue;
 					}
 

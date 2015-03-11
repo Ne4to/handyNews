@@ -37,6 +37,9 @@ namespace Inoreader.Converters
 				case "SubscriptionTreeItemFontSize":
 					return _appSettings.SubscriptionTreeItemFontSize;
 
+				case "StreamItemTextAlignment":
+					return _appSettings.TextAlignment;
+
 				default:
 					throw new ArgumentOutOfRangeException("parameter");
 			}

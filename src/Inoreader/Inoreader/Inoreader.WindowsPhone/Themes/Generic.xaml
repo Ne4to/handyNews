@@ -387,7 +387,8 @@
 								</Grid.ColumnDefinitions>
 
 								<TextBlock x:Name="CollapsedTextBlock" 
-										   Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HtmlContent, Converter={StaticResource HtmlToShortPlainTextConverter}}" 
+										   Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HtmlContent, Converter={StaticResource HtmlToShortPlainTextConverter}}"
+										   TextAlignment="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamItemTextAlignment}"
 										   TextWrapping="WrapWholeWords" 
 										   TextTrimming="WordEllipsis" 
 										   MaxLines="2" />

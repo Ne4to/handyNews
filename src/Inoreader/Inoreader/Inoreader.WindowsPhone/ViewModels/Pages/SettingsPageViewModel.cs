@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
-using Windows.ApplicationModel.Resources.Core;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
 using Inoreader.Services;
@@ -35,6 +33,8 @@ namespace Inoreader.ViewModels.Pages
 		private List<StreamViewItem> _streamViewItems;
 		private StreamViewItem _selectedStreamView;
 		private double _fontSize;
+		private bool _textJustification;
+		private TextAlignment _textAlignment;
 
 		private ReactiveCommand<object> _clearCacheComand;
 
@@ -102,6 +102,22 @@ namespace Inoreader.ViewModels.Pages
 			set { SetProperty(ref _fontSize, value); }
 		}
 
+		public bool TextJustification
+		{
+			get { return _textJustification; }
+			set
+			{
+				SetProperty(ref _textJustification, value);
+				TextAlignment = TextJustification ? TextAlignment.Justify : TextAlignment.Left;
+			}
+		}
+
+		public TextAlignment TextAlignment
+		{
+			get { return _textAlignment; }
+			set { SetProperty(ref _textAlignment, value); }
+		}
+
 		#endregion
 
 		public ICommand ClearCacheCommand
@@ -165,6 +181,7 @@ namespace Inoreader.ViewModels.Pages
 
 			SelectedStreamView = StreamViewItems.Single(s => s.View == _settingsService.StreamView);
 			FontSize = _settingsService.FontSize;
+			TextJustification = _settingsService.TextAlignment == TextAlignment.Justify;
 
 			IsCacheBusy = true;
 			TotalCacheSize = await _cacheManager.GetTotalCacheSizeAsync();
@@ -181,13 +198,14 @@ namespace Inoreader.ViewModels.Pages
 			SaveStreamView();
 			SaveShowOrder();
 			SaveFontSize();
+			SaveTextJustification();
 
 			_settingsService.Save();
 
 			if (!suspending && _clearCacheComand != null)
 				_clearCacheComand.Dispose();
 		}
-
+		
 		private void SaveLang()
 		{
 			if (_settingsService.DisplayCulture == SelectedLang.Name)
@@ -251,6 +269,21 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.FontSize = FontSize;
+		}
+		
+		private void SaveTextJustification()
+		{
+			if (TextJustification == (_settingsService.TextAlignment == TextAlignment.Justify))
+				return;
+
+			var newValue = TextJustification ? TextAlignment.Justify : TextAlignment.Left;
+
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeTextAlignment);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.TextAlignment.ToString());
+			eventTelemetry.Properties.Add("NewValue", newValue.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
+
+			_settingsService.TextAlignment = newValue;
 		}
 
 		private async void OnClearCache(object obj)
