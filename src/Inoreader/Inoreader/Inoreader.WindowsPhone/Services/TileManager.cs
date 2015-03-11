@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Activation;
 using Windows.Graphics.Display;
 using Windows.Graphics.Imaging;
-using Windows.Media.Capture;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI;
@@ -78,6 +72,7 @@ namespace Inoreader.Services
 				tileNotification.ExpirationTime = DateTimeOffset.Now.AddDays(1D);
 
 				var tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();			
+				tileUpdater.Clear();
 				tileUpdater.Update(tileNotification);
 			}
 			catch (Exception ex)

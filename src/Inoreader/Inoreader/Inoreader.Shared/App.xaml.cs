@@ -70,6 +70,7 @@ namespace Inoreader
 			_container.RegisterType<TileManager>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_appSettingsService);
 			_container.RegisterInstance(TelemetryClient);
+			_container.RegisterInstance(_container.Resolve<HtmlParser>());
 
 			var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);

@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Windows.ApplicationModel;
 using Windows.Data.Html;
 using Windows.System;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
+using Inoreader.Annotations;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
 
@@ -15,16 +17,17 @@ namespace Inoreader.Services
 {
 	public class HtmlParser
 	{
-		private static readonly TelemetryClient _telemetry = new TelemetryClient();
-		private static double _fontSize = 11D;
-		private static double _fontMultiplier = 1D;
+		private static TelemetryClient _telemetry;
+		private static AppSettingsService _appSettings;
 
-		private const double FontSizeH1 = 28D;
-		private const double FontSizeH2 = 24D;
-		private const double FontSizeH3 = 20D;
-		private const double FontSizeH4 = 17D;
-		private const double FontSizeH5 = 14D;
-		private const double FontSizeH6 = 12D;
+		public HtmlParser([NotNull] AppSettingsService appSettingsService, [NotNull] TelemetryClient telemetryClient)
+		{
+			if (appSettingsService == null) throw new ArgumentNullException("appSettingsService");
+			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+
+			_appSettings = appSettingsService;
+			_telemetry = telemetryClient;
+		}
 
 		public static Paragraph GetParagraph(string html)
 		{
@@ -33,9 +36,6 @@ namespace Inoreader.Services
 
 			try
 			{
-				_fontSize = ServiceLocator.Current.GetInstance<AppSettingsService>().FontSize;
-				_fontMultiplier = _fontSize / 11D;
-
 				var strings = GetStrings(html);
 				var lexemes = GetLexemes(strings);
 
@@ -48,7 +48,7 @@ namespace Inoreader.Services
 					var literalLexeme = lexeme as LiteralLexeme;
 					if (literalLexeme != null)
 					{
-						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _fontSize });
+						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
 						continue;
 					}
 
@@ -132,7 +132,7 @@ namespace Inoreader.Services
 
 			if (String.Equals(startL.Name, "li", StringComparison.OrdinalIgnoreCase))
 			{
-				inlines.Add(new Run() { Text = "• ", FontSize = _fontSize });
+				inlines.Add(new Run() { Text = "• ", FontSize = _appSettings.FontSize });
 			}
 
 			if (String.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
@@ -151,7 +151,7 @@ namespace Inoreader.Services
 					if (literalLexeme != null)
 					{
 						var hyperlink = new Hyperlink { NavigateUri = navigateUri };
-						hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _fontSize });
+						hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
 						inlines.Add(hyperlink);
 						return;
 					}
@@ -194,7 +194,7 @@ namespace Inoreader.Services
 				if (literalLexeme != null)
 				{
 					var item = new Bold();
-					item.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _fontSize });
+					item.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
 					inlines.Add(item);
 				}
 				return;
@@ -213,11 +213,9 @@ namespace Inoreader.Services
 				var literalLexeme = lexeme as LiteralLexeme;
 				if (literalLexeme != null)
 				{
-					var item = new Run { Text = literalLexeme.Text, FontSize = _fontSize };
+					var item = new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize };
 
-					double? customFontSize = GetFontSize(strParams);
-					if (customFontSize.HasValue)
-						item.FontSize = customFontSize.Value * _fontMultiplier;
+					item.FontSize = GetFontSize(strParams);
 
 					if (strParams.Italic)
 						item.FontStyle = FontStyle.Italic;
@@ -291,27 +289,27 @@ namespace Inoreader.Services
 			}
 		}
 
-		private static double? GetFontSize(StringParameters strParams)
+		private static double GetFontSize(StringParameters strParams)
 		{
 			if (strParams.H1)
-				return FontSizeH1;
+				return _appSettings.FontSizeH1;
 
 			if (strParams.H2)
-				return FontSizeH2;
+				return _appSettings.FontSizeH2;
 
 			if (strParams.H3)
-				return FontSizeH3;
+				return _appSettings.FontSizeH3;
 
 			if (strParams.H4)
-				return FontSizeH4;
+				return _appSettings.FontSizeH4;
 
 			if (strParams.H5)
-				return FontSizeH5;
+				return _appSettings.FontSizeH5;
 
 			if (strParams.H6)
-				return FontSizeH6;
+				return _appSettings.FontSizeH6;
 
-			return null;
+			return _appSettings.FontSize;
 		}
 
 		private static int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)

@@ -265,12 +265,12 @@
 												</Grid.ColumnDefinitions>
 
 												<TextBlock Text="{Binding Title}"
-													   FontSize="14" 
-													   TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="2" />
+													   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamTitleFontSize}" 
+													   Style="{StaticResource StreamItemTitleStyle}" />
 
 												<TextBlock Grid.Column="1" 
 													   Text="{Binding Published, Converter={StaticResource SmartDateToStringConverter}}"
-													   FontSize="11"
+													   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamDateFontSize}"
 													   FontWeight="SemiLight" />
 											</Grid>
 
@@ -444,7 +444,12 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBlock Text="{Binding Title}" Style="{StaticResource PageHeaderTextStyle}" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="WordEllipsis" />
+		<TextBlock Text="{Binding Title}" 
+				   Style="{StaticResource PageHeaderTextStyle}" 
+				   TextWrapping="WrapWholeWords"
+				   MaxLines="2" 
+				   TextTrimming="WordEllipsis"
+				   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=PageHeaderFontSize}"/>
 		<details:OfflineBar Grid.Row="0"
 		                    Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
 		<ProgressBar Grid.Row="0" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />

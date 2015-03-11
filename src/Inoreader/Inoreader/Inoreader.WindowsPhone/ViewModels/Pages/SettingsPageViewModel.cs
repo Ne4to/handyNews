@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
+using Windows.ApplicationModel.Resources.Core;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
 using Inoreader.Services;
@@ -233,7 +236,7 @@ namespace Inoreader.ViewModels.Pages
 			eventTelemetry.Properties.Add("OldValue", _settingsService.ShowNewestFirst.ToString());
 			eventTelemetry.Properties.Add("NewValue", SelectedShowOrder.Value.ToString());
 			_telemetryClient.TrackEvent(eventTelemetry);
-			
+
 			_settingsService.ShowNewestFirst = SelectedShowOrder.Value;
 		}
 

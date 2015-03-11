@@ -38,9 +38,12 @@
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 
-						<TextBlock Text="&#xE09B;" FontFamily="Segoe UI Symbol" Style="{StaticResource TreeItemTextStyle}" Margin="0,0,5,0"  />
-						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis" />
-						<TextBlock Grid.Column="2" Text="{Binding UnreadCount, Converter={StaticResource UnreadCountStringConverter}}" Style="{StaticResource TreeItemUnreadCountTextStyle}" />
+						<TextBlock Text="&#xE09B;" FontFamily="Segoe UI Symbol" Style="{StaticResource TreeItemTextStyle}" Margin="0,0,5,0"
+								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
+						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
+								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
+						<TextBlock Grid.Column="2" Text="{Binding UnreadCount}" Style="{StaticResource TreeItemUnreadCountTextStyle}"
+								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
 					</Grid>
 				</DataTemplate>
 			</resources:SubscriptionItemTemplateSelector.CategoryTemplate>
@@ -55,8 +58,10 @@
 						</Grid.ColumnDefinitions>
 
 						<Image Width="16" Height="16" Source="{Binding IconUrl}" Margin="0,0,5,0" />
-						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"/>
-						<TextBlock Grid.Column="2" Text="{Binding UnreadCount, Converter={StaticResource UnreadCountStringConverter}}" Style="{StaticResource TreeItemUnreadCountTextStyle}" />
+						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
+								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
+						<TextBlock Grid.Column="2" Text="{Binding UnreadCount}" Style="{StaticResource TreeItemUnreadCountTextStyle}"
+								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
 					</Grid>
 				</DataTemplate>
 			</resources:SubscriptionItemTemplateSelector.ItemTemplate>

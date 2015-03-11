@@ -368,16 +368,16 @@
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition />
 									<ColumnDefinition Width="Auto" />
-								</Grid.ColumnDefinitions>
-
-								<TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Title}"
-													   FontSize="14" 
-													   TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="2" />
+								</Grid.ColumnDefinitions>						
+								
+								<TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Title}" 
+										   Style="{StaticResource StreamItemTitleStyle}"
+										   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamTitleFontSize}" />
 
 								<TextBlock Grid.Column="1" 
-													   Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Published, Converter={StaticResource SmartDateToStringConverter}}"
-													   FontSize="11"
-													   FontWeight="SemiLight" />
+										   Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Published, Converter={StaticResource SmartDateToStringConverter}}"
+										   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamDateFontSize}"
+										   FontWeight="SemiLight" />
 							</Grid>
 
 							<Grid>
@@ -386,10 +386,11 @@
 									<ColumnDefinition Width="20" />
 								</Grid.ColumnDefinitions>
 
-								<TextBlock x:Name="CollapsedTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HtmlContent, Converter={StaticResource HtmlToShortPlainTextConverter}}" 
-														   TextWrapping="WrapWholeWords" 
-														   TextTrimming="WordEllipsis" 
-														   MaxLines="2" />
+								<TextBlock x:Name="CollapsedTextBlock" 
+										   Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HtmlContent, Converter={StaticResource HtmlToShortPlainTextConverter}}" 
+										   TextWrapping="WrapWholeWords" 
+										   TextTrimming="WordEllipsis" 
+										   MaxLines="2" />
 
 								<RichTextBlock Grid.Column="0" x:Name="ExpandedTextBlock" IsTextSelectionEnabled="False" Visibility="Collapsed">
 									<interactivity:Interaction.Behaviors>

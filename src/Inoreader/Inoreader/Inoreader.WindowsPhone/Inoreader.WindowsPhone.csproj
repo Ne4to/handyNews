@@ -93,6 +93,7 @@
     <Compile Include="Converters\BooleanToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\DebugConverter.cs" />
+    <Compile Include="Converters\DynamicResourcesConverter.cs" />
     <Compile Include="Converters\FileSizeToStringConverter.cs" />
     <Compile Include="Converters\FormatStringConverter.cs" />
     <Compile Include="Converters\HtmlToShortPlainTextConverter.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="PageTokens.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Resources\StreamItemTemplateSelector.cs" />
+    <Compile Include="Resources\StylesContainer.cs" />
     <Compile Include="Resources\SubscriptionItemTemplateSelector.cs" />
     <Compile Include="Services\CacheManager.cs" />
     <Compile Include="Services\Extensions.cs" />
