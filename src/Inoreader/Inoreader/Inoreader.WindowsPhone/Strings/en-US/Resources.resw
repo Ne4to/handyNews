@@ -316,4 +316,7 @@ This cannot be undone!</value>
   <data name="SettingTextJustification.Content" xml:space="preserve">
     <value>text justification</value>
   </data>
+  <data name="SettingAutoMarkAsReadContent.Text" xml:space="preserve">
+    <value>mark items as read when scrolling</value>
+  </data>
 </root>

@@ -35,6 +35,7 @@ namespace Inoreader.ViewModels.Pages
 		private double _fontSize;
 		private bool _textJustification;
 		private TextAlignment _textAlignment;
+		private bool _autoMarkAsRead;
 
 		private ReactiveCommand<object> _clearCacheComand;
 
@@ -118,6 +119,12 @@ namespace Inoreader.ViewModels.Pages
 			set { SetProperty(ref _textAlignment, value); }
 		}
 
+		public bool AutoMarkAsRead
+		{
+			get { return _autoMarkAsRead; }
+			set { SetProperty(ref _autoMarkAsRead, value); }
+		}
+
 		#endregion
 
 		public ICommand ClearCacheCommand
@@ -182,6 +189,7 @@ namespace Inoreader.ViewModels.Pages
 			SelectedStreamView = StreamViewItems.Single(s => s.View == _settingsService.StreamView);
 			FontSize = _settingsService.FontSize;
 			TextJustification = _settingsService.TextAlignment == TextAlignment.Justify;
+			AutoMarkAsRead = _settingsService.AutoMarkAsRead;
 
 			IsCacheBusy = true;
 			TotalCacheSize = await _cacheManager.GetTotalCacheSizeAsync();
@@ -199,6 +207,7 @@ namespace Inoreader.ViewModels.Pages
 			SaveShowOrder();
 			SaveFontSize();
 			SaveTextJustification();
+			SaveAutoMarkAsRead();
 
 			_settingsService.Save();
 
@@ -284,6 +293,19 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.TextAlignment = newValue;
+		}
+
+		private void SaveAutoMarkAsRead()
+		{
+			if (AutoMarkAsRead == _settingsService.AutoMarkAsRead)
+				return;
+
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangeAutoMarkAsRead);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.AutoMarkAsRead.ToString());
+			eventTelemetry.Properties.Add("NewValue", AutoMarkAsRead.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
+
+			_settingsService.AutoMarkAsRead = AutoMarkAsRead;
 		}
 
 		private async void OnClearCache(object obj)

@@ -43,6 +43,7 @@ namespace Inoreader.ViewModels.Pages
 		private StreamItem _currentItem;
 		private bool _isOffline;
 		private StreamView _currentView;
+		private bool _autoMarkAsRead;
 
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
@@ -186,6 +187,7 @@ namespace Inoreader.ViewModels.Pages
 			_tagsManager = tagsManager;
 			_showNewestFirst = settingsService.ShowNewestFirst;
 			_currentView = settingsService.StreamView;
+			_autoMarkAsRead = settingsService.AutoMarkAsRead;
 
 			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
 			dataTransferManager.DataRequested += dataTransferManager_DataRequested;
@@ -366,7 +368,7 @@ namespace Inoreader.ViewModels.Pages
 				return;
 			}
 
-			if (!firstItem.NeedSetReadExplicitly && firstItem.Unread && CurrentView == StreamView.ExpandedView && !_isStarsList)
+			if (!firstItem.NeedSetReadExplicitly && firstItem.Unread && _autoMarkAsRead && !_isStarsList)
 			{
 				firstItem.Unread = false;
 				MarkAsRead(firstItem.Id, true);

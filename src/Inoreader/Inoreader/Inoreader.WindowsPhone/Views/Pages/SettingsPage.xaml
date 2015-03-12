@@ -43,7 +43,16 @@
 					  ItemsSource="{Binding StreamViewItems}"
 					  SelectedItem="{Binding SelectedStreamView, Mode=TwoWay}"
 					  DisplayMemberPath="Title" />
-			
+
+			<CheckBox x:Uid="SettingAutoMarkAsRead" 
+					  IsChecked="{Binding AutoMarkAsRead, Mode=TwoWay}">
+				<CheckBox.Content>
+					<TextBlock x:Uid="SettingAutoMarkAsReadContent" 
+							   Text="mark items as read when scrolling" 
+							   TextWrapping="WrapWholeWords" />
+				</CheckBox.Content>
+			</CheckBox>
+
 			<ComboBox x:Uid="SettingShowOrderBox" 
 					  Header="display order" 
 					  ItemsSource="{Binding ShowOrderItems}" 
@@ -62,13 +71,13 @@
 					  Content="text justification"
 					  IsChecked="{Binding TextJustification, Mode=TwoWay}" />
 			<!--TextJustification-->
-			
+
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="5" />
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
-				
+
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
@@ -76,19 +85,19 @@
 				</Grid.ColumnDefinitions>
 
 				<ProgressBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsCacheBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
-				
+
 				<TextBlock Grid.Row="1" Grid.Column="0" x:Uid="SettingsCacheTitle" Text="cache" FontSize="18" VerticalAlignment="Bottom" Margin="0,0,0,13.5" />
 				<TextBlock Grid.Row="1" Grid.Column="1"
 						   FontSize="18" VerticalAlignment="Bottom" Margin="0,0,0,13.5"
 						   Text="{Binding TotalCacheSize, Converter={StaticResource FileSizeToStringConverter}}" />
 				<Button Grid.Row="1" Grid.Column="2" 
 						x:Uid="SettingsClearCacheButton" Content="clear"
-						Margin="5,0,0,0" Command="{Binding ClearCacheCommand}" />				
-				
+						Margin="5,0,0,0" Command="{Binding ClearCacheCommand}" />
+
 				<!--// IsCacheBusy
 			// TotalCacheSize-->
 			</Grid>
-			
+
 		</StackPanel>
 	</Grid>
 </storeApps:VisualStateAwarePage>

@@ -316,4 +316,7 @@ Isto não pode ser desfeito!</value>
   <data name="SettingTextJustification.Content" xml:space="preserve">
     <value>justificação de texto</value>
   </data>
+  <data name="SettingAutoMarkAsReadContent.Text" xml:space="preserve">
+    <value>marcar itens como lidos quando rolagem</value>
+  </data>
 </root>

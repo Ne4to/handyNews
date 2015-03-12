@@ -286,4 +286,7 @@
   <data name="SettingTextJustification.Content" xml:space="preserve">
     <value>выравнивание текста</value>
   </data>
+  <data name="SettingAutoMarkAsReadContent.Text" xml:space="preserve">
+    <value>помечать элементы прочитанными при прокрутке</value>
+  </data>
 </root>

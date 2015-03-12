@@ -25,10 +25,11 @@ namespace Inoreader.Services
 		public string DisplayCulture { get; set; }
 		public bool HideEmptySubscriptions { get; set; }
 		public bool ShowNewestFirst { get; set; }
+		public bool AutoMarkAsRead { get; set; }
 		public StreamView StreamView { get; set; }
 		public TextAlignment TextAlignment { get; set; }
 		public double FontSize { get; set; }
-
+		
 		public double StreamTitleFontSize
 		{
 			get { return FontSize * StreamTitleFontSizeMult; }
@@ -87,6 +88,7 @@ namespace Inoreader.Services
 			StreamView = StreamView.ExpandedView;
 			FontSize = 11D;
 			TextAlignment = TextAlignment.Justify;
+			AutoMarkAsRead = StreamView == StreamView.ExpandedView;
 
 			Load();
 		}
@@ -103,6 +105,14 @@ namespace Inoreader.Services
 			StreamView = (StreamView)container.GetValue("StreamView", (int)StreamView.ExpandedView);
 			FontSize = container.GetValue("FontSize", 11D);
 			TextAlignment = (TextAlignment)container.GetValue("TextAlignment", (int)TextAlignment.Justify);
+			
+			// This setting did not exist in app version <= 1.1.3.15
+			// If user updates app do not change behaviour
+			AutoMarkAsRead = StreamView == StreamView.ExpandedView;
+			if (container.Values.ContainsKey("AutoMarkAsRead"))
+			{
+				AutoMarkAsRead = container.GetValue("AutoMarkAsRead", true);
+			}
 		}
 
 		public void Save()
@@ -114,6 +124,7 @@ namespace Inoreader.Services
 			container.Values["StreamView"] = (int)StreamView;
 			container.Values["FontSize"] = FontSize;
 			container.Values["TextAlignment"] = (int)TextAlignment;
+			container.Values["AutoMarkAsRead"] = AutoMarkAsRead;
 		}
 	}
 
