@@ -249,7 +249,7 @@ namespace Inoreader.ViewModels.Details
 
 			var readAllRootItem = new SubscriptionItem
 			{
-				Id = String.Empty,
+				Id = SpecialTags.Read,
 				IconUrl = ReadAllIconUrl,
 				Title = Strings.Resources.ReadAllSubscriptionItem,
 				UnreadCount = allItems.Sum(s => s.UnreadCount)
