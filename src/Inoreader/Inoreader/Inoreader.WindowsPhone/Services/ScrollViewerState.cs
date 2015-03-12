@@ -8,7 +8,7 @@ namespace Inoreader.Services
 {
 	public class ScrollViewerState
 	{
-		const double Tolerance = 1D;
+		const double Tolerance = 0.05D;
 
 		private readonly FrameworkElement _element;
 
@@ -71,17 +71,19 @@ namespace Inoreader.Services
 					return;
 			}
 
-			//var canSetHorizontalOffset = Math.Abs(_scrollViewer.ScrollableWidth - _scrollableWidth) < Tolerance;
-			//var canSetVerticalOffset = Math.Abs(_scrollViewer.ScrollableHeight - _scrollableHeight) < Tolerance;
-
-			var canSetHorizontalOffset = _horizontalOffset <= _scrollViewer.ScrollableWidth;
-			var canSetVerticalOffset = _verticalOffset <= _scrollViewer.ScrollableHeight;
-
+			var canSetHorizontalOffset = _scrollViewer.ScrollableWidth > 0D 
+				&& _scrollableWidth > 0D 
+				&& Math.Abs(1D - (_scrollViewer.ScrollableWidth / _scrollableWidth)) < Tolerance;
+			
 			if (canSetHorizontalOffset && !_horizontalSet)
 			{
 				_scrollViewer.ChangeView(_horizontalOffset, null, null, true);
 				_horizontalSet = true;
 			}
+
+			var canSetVerticalOffset = _scrollViewer.ScrollableHeight > 0D 
+				&& _scrollableHeight > 0D 
+				&& Math.Abs(1D - (_scrollViewer.ScrollableHeight / _scrollableHeight)) < Tolerance;
 
 			if (canSetVerticalOffset && !_verticalSet)
 			{
