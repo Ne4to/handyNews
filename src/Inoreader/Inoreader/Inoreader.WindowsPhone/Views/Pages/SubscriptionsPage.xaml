@@ -78,6 +78,10 @@
 				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding Subscriptions.RefreshCommand}" />
 			</CommandBar.PrimaryCommands>
 			<CommandBar.SecondaryCommands>
+				<AppBarButton x:Uid="MarkAllAsReadAppBarButton" 
+							  Label="mark all as read"
+							  Command="{Binding Subscriptions.MarkAllAsReadCommand}"/>
+
 				<AppBarButton x:Uid="SettingsAppBarButton" Label="settings" Command="{Binding SettingsPageCommand}" />
 				<AppBarButton x:Uid="AboutAppBarButton" Label="about" Command="{Binding AboutPageCommand}" />
 				<AppBarButton x:Uid="SignOutAppBarButton" Label="sign out" Command="{Binding SignOutCommand}" />

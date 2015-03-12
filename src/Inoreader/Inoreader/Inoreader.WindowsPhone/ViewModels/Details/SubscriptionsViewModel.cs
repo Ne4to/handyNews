@@ -49,6 +49,7 @@ namespace Inoreader.ViewModels.Details
 
 		private ICommand _itemClickCommand;
 		private ICommand _refreshCommand;
+		private ICommand _markAllAsReadCommand;
 
 		#endregion
 
@@ -90,6 +91,11 @@ namespace Inoreader.ViewModels.Details
 		public ICommand RefreshCommand
 		{
 			get { return _refreshCommand ?? (_refreshCommand = new DelegateCommand(OnRefresh)); }
+		}
+
+		public ICommand MarkAllAsReadCommand
+		{
+			get { return _markAllAsReadCommand ?? (_markAllAsReadCommand = new DelegateCommand(OnMarkAllAsRead)); }
 		}
 
 		#endregion
@@ -352,6 +358,51 @@ namespace Inoreader.ViewModels.Details
 		{
 			_telemetryClient.TrackEvent(TelemetryEvents.ManualRefreshSubscriptions);
 			LoadSubscriptions();
+		}
+
+		private async void OnMarkAllAsRead()
+		{
+			if (TreeItems == null)
+				return;
+
+			var item = TreeItems.FirstOrDefault();
+			if (item == null)
+				return;
+
+			var dlg = new MessageDialog(Strings.Resources.MarkAllAsReadDialogContent);
+			dlg.Commands.Add(new UICommand(Strings.Resources.DialogCommandYes) { Id = 1 });
+			dlg.Commands.Add(new UICommand(Strings.Resources.DialogCommandNo) { Id = 0 });
+			var x = await dlg.ShowAsync();
+
+			if ((int)x.Id != 1)
+				return;
+
+			Exception error = null;
+			try
+			{
+				_telemetryClient.TrackEvent(TelemetryEvents.MarkAllAsRead);
+
+				var timestamp = GetUnixTimeStamp();
+				await _apiClient.MarkAllAsReadAsync(item.Id, timestamp);
+
+				LoadSubscriptions();
+			}
+			catch (Exception ex)
+			{
+				error = ex;
+				_telemetryClient.TrackException(ex);
+			}
+
+			if (error == null) return;
+
+			MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
+			await msgbox.ShowAsync();
+		}
+
+		public int GetUnixTimeStamp()
+		{
+			var epochDate = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+			return (int)(DateTimeOffset.UtcNow - epochDate).TotalSeconds;
 		}
 
 		public bool NavigateBack()
