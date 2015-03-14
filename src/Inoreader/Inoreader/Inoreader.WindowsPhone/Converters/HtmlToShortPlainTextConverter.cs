@@ -9,7 +9,8 @@ namespace Inoreader.Converters
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
 			var str = (string) value;
-			return HtmlParser.GetPlainText(str, 200);
+			var parser = new HtmlParser();
+			return parser.GetPlainText(str, 200);
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, string language)

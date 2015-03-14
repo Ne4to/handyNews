@@ -45,7 +45,16 @@ namespace Inoreader.Models
 
 		public string ShortPlainText
 		{
-			get { return _shortPlainText ?? (_shortPlainText = HtmlParser.GetPlainText(Content, 200)); }
+			get
+			{
+				if (_shortPlainText == null)
+				{
+					var parser = new HtmlParser();
+					_shortPlainText = parser.GetPlainText(Content, 200);
+				}
+				
+				return _shortPlainText;
+			}
 		}
 
 		public bool Unread

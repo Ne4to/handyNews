@@ -21,6 +21,8 @@ namespace Inoreader.Models
 {
 	public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
 	{
+		private const uint MinLoadMoreItemsCount = 5U;
+
 		private readonly ApiClient _apiClient;
 		private readonly string _streamId;
 		private readonly bool _showNewestFirst;
@@ -168,7 +170,9 @@ namespace Inoreader.Models
 
 			_busy = true;
 
-			return AsyncInfo.Run(c => LoadMoreItemsAsync(c, count));
+			var loadCount = Math.Max(count, MinLoadMoreItemsCount);
+
+			return AsyncInfo.Run(c => LoadMoreItemsAsync(c, loadCount));
 		}
 
 		#endregion

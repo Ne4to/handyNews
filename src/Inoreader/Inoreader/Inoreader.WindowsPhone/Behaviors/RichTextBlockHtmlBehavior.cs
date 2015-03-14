@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Inoreader.Services;
+using Microsoft.Practices.ServiceLocation;
 using Microsoft.Xaml.Interactivity;
 
 namespace Inoreader.Behaviors
@@ -34,10 +36,20 @@ namespace Inoreader.Behaviors
 			var richTextBlock = (RichTextBlock)AssociatedObject;
 			if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string && richTextBlock.Blocks.Count == 0)
 			{
-				var paragraph = HtmlParser.GetParagraph((string)HtmlContent);
-				richTextBlock.Blocks.Add(paragraph);
-				_created = true;
+				UpdateTextBlock(richTextBlock);
 			}
+		}
+
+		private void UpdateTextBlock(RichTextBlock richTextBlock)
+		{
+			var parser = new HtmlParser();
+			IList<Image> images;
+			var paragraph = parser.GetParagraph((string) HtmlContent, out images);
+			richTextBlock.Blocks.Add(paragraph);
+			_created = true;
+
+			var imageManager = ServiceLocator.Current.GetInstance<ImageManager>();
+			imageManager.RegisterBlock(richTextBlock, images);
 		}
 
 		private static void OnHtmlContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -56,9 +68,7 @@ namespace Inoreader.Behaviors
 
 			if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string)
 			{
-				var paragraph = HtmlParser.GetParagraph((string)HtmlContent);
-				richTextBlock.Blocks.Add(paragraph);
-				_created = true;
+				UpdateTextBlock(richTextBlock);
 			}
 		}
 
@@ -67,9 +77,7 @@ namespace Inoreader.Behaviors
 			var richTextBlock = (RichTextBlock)AssociatedObject;
 			if (!_created && richTextBlock.Visibility == Visibility.Visible && HtmlContent is string)
 			{
-				var paragraph = HtmlParser.GetParagraph((string)HtmlContent);
-				richTextBlock.Blocks.Add(paragraph);
-				_created = true;
+				UpdateTextBlock(richTextBlock);
 			}
 		}
 

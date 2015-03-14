@@ -2,35 +2,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Windows.ApplicationModel;
 using Windows.Data.Html;
+using Windows.Graphics.Display;
 using Windows.System;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
-using Inoreader.Annotations;
 using Microsoft.ApplicationInsights;
+using Microsoft.Practices.ServiceLocation;
 
 namespace Inoreader.Services
 {
 	public class HtmlParser
 	{
-		private static TelemetryClient _telemetry;
-		private static AppSettingsService _appSettings;
+		private readonly TelemetryClient _telemetry;
+		private readonly AppSettingsService _appSettings;
+		private readonly List<Image> _allImages = new List<Image>();
+		private readonly double _maxImageWidth;
 
-		public HtmlParser([NotNull] AppSettingsService appSettingsService, [NotNull] TelemetryClient telemetryClient)
+		public HtmlParser()
 		{
-			if (appSettingsService == null) throw new ArgumentNullException("appSettingsService");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (DesignMode.DesignModeEnabled)
+				return;
 
-			_appSettings = appSettingsService;
-			_telemetry = telemetryClient;
+			_appSettings = ServiceLocator.Current.GetInstance<AppSettingsService>();
+			_telemetry = ServiceLocator.Current.GetInstance<TelemetryClient>();
+
+			var displayInformation = DisplayInformation.GetForCurrentView();
+			_maxImageWidth = ImageManager.GetMaxImageWidth(displayInformation);
 		}
 
-		public static Paragraph GetParagraph(string html)
+		public Paragraph GetParagraph(string html, out IList<Image> images)
 		{
 			if (html == null)
+			{
+				images = new Image[0];
 				return new Paragraph();
+			}
 
 			try
 			{
@@ -46,8 +56,8 @@ namespace Inoreader.Services
 
 					var literalLexeme = lexeme as LiteralLexeme;
 					if (literalLexeme != null)
-					{						
-						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize});
+					{
+						paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
 						continue;
 					}
 
@@ -60,35 +70,11 @@ namespace Inoreader.Services
 
 					if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
 					{
-						var src = tagLexeme.Attributes["src"];
-						if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
+						var image = CreateImage(tagLexeme);
+						if (image == null)
 							continue;
 
-						string widthStr;
-						int width = 0;
-						if (tagLexeme.Attributes.TryGetValue("width", out widthStr))
-						{
-							Int32.TryParse(widthStr, out width);
-						}
-
-						string heightStr;
-						int height = 0;
-						if (tagLexeme.Attributes.TryGetValue("height", out heightStr))
-						{
-							Int32.TryParse(heightStr, out height);
-						}
-
-						var image = new Image
-						{
-							Source = new BitmapImage(new Uri(src))
-						};
-
-						if (width != 0)
-							image.Width = width;
-
-						if (height != 0)
-							image.Height = height;
-
+						_allImages.Add(image);
 						var inlineUiContainer = new InlineUIContainer
 						{
 							Child = image
@@ -111,16 +97,37 @@ namespace Inoreader.Services
 					}
 				}
 
+				images = _allImages;
 				return paragraph;
 			}
 			catch (Exception e)
 			{
 				_telemetry.TrackException(e);
+				images = _allImages;
 				return new Paragraph();
 			}
 		}
 
-		private static void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex, StringParameters strParams)
+		private Image CreateImage(HtmlTagLexeme tagLexeme)
+		{
+			var src = tagLexeme.Attributes["src"];
+			if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
+				return null;
+
+			var image = new Image
+			{
+				Source = new BitmapImage(new Uri(src)),
+			};
+
+			image.ImageOpened += (sender, args) =>
+			{
+				var img = (Image)sender;
+				ImageManager.UpdateImageSize(img, _maxImageWidth);
+			};
+			return image;
+		}
+
+		private void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex, StringParameters strParams)
 		{
 			var startL = (HtmlTagLexeme)lexemes[lexemeIndex];
 
@@ -132,6 +139,11 @@ namespace Inoreader.Services
 			if (String.Equals(startL.Name, "li", StringComparison.OrdinalIgnoreCase))
 			{
 				inlines.Add(new Run() { Text = "• ", FontSize = _appSettings.FontSize });
+			}
+
+			if (String.Equals(startL.Name, "div", StringComparison.OrdinalIgnoreCase))
+			{
+				inlines.Add(new LineBreak());
 			}
 
 			if (String.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
@@ -158,15 +170,11 @@ namespace Inoreader.Services
 					var tagLexeme = (HtmlTagLexeme)lexeme;
 					if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
 					{
-						var src = tagLexeme.Attributes["src"];
-						if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
+						var image = CreateImage(tagLexeme);
+						if (image == null)
 							return;
 
-						var image = new Image
-						{
-							Source = new BitmapImage(new Uri(src))
-						};
-
+						_allImages.Add(image);
 						image.IsTapEnabled = true;
 						image.Tapped += async (sender, args) =>
 						{
@@ -179,6 +187,7 @@ namespace Inoreader.Services
 						};
 
 						inlines.Add(inlineUiContainer);
+						inlines.Add(new LineBreak());
 					}
 
 					return;
@@ -230,6 +239,24 @@ namespace Inoreader.Services
 					continue;
 				}
 
+				if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase)
+					&& tagLexeme.IsOpen
+					&& tagLexeme.IsClose)
+				{
+					var image = CreateImage(tagLexeme);
+					if (image != null)
+					{
+						_allImages.Add(image);
+						var inlineUiContainer = new InlineUIContainer
+						{
+							Child = image
+						};
+
+						inlines.Add(inlineUiContainer);
+						inlines.Add(new LineBreak());
+					}
+				}
+
 				if (tagLexeme.IsOpen && !tagLexeme.IsClose)
 				{
 					var closeIndex2 = GetCloseIndex(index, lexemes);
@@ -256,9 +283,14 @@ namespace Inoreader.Services
 			{
 				inlines.Add(new LineBreak());
 			}
+
+			if (String.Equals(startL.Name, "div", StringComparison.OrdinalIgnoreCase))
+			{
+				inlines.Add(new LineBreak());
+			}
 		}
 
-		private static void SetHeadersValue(StringParameters strParams, string tagName, bool value)
+		private void SetHeadersValue(StringParameters strParams, string tagName, bool value)
 		{
 			switch (tagName.ToLower())
 			{
@@ -288,7 +320,7 @@ namespace Inoreader.Services
 			}
 		}
 
-		private static double GetFontSize(StringParameters strParams)
+		private double GetFontSize(StringParameters strParams)
 		{
 			if (strParams.H1)
 				return _appSettings.FontSizeH1;
@@ -311,7 +343,7 @@ namespace Inoreader.Services
 			return _appSettings.FontSize;
 		}
 
-		private static int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
+		private int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
 		{
 			var startLexeme = (HtmlTagLexeme)lexemes[startLexemeIndex];
 			int deep = 1;
@@ -343,7 +375,7 @@ namespace Inoreader.Services
 			return -1;
 		}
 
-		private static List<string> GetStrings(string html)
+		private List<string> GetStrings(string html)
 		{
 			List<string> tokens = new List<string>(20);
 			var currentIndex = 0;
@@ -381,7 +413,7 @@ namespace Inoreader.Services
 			return tokens;
 		}
 
-		private static ILexeme[] GetLexemes(List<string> lexemes)
+		private ILexeme[] GetLexemes(List<string> lexemes)
 		{
 			var q = from l in lexemes
 					let isTag = l[0] == '<' && l[l.Length - 1] == '>'
@@ -390,7 +422,7 @@ namespace Inoreader.Services
 			return q.ToArray();
 		}
 
-		private static HtmlTagLexeme GetHtmlTag(string token)
+		private HtmlTagLexeme GetHtmlTag(string token)
 		{
 			var tag = new HtmlTagLexeme();
 
@@ -452,10 +484,10 @@ namespace Inoreader.Services
 			return tag;
 		}
 
-		public static string GetPlainText(string html, int maxLength)
+		public string GetPlainText(string html, int maxLength)
 		{
 			if (html == null)
-				return null;
+				return String.Empty;
 
 			try
 			{
@@ -483,48 +515,8 @@ namespace Inoreader.Services
 			catch (Exception e)
 			{
 				_telemetry.TrackException(e);
-				return null;
+				return String.Empty;
 			}
-		}
-	}
-
-
-	class StringParameters
-	{
-		public bool Bold { get; set; }
-		public bool Italic { get; set; }
-		public bool H1 { get; set; }
-		public bool H2 { get; set; }
-		public bool H3 { get; set; }
-		public bool H4 { get; set; }
-		public bool H5 { get; set; }
-		public bool H6 { get; set; }
-	}
-
-	public interface ILexeme
-	{
-	}
-
-	public class LiteralLexeme : ILexeme
-	{
-		public string Text { get; set; }
-
-		public LiteralLexeme(string text)
-		{
-			Text = HtmlUtilities.ConvertToText(text);
-		}
-	}
-
-	public class HtmlTagLexeme : ILexeme
-	{
-		public string Name { get; set; }
-		public bool IsOpen { get; set; }
-		public bool IsClose { get; set; }
-		public Dictionary<string, string> Attributes { get; set; }
-
-		public HtmlTagLexeme()
-		{
-			Attributes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 		}
 	}
 }

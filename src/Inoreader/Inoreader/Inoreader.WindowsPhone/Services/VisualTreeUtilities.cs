@@ -21,5 +21,21 @@ namespace Inoreader.Services
 			return child;
 		}
 
+		public static T GetVisualParent<T>(DependencyObject control)
+			where T : DependencyObject
+		{
+			var current = control;
+
+			while (current != null)
+			{
+				var typedControl = current as T;
+				if (typedControl != null)
+					return typedControl;
+
+				current = VisualTreeHelper.GetParent(current);
+			}
+
+			return null;
+		}
 	}
 }
