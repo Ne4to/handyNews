@@ -289,4 +289,7 @@
   <data name="SettingAutoMarkAsReadContent.Text" xml:space="preserve">
     <value>помечать элементы прочитанными при прокрутке</value>
   </data>
+  <data name="YoutubeVideoTitle" xml:space="preserve">
+    <value>YouTube видео</value>
+  </data>
 </root>

@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 03/12/2015 23:00:42
+// 	Generated: 03/15/2015 03:13:08
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -226,6 +226,17 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("StartPageHeader");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "YouTube video"
+        /// </summary>
+        public static string YoutubeVideoTitle
+        {
+            get
+            {
+                return resourceLoader.GetString("YoutubeVideoTitle");
             }
         }
     }

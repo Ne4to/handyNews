@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.Data.Html;
 using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -228,7 +229,7 @@ namespace Inoreader.ViewModels.Details
 				categoryItem.Title = (from s in subscriptions.Subscriptions
 									  from c in s.Categories
 									  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
-									  select c.Label).FirstOrDefault();
+									  select HtmlUtilities.ConvertToText(c.Label)).FirstOrDefault();
 
 				var readAllItem = new SubscriptionItem
 				{
@@ -296,11 +297,6 @@ namespace Inoreader.ViewModels.Details
 
 		private void UpdateBadge(UnreadCountResponse unreadCount)
 		{
-			//var unreadAllItem = unreadCount.UnreadCounts.FirstOrDefault(uc => uc.Id.EndsWith("/state/com.google/reading-list", StringComparison.OrdinalIgnoreCase));
-			//int totalUnreadCount = unreadAllItem != null ? unreadAllItem.Count : TreeItems.Sum(ti => ti.UnreadCount);
-
-			//BadgeNumericNotificationContent badgeContent = new BadgeNumericNotificationContent((uint)totalUnreadCount);
-			//BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(badgeContent.CreateNotification());
 			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
 		}
 
@@ -322,7 +318,7 @@ namespace Inoreader.ViewModels.Details
 				Url = s.Url,
 				HtmlUrl = s.HtmlUrl,
 				IconUrl = s.IconUrl,
-				Title = s.Title,
+				Title = HtmlUtilities.ConvertToText(s.Title),
 				FirstItemMsec = s.FirstItemMsec,
 				UnreadCount = GetUnreadCount(unreadCountDictionary, s.Id)
 			};

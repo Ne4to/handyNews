@@ -68,13 +68,14 @@ namespace Inoreader.Services
 						continue;
 					}
 
+					TryAddYoutubeVideo(tagLexeme, paragraph.Inlines);
+
 					if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
 					{
 						var image = CreateImage(tagLexeme);
 						if (image == null)
 							continue;
 
-						_allImages.Add(image);
 						var inlineUiContainer = new InlineUIContainer
 						{
 							Child = image
@@ -114,10 +115,17 @@ namespace Inoreader.Services
 			if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
 				return null;
 
+			return CreateImage(src);
+		}
+
+		private Image CreateImage(string src)
+		{
 			var image = new Image
 			{
 				Source = new BitmapImage(new Uri(src)),
 			};
+
+			_allImages.Add(image);
 
 			image.ImageOpened += (sender, args) =>
 			{
@@ -174,7 +182,6 @@ namespace Inoreader.Services
 						if (image == null)
 							return;
 
-						_allImages.Add(image);
 						image.IsTapEnabled = true;
 						image.Tapped += async (sender, args) =>
 						{
@@ -214,6 +221,11 @@ namespace Inoreader.Services
 				strParams.Italic = true;
 			}
 
+			if (String.Equals(startL.Name, "i", StringComparison.OrdinalIgnoreCase))
+			{
+				strParams.Italic = true;
+			}
+
 			for (int index = lexemeIndex + 1; index < closeIndex; index++)
 			{
 				var lexeme = lexemes[index];
@@ -246,7 +258,6 @@ namespace Inoreader.Services
 					var image = CreateImage(tagLexeme);
 					if (image != null)
 					{
-						_allImages.Add(image);
 						var inlineUiContainer = new InlineUIContainer
 						{
 							Child = image
@@ -270,6 +281,11 @@ namespace Inoreader.Services
 
 			SetHeadersValue(strParams, startL.Name, false);
 			if (String.Equals(startL.Name, "em", StringComparison.OrdinalIgnoreCase))
+			{
+				strParams.Italic = false;
+			}
+
+			if (String.Equals(startL.Name, "i", StringComparison.OrdinalIgnoreCase))
 			{
 				strParams.Italic = false;
 			}
@@ -517,6 +533,91 @@ namespace Inoreader.Services
 				_telemetry.TrackException(e);
 				return String.Empty;
 			}
+		}
+
+		private static readonly string[] YoutubeLinks = new[]
+		{
+			"http://www.youtube.com/embed/",
+			"https://www.youtube.com/embed/",
+			"http://youtube.com/embed/",
+			"https://youtube.com/embed/"
+		};
+
+		private const string YoutubePreviewFormat = "http://img.youtube.com/vi/{0}/0.jpg";
+
+		private void TryAddYoutubeVideo(HtmlTagLexeme tagLexeme, InlineCollection inlines)
+		{
+			if (String.Equals(tagLexeme.Name, "iframe", StringComparison.OrdinalIgnoreCase))
+			{
+				string videoLink;
+				if (!tagLexeme.Attributes.TryGetValue("src", out videoLink))
+					return;
+
+				AddYoutubeLink(videoLink, inlines);
+				return;
+			}
+
+			if (String.Equals(tagLexeme.Name, "object", StringComparison.OrdinalIgnoreCase))
+			{
+				string videoLink;
+				if (!tagLexeme.Attributes.TryGetValue("data", out videoLink))
+					return;
+
+				AddYoutubeLink(videoLink, inlines);
+				return;
+			}
+
+			if (String.Equals(tagLexeme.Name, "embed", StringComparison.OrdinalIgnoreCase))
+			{
+				string videoLink;
+				if (!tagLexeme.Attributes.TryGetValue("src", out videoLink))
+					return;
+
+				AddYoutubeLink(videoLink, inlines);
+			}
+		}
+
+		private void AddYoutubeLink(string videoLink, InlineCollection inlines)
+		{
+			videoLink = videoLink.Trim();
+			foreach (var testLink in YoutubeLinks)
+			{
+				if (videoLink.StartsWith(testLink, StringComparison.OrdinalIgnoreCase))
+				{
+					var id = videoLink.Substring(testLink.Length).Replace("/", string.Empty);
+					AddYoutubeLink(id, videoLink, inlines);
+				}
+			}
+		}
+
+		private void AddYoutubeLink(string id, string videoLink, InlineCollection inlines)
+		{
+			var imageUrl = String.Format(YoutubePreviewFormat, id);
+			
+			var navigateUri = new Uri(videoLink);
+			var image = CreateImage(imageUrl);
+			image.IsTapEnabled = true;
+			image.Tapped += async (sender, args) =>
+			{
+				await Launcher.LaunchUriAsync(navigateUri);
+			};
+
+			var inlineUiContainer = new InlineUIContainer
+			{
+				Child = image
+			};
+
+			inlines.Add(new Run
+			{
+				Text = Strings.Resources.YoutubeVideoTitle,
+				FontSize = _appSettings.FontSize,
+				FontStyle = FontStyle.Italic,				
+			});
+
+
+			inlines.Add(new LineBreak());
+			inlines.Add(inlineUiContainer);
+			inlines.Add(new LineBreak());
 		}
 	}
 }

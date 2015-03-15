@@ -319,4 +319,7 @@ This cannot be undone!</value>
   <data name="SettingAutoMarkAsReadContent.Text" xml:space="preserve">
     <value>mark items as read when scrolling</value>
   </data>
+  <data name="YoutubeVideoTitle" xml:space="preserve">
+    <value>YouTube video</value>
+  </data>
 </root>

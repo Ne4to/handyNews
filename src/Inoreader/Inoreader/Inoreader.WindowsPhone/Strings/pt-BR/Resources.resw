@@ -319,4 +319,7 @@ Isto não pode ser desfeito!</value>
   <data name="SettingAutoMarkAsReadContent.Text" xml:space="preserve">
     <value>marcar itens como lidos quando rolagem</value>
   </data>
+  <data name="YoutubeVideoTitle" xml:space="preserve">
+    <value>Vídeo do YouTube</value>
+  </data>
 </root>
