@@ -159,61 +159,17 @@ namespace Inoreader.Services
 				string href;
 				if (startL.Attributes.TryGetValue("href", out href))
 				{
-					// Inoreader AD
+					// skip Inoreader AD
 					if (href.StartsWith(@"https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
 						return;
 
-					var navigateUri = new Uri(href);
-
-					var lexeme = lexemes[lexemeIndex + 1];
-					var literalLexeme = lexeme as LiteralLexeme;
-					if (literalLexeme != null)
-					{
-						var hyperlink = new Hyperlink { NavigateUri = navigateUri };
-						hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
-						inlines.Add(hyperlink);
-						inlines.Add(new Run { Text = " ", FontSize = _appSettings.FontSize });
-						return;
-					}
-
-					var tagLexeme = (HtmlTagLexeme)lexeme;
-					if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
-					{
-						var image = CreateImage(tagLexeme);
-						if (image == null)
-							return;
-
-						image.IsTapEnabled = true;
-						image.Tapped += async (sender, args) =>
-						{
-							await Launcher.LaunchUriAsync(navigateUri);
-						};
-
-						var inlineUiContainer = new InlineUIContainer
-						{
-							Child = image
-						};
-
-						inlines.Add(inlineUiContainer);
-						inlines.Add(new LineBreak());
-					}
-
-					return;
+					strParams.NavigateUri = href;
 				}
 			}
 
 			if (String.Equals(startL.Name, "strong", StringComparison.OrdinalIgnoreCase))
 			{
-				var lexeme = lexemes[lexemeIndex + 1];
-				var literalLexeme = lexeme as LiteralLexeme;
-
-				if (literalLexeme != null)
-				{
-					var item = new Bold();
-					item.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
-					inlines.Add(item);
-				}
-				return;
+				strParams.Bold = true;
 			}
 
 			SetHeadersValue(strParams, startL.Name, true);
@@ -234,16 +190,28 @@ namespace Inoreader.Services
 				var literalLexeme = lexeme as LiteralLexeme;
 				if (literalLexeme != null)
 				{
-					var item = new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize };
+					var fontSize = GetFontSize(strParams);
 
-					item.FontSize = GetFontSize(strParams);
-					if (IsHtmlHeader(strParams))
-						item.FontWeight = FontWeights.Bold;
-					
-					if (strParams.Italic)
-						item.FontStyle = FontStyle.Italic;
+					if (String.IsNullOrWhiteSpace(strParams.NavigateUri))
+					{
+						var item = new Run { Text = literalLexeme.Text, FontSize = fontSize };
 
-					inlines.Add(item);
+						if (IsHtmlHeader(strParams))
+							item.FontWeight = FontWeights.Bold;
+
+						if (strParams.Italic)
+							item.FontStyle = FontStyle.Italic;
+
+						inlines.Add(item);
+					}
+					else
+					{
+						var navigateUri = new Uri(strParams.NavigateUri);
+						var hyperlink = new Hyperlink { NavigateUri = navigateUri };
+						hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
+						inlines.Add(hyperlink);
+						inlines.Add(new Run { Text = " ", FontSize = _appSettings.FontSize });
+					}
 					continue;
 				}
 
@@ -268,6 +236,17 @@ namespace Inoreader.Services
 
 						inlines.Add(inlineUiContainer);
 						inlines.Add(new LineBreak());
+
+						if (!String.IsNullOrWhiteSpace(strParams.NavigateUri))
+						{
+							image.IsTapEnabled = true;
+							var navigateUri = new Uri(strParams.NavigateUri);
+
+							image.Tapped += async (sender, args) =>
+							{
+								await Launcher.LaunchUriAsync(navigateUri);
+							};
+						}
 					}
 				}
 
@@ -306,6 +285,16 @@ namespace Inoreader.Services
 			if (String.Equals(startL.Name, "div", StringComparison.OrdinalIgnoreCase))
 			{
 				inlines.Add(new LineBreak());
+			}
+
+			if (String.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
+			{
+				strParams.NavigateUri = null;
+			}
+
+			if (String.Equals(startL.Name, "strong", StringComparison.OrdinalIgnoreCase))
+			{
+				strParams.Bold = false;
 			}
 		}
 
@@ -365,11 +354,11 @@ namespace Inoreader.Services
 		private bool IsHtmlHeader(StringParameters strParams)
 		{
 			return strParams.H1
-			       || strParams.H2
-			       || strParams.H3
-			       || strParams.H4
-			       || strParams.H5
-			       || strParams.H6;
+				   || strParams.H2
+				   || strParams.H3
+				   || strParams.H4
+				   || strParams.H5
+				   || strParams.H6;
 		}
 
 		private int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
@@ -606,7 +595,7 @@ namespace Inoreader.Services
 		private void AddYoutubeLink(string id, string videoLink, InlineCollection inlines)
 		{
 			var imageUrl = String.Format(YoutubePreviewFormat, id);
-			
+
 			var navigateUri = new Uri(videoLink);
 			var image = CreateImage(imageUrl);
 			image.IsTapEnabled = true;
@@ -624,7 +613,7 @@ namespace Inoreader.Services
 			{
 				Text = Strings.Resources.YoutubeVideoTitle,
 				FontSize = _appSettings.FontSize,
-				FontStyle = FontStyle.Italic,				
+				FontStyle = FontStyle.Italic,
 			});
 
 
