@@ -9,12 +9,12 @@ namespace Inoreader.Services
 		private const double DefaultFontSize = 11D;
 		private const double StreamTitleFontSizeMult = 14D / DefaultFontSize;
 		private const double StreamDateFontSizeMult = 11D / DefaultFontSize;
-		private const double FontSizeH1Mult = 28D / DefaultFontSize;
-		private const double FontSizeH2Mult = 24D / DefaultFontSize;
-		private const double FontSizeH3Mult = 20D / DefaultFontSize;
-		private const double FontSizeH4Mult = 17D / DefaultFontSize;
-		private const double FontSizeH5Mult = 14D / DefaultFontSize;
-		private const double FontSizeH6Mult = 12D / DefaultFontSize;
+		private const double FontSizeH1Mult = 2D; // in em, em = 16px
+		private const double FontSizeH2Mult = 1.5D; // in em, em = 16px
+		private const double FontSizeH3Mult = 1.17D; // in em, em = 16px
+		private const double FontSizeH4Mult = 1D; // in em, em = 16px
+		private const double FontSizeH5Mult = .83D; // in em, em = 16px
+		private const double FontSizeH6Mult = .67D; // in em, em = 16px
 
 		private const double PageHeaderFontSizeMult = 24D / DefaultFontSize;
 		private const double SubscriptionTreeItemFontSizeMult = 18D / DefaultFontSize;

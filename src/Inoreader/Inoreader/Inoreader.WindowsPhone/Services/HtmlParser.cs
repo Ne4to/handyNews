@@ -172,6 +172,7 @@ namespace Inoreader.Services
 						var hyperlink = new Hyperlink { NavigateUri = navigateUri };
 						hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
 						inlines.Add(hyperlink);
+						inlines.Add(new Run { Text = " ", FontSize = _appSettings.FontSize });
 						return;
 					}
 
@@ -236,7 +237,9 @@ namespace Inoreader.Services
 					var item = new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize };
 
 					item.FontSize = GetFontSize(strParams);
-
+					if (IsHtmlHeader(strParams))
+						item.FontWeight = FontWeights.Bold;
+					
 					if (strParams.Italic)
 						item.FontStyle = FontStyle.Italic;
 
@@ -357,6 +360,16 @@ namespace Inoreader.Services
 				return _appSettings.FontSizeH6;
 
 			return _appSettings.FontSize;
+		}
+
+		private bool IsHtmlHeader(StringParameters strParams)
+		{
+			return strParams.H1
+			       || strParams.H2
+			       || strParams.H3
+			       || strParams.H4
+			       || strParams.H5
+			       || strParams.H6;
 		}
 
 		private int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
