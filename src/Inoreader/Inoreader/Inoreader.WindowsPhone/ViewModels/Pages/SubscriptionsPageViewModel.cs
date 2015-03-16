@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 using Windows.UI.Xaml.Navigation;
+using Inoreader.Annotations;
 using Inoreader.Api;
 using Inoreader.Services;
 using Inoreader.ViewModels.Details;
@@ -16,6 +17,7 @@ namespace Inoreader.ViewModels.Pages
 	{
 		private readonly INavigationService _navigationService;
 		private readonly ApiClient _apiClient;
+		private readonly AppSettingsService _appSettingsService;
 
 		private ICommand _settingsPageCommand;
 		private ICommand _aboutPageCommand;
@@ -44,14 +46,17 @@ namespace Inoreader.ViewModels.Pages
 			get { return _starsCommand ?? (_starsCommand = new DelegateCommand(OnStars)); }
 		}
 
-		public SubscriptionsPageViewModel(IUnityContainer container, INavigationService navigationService, ApiClient apiClient)
+		public SubscriptionsPageViewModel(IUnityContainer container, INavigationService navigationService, ApiClient apiClient,
+			[NotNull] AppSettingsService appSettingsService)
 		{
 			if (container == null) throw new ArgumentNullException("container");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
+			if (appSettingsService == null) throw new ArgumentNullException("appSettingsService");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
+			_appSettingsService = appSettingsService;
 
 			Subscriptions = container.Resolve<SubscriptionsViewModel>();
 		}
@@ -95,7 +100,8 @@ namespace Inoreader.ViewModels.Pages
 
 		private void OnStars()
 		{
-			_navigationService.Navigate(PageTokens.Stream, SpecialTags.Starred);
+			var pageToken = _appSettingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
+			_navigationService.Navigate(pageToken, SpecialTags.Starred);
 		}
 	}
 }

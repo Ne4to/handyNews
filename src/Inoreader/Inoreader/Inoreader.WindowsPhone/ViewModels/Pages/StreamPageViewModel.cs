@@ -30,6 +30,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly CacheManager _cacheManager;
 		private readonly TagsManager _tagsManager;
 		private readonly bool _showNewestFirst;
+		private readonly bool _autoMarkAsRead;
 		private string _streamId;
 		private bool _isStarsList;
 
@@ -42,9 +43,7 @@ namespace Inoreader.ViewModels.Pages
 		private bool _currentItemStarredEnabled;
 		private StreamItem _currentItem;
 		private bool _isOffline;
-		private StreamView _currentView;
-		private bool _autoMarkAsRead;
-
+		
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
 		private DelegateCommand _openWebCommand;
@@ -114,12 +113,6 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _isOffline, value); }
 		}
 
-		public StreamView CurrentView
-		{
-			get { return _currentView; }
-			private set { SetProperty(ref _currentView, value); }
-		}
-
 		#endregion
 
 		#region Commands
@@ -186,7 +179,6 @@ namespace Inoreader.ViewModels.Pages
 			_cacheManager = cacheManager;
 			_tagsManager = tagsManager;
 			_showNewestFirst = settingsService.ShowNewestFirst;
-			_currentView = settingsService.StreamView;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
 
 			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();

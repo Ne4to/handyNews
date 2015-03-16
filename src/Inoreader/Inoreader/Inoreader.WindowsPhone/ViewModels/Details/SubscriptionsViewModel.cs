@@ -21,7 +21,6 @@ using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
-using NotificationsExtensions.BadgeContent;
 
 namespace Inoreader.ViewModels.Details
 {
@@ -39,6 +38,7 @@ namespace Inoreader.ViewModels.Details
 		private readonly AppSettingsService _settingsService;
 		private readonly CacheManager _cacheManager;
 		private readonly TileManager _tileManager;
+		private readonly AppSettingsService _appSettingsService;
 
 		private bool _isBusy;
 		private bool _isOffline;
@@ -106,7 +106,8 @@ namespace Inoreader.ViewModels.Details
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] CacheManager cacheManager,
-			[NotNull] TileManager tileManager)
+			[NotNull] TileManager tileManager, 
+			[NotNull] AppSettingsService appSettingsService)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -114,6 +115,7 @@ namespace Inoreader.ViewModels.Details
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 			if (tileManager == null) throw new ArgumentNullException("tileManager");
+			if (appSettingsService == null) throw new ArgumentNullException("appSettingsService");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
@@ -121,6 +123,7 @@ namespace Inoreader.ViewModels.Details
 			_settingsService = settingsService;
 			_cacheManager = cacheManager;
 			_tileManager = tileManager;
+			_appSettingsService = appSettingsService;
 
 			Application.Current.Resuming += Application_Resuming;
 		}
@@ -346,7 +349,10 @@ namespace Inoreader.ViewModels.Details
 			{
 				var subscriptionItem = clickEventArgs.ClickedItem as SubscriptionItem;
 				if (subscriptionItem != null)
-					_navigationService.Navigate(PageTokens.Stream, subscriptionItem.Id);
+				{
+					var pageToken = _appSettingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
+					_navigationService.Navigate(pageToken, subscriptionItem.Id);
+				}
 			}
 		}
 

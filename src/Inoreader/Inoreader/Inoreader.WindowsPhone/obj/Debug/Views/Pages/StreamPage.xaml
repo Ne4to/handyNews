@@ -23,10 +23,6 @@
 		<behaviors:DataContextPresenter DataContext="{Binding}" 
 										x:Key="DataContextPresenter" />
 
-		<converters:StreamViewToVisibilityConverter x:Key="StreamViewToVisibilityConverter" />
-		<services:StreamView x:Key="StreamListView">ListView</services:StreamView>
-		<services:StreamView x:Key="StreamExpandedView">ExpandedView</services:StreamView>
-
 		<FontFamily x:Key="ContentControlThemeFontFamily">Segoe WP</FontFamily>
 		<x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
 		<Thickness x:Key="ListViewItemMargin">0</Thickness>

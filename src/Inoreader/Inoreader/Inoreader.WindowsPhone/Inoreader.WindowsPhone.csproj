@@ -138,8 +138,10 @@
     <Compile Include="Models\TreeItemBase.cs" />
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
     <Compile Include="Models\EmptySpaceStreamItem.cs" />
+    <Compile Include="ViewModels\Pages\ExpandedStreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
+    <Compile Include="ViewModels\Pages\ListStreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
     <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
@@ -182,10 +184,16 @@
     <Compile Include="Views\Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Pages\ExpandedStreamPage.xaml.cs">
+      <DependentUpon>ExpandedStreamPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Pages\HubPage.xaml.cs">
       <DependentUpon>HubPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\ScrollViewerState.cs" />
+    <Compile Include="Views\Pages\ListStreamPage.xaml.cs">
+      <DependentUpon>ListStreamPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Pages\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
@@ -302,7 +310,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Pages\ExpandedStreamPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Pages\HubPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\ListStreamPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
