@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
 using Windows.Data.Html;
 using Windows.Graphics.Display;
@@ -17,10 +18,17 @@ namespace Inoreader.Services
 {
 	public class HtmlParser
 	{
+		private static readonly Regex RemoveAdRegex;
+
 		private readonly TelemetryClient _telemetry;
 		private readonly AppSettingsService _appSettings;
 		private readonly List<Image> _allImages = new List<Image>();
 		private readonly double _maxImageWidth;
+
+		static HtmlParser()
+		{
+			RemoveAdRegex = new Regex("(<center>).*(www.inoreader.com/adv).*(</center>)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+		}
 
 		public HtmlParser()
 		{
@@ -32,6 +40,12 @@ namespace Inoreader.Services
 
 			var displayInformation = DisplayInformation.GetForCurrentView();
 			_maxImageWidth = ImageManager.GetMaxImageWidth(displayInformation);
+		}
+
+		public static ILexeme[] Parse(string html)
+		{
+			var strings = GetStrings(html);
+			return GetLexemes(strings);
 		}
 
 		public Paragraph GetParagraph(string html, out IList<Image> images)
@@ -393,8 +407,10 @@ namespace Inoreader.Services
 			return -1;
 		}
 
-		private List<string> GetStrings(string html)
+		private static List<string> GetStrings(string html)
 		{
+			html = RemoveAdRegex.Replace(html, String.Empty);
+
 			List<string> tokens = new List<string>(20);
 			var currentIndex = 0;
 
@@ -431,7 +447,7 @@ namespace Inoreader.Services
 			return tokens;
 		}
 
-		private ILexeme[] GetLexemes(List<string> lexemes)
+		private static ILexeme[] GetLexemes(List<string> lexemes)
 		{
 			var q = from l in lexemes
 					let isTag = l[0] == '<' && l[l.Length - 1] == '>'
@@ -440,7 +456,7 @@ namespace Inoreader.Services
 			return q.ToArray();
 		}
 
-		private HtmlTagLexeme GetHtmlTag(string token)
+		private static HtmlTagLexeme GetHtmlTag(string token)
 		{
 			var tag = new HtmlTagLexeme();
 
