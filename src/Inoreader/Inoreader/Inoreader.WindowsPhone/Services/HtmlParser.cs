@@ -439,6 +439,10 @@ namespace Inoreader.Services
 				}
 				else
 				{
+					if (currentIndex < html.Length - 1)
+					{
+						tokens.Add(html.Substring(currentIndex));	
+					}
 					break;
 				}
 			}
