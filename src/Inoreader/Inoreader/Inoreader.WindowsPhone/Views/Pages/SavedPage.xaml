@@ -263,7 +263,7 @@
 									           FontWeight="SemiLight" />
 								</Grid>
 
-								<TextBlock Text="{Binding ShortPlainText}"
+								<TextBlock Text="{Binding ShortContent}"
 								           TextAlignment="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamItemTextAlignment}"
 								           TextWrapping="WrapWholeWords"
 								           TextTrimming="WordEllipsis"

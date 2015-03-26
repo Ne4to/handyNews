@@ -1,74 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Inoreader.Annotations;
 using Inoreader.Models;
 
 namespace Inoreader.Services
 {
-	public class LocalCacheManager
+	public class SavedStreamManager
 	{
-		private const string CacheFolderName = "LocalCache";
-		private const string HtmlStringContentFileName = "html.data";
+		private const string CacheFolderName = "SavedItems";
 		private readonly StorageFolder _rootCacheFolder = ApplicationData.Current.LocalCacheFolder;
+		private readonly LocalStorageManager _storageManager;
 
-		private readonly Dictionary<string, string> _index;
-		private readonly List<LocalStreamItem> _items;
+		private readonly Lazy<List<SavedStreamItem>> _items;
 
-		public IReadOnlyCollection<LocalStreamItem> Items
+		public IReadOnlyCollection<SavedStreamItem> Items
 		{
 			get
 			{
-				return new ReadOnlyCollection<LocalStreamItem>(_items);
+				return new ReadOnlyCollection<SavedStreamItem>(_items.Value);
 			}
 		}
 
-		public LocalCacheManager(LocalCacheState state)
+		public SavedStreamManager([NotNull] LocalStorageManager storageManager)
 		{
-			if (state == null)
-			{
-				_index = new Dictionary<string, string>();
-				_items = new List<LocalStreamItem>();
-			}
-			else
-			{
-				_index = state.Index;
-				_items = state.Items;
-			}
+			if (storageManager == null) throw new ArgumentNullException("storageManager");
+			_storageManager = storageManager;
+
+			_items = new Lazy<List<SavedStreamItem>>(InitItems);
+		}
+
+		private List<SavedStreamItem> InitItems()
+		{
+			return new List<SavedStreamItem>(_storageManager.LoadSavedStreamItems());
 		}
 
 		public async Task AddAsync(StreamItem item)
 		{
 			var folderName = Guid.NewGuid().ToString("N");
-			_index.Add(item.Id, folderName);
 			
 			var parser = new HtmlParser();
 			var plainText = parser.GetPlainText(item.Content, 200);
-			
-			_items.Add(new LocalStreamItem
-			{
-				Id = item.Id,
-				Published = item.Published,
-				ShortPlainText = plainText,
-				Starred = item.Starred,
-				Title = item.Title,
-				WebUri = item.WebUri
-			});
 
 			var cacheFolder = await _rootCacheFolder.CreateFolderAsync(CacheFolderName, CreationCollisionOption.OpenIfExists).AsTask().ConfigureAwait(false);
 			var folder = await cacheFolder.CreateFolderAsync(folderName).AsTask().ConfigureAwait(false);
 
 			var newHtml = await SaveImagesAsync(folder, item.Content).ConfigureAwait(false);
 
-			var file = await folder.CreateFileAsync(HtmlStringContentFileName).AsTask().ConfigureAwait(false);
-			await FileIO.WriteTextAsync(file, newHtml).AsTask().ConfigureAwait(false);
+			var savedItem = new SavedStreamItem
+			{
+				Id = item.Id,
+				Title = item.Title,
+				Published = item.Published,
+				WebUri = item.WebUri,
+				ShortContent = plainText,
+				Content = newHtml,
+				ImageFolder = folderName
+			};
+
+			_items.Value.Add(savedItem);		
+			_storageManager.Save(savedItem);
 		}
 
 		private async Task<string> SaveImagesAsync(StorageFolder folder, string html)
@@ -121,56 +117,21 @@ namespace Inoreader.Services
 			return true;
 		}
 
-		public async Task DeleteAsync(string itemId)
+		public async Task DeleteAsync([NotNull] string itemId)
 		{
-			string folderName;
-			if (!_index.TryGetValue(itemId, out folderName))
+			if (itemId == null) throw new ArgumentNullException("itemId");
+
+			var item = _items.Value.FirstOrDefault(a => a.Id == itemId);
+			if (item == null)
 				return;
 
-			_index.Remove(itemId);
-			_items.RemoveAll(a => a.Id == itemId);
+			_items.Value.Remove(item);
+			_storageManager.DeleteSavedStreamItem(item.Id);
 			
 			var cacheFolder = await _rootCacheFolder.CreateFolderAsync(CacheFolderName, CreationCollisionOption.OpenIfExists).AsTask().ConfigureAwait(false);
-			var folder = await cacheFolder.GetFolderAsync(folderName).AsTask().ConfigureAwait(false);
+
+			var folder = await cacheFolder.GetFolderAsync(item.ImageFolder).AsTask().ConfigureAwait(false);
 			await folder.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask().ConfigureAwait(false);
-		}
-	}
-
-	[DataContract]
-	public class LocalCacheState
-	{
-		[DataMember]
-		public Dictionary<string, string> Index { get; set; }
-
-		[DataMember]
-		public List<LocalStreamItem> Items { get; set; }
-	}
-
-	[DataContract]
-	public class LocalStreamItem : BindableBaseEx
-	{
-		[DataMember]
-		private bool _starred;
-
-		[DataMember]
-		public string Id { get; set; }
-
-		[DataMember]
-		public DateTimeOffset Published { get; set; }
-
-		[DataMember]
-		public string Title { get; set; }
-
-		[DataMember]
-		public string WebUri { get; set; }
-
-		[DataMember]
-		public string ShortPlainText { get; set; }
-
-		public bool Starred
-		{
-			get { return _starred; }
-			set { SetProperty(ref _starred, value); }
 		}
 	}
 }

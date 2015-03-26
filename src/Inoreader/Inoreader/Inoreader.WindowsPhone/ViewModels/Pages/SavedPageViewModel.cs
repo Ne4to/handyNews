@@ -10,26 +10,26 @@ namespace Inoreader.ViewModels.Pages
 {
 	public class SavedPageViewModel : ViewModel
 	{
-		private readonly LocalCacheManager _localCacheManager;
-		private ObservableCollection<LocalStreamItem> _items;
+		private readonly SavedStreamManager _savedStreamManager;
+		private ObservableCollection<SavedStreamItem> _items;
 
-		public ObservableCollection<LocalStreamItem> Items
+		public ObservableCollection<SavedStreamItem> Items
 		{
 			get { return _items; }
 			set { SetProperty(ref _items, value); }
 		}
 
-		public SavedPageViewModel([NotNull] LocalCacheManager localCacheManager)
+		public SavedPageViewModel([NotNull] SavedStreamManager savedStreamManager)
 		{
-			_localCacheManager = localCacheManager;
-			if (localCacheManager == null) throw new ArgumentNullException("localCacheManager");
+			_savedStreamManager = savedStreamManager;
+			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
 		}
 
 		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
 		{
 			base.OnNavigatedTo(navigationParameter, navigationMode, viewModelState);
 
-			Items = new ObservableCollection<LocalStreamItem>(_localCacheManager.Items);
+			Items = new ObservableCollection<SavedStreamItem>(_savedStreamManager.Items);
 		}
 	}
 }

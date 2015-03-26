@@ -82,12 +82,16 @@ namespace Inoreader
 			_apiClient = new ApiClient(appId, appKey);
 			_container.RegisterInstance(_apiClient);
 
+			var localStorageManager = new LocalStorageManager();
+			localStorageManager.Init();
+			_container.RegisterInstance(localStorageManager);
+
 			_cacheManager = new CacheManager(TelemetryClient);
 			await _cacheManager.InitAsync();
 			_container.RegisterInstance(_cacheManager);
 
-			var localCacheManager = new LocalCacheManager(null);
-			_container.RegisterInstance(localCacheManager);
+			var savedStreamManager = new SavedStreamManager(localStorageManager);
+			_container.RegisterInstance(savedStreamManager);
 
 			var tagsManagerState = await _cacheManager.LoadTagsManagerStateAsync();
 			_tagsManager = new TagsManager(tagsManagerState, _apiClient, TelemetryClient, _container.Resolve<NetworkManager>());

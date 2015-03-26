@@ -29,7 +29,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly TelemetryClient _telemetryClient;
 		private readonly CacheManager _cacheManager;
 		private readonly TagsManager _tagsManager;
-		private readonly LocalCacheManager _localCacheManager;
+		private readonly SavedStreamManager _savedStreamManager;
 		private readonly bool _showNewestFirst;
 		private readonly bool _autoMarkAsRead;
 		private string _streamId;
@@ -172,7 +172,7 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] CacheManager cacheManager,
 			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService,
-			[NotNull] LocalCacheManager localCacheManager)
+			[NotNull] SavedStreamManager savedStreamManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
@@ -180,14 +180,14 @@ namespace Inoreader.ViewModels.Pages
 			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
-			if (localCacheManager == null) throw new ArgumentNullException("localCacheManager");
+			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryClient = telemetryClient;
 			_cacheManager = cacheManager;
 			_tagsManager = tagsManager;
-			_localCacheManager = localCacheManager;
+			_savedStreamManager = savedStreamManager;
 			_showNewestFirst = settingsService.ShowNewestFirst;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
 
@@ -459,12 +459,12 @@ namespace Inoreader.ViewModels.Pages
 				if (_currentItem.Saved)
 				{
 					_currentItem.Saved = false;
-					await _localCacheManager.DeleteAsync(_currentItem.Id);
+					await _savedStreamManager.DeleteAsync(_currentItem.Id);
 				}
 				else
 				{
 					_currentItem.Saved = true;
-					await _localCacheManager.AddAsync(_currentItem);
+					await _savedStreamManager.AddAsync(_currentItem);
 				}
 			}
 			catch (Exception e)
