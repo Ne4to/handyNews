@@ -151,23 +151,38 @@ namespace Inoreader.Services
 				ImageManager.UpdateImageSize(img, _maxImageWidth);
 			};
 
-			_httpClient.GetAsync(src).ContinueWith(async t =>
+			image.ImageFailed += (sender, args) =>
 			{
-				if (!t.Result.IsSuccessStatusCode)
-					return;
 
-				var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Path.GetRandomFileName(), CreationCollisionOption.GenerateUniqueName);
+			};
 
-				using (var stream = await file.OpenStreamForWriteAsync())
+			if (src.StartsWith("ms-appdata"))
+			{
+				image.Source = new BitmapImage(new Uri(src));
+			}
+			else
+			{
+				_httpClient.GetAsync(src).ContinueWith(async t =>
 				{
-					await t.Result.Content.CopyToAsync(stream);
-				}
+					if (!t.Result.IsSuccessStatusCode)
+						return;
 
-				await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-				{
-					image.Source = new BitmapImage(new Uri("ms-appdata:///temp/" + file.Name));
-				});
-			}, TaskContinuationOptions.OnlyOnRanToCompletion);
+					var file =
+						await
+							ApplicationData.Current.TemporaryFolder.CreateFileAsync(Path.GetRandomFileName(),
+								CreationCollisionOption.GenerateUniqueName);
+
+					using (var stream = await file.OpenStreamForWriteAsync())
+					{
+						await t.Result.Content.CopyToAsync(stream);
+					}
+
+					await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+					{
+						image.Source = new BitmapImage(new Uri("ms-appdata:///temp/" + file.Name));
+					});
+				}, TaskContinuationOptions.OnlyOnRanToCompletion);
+			}
 
 			return image;
 		}

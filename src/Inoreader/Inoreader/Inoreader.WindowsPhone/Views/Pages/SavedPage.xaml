@@ -6,6 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:storeApps="using:Microsoft.Practices.Prism.StoreApps"
     xmlns:mvvm="using:Microsoft.Practices.Prism.Mvvm"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:Inoreader.Behaviors"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">

@@ -14,7 +14,7 @@ namespace Inoreader.Services
 	public class SavedStreamManager
 	{
 		private const string CacheFolderName = "SavedItems";
-		private readonly StorageFolder _rootCacheFolder = ApplicationData.Current.LocalCacheFolder;
+		private readonly StorageFolder _rootCacheFolder = ApplicationData.Current.LocalFolder;
 		private readonly LocalStorageManager _storageManager;
 
 		private readonly Lazy<List<SavedStreamItem>> _items;
@@ -90,7 +90,7 @@ namespace Inoreader.Services
 				
 				fixedImages.Add(src);
 
-				var newSrc = String.Format("ms-appdata:///localcache/{0}/{1}/{2}", CacheFolderName, folder.Name, fileName);
+				var newSrc = String.Format("ms-appdata:///local/{0}/{1}/{2}", CacheFolderName, folder.Name, fileName);
 				localHtml.Replace(src, newSrc);				
 			}
 
