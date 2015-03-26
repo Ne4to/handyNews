@@ -282,12 +282,20 @@
 													</interactivity:Interaction.Behaviors>
 												</RichTextBlock>
 
-												<controls:StarControl Grid.Column="1" 
+												<StackPanel Grid.Column="1" 
+															HorizontalAlignment="Right" 
+															VerticalAlignment="Top">											
+													
+													<controls:StarControl
 																Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
 																Width="15" 
-																Height="15" 
-																HorizontalAlignment="Right" 
-																VerticalAlignment="Top" />
+																Height="15" />
+
+													<controls:SaveControl 
+																Visibility="{Binding Saved, Converter={StaticResource BooleanToVisibilityConverter}}"
+																Width="15" 
+																Height="15" />
+												</StackPanel>
 											</Grid>
 										</StackPanel>
 									</Grid>
@@ -339,17 +347,15 @@
 
 	<Page.BottomAppBar>
 		<CommandBar>
-			<AppBarToggleButton x:Uid="SetReadAppBarButton"
-								Label="read"
-								Icon="Read" 
-								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}"
-								IsEnabled="{Binding CurrentItemReadEnabled}" />
+			<AppBarButton x:Uid="SaveAppBarCommand"
+							Icon="Download" 
+						  Label="save"
+						  Command="{Binding SaveCommand}" />
 
-			<AppBarToggleButton x:Uid="SetStarAppBarButton"
-								Label="star"
-								Icon="Favorite"
-								IsChecked="{Binding CurrentItemStarred, Mode=TwoWay}"
-								IsEnabled="{Binding CurrentItemStarredEnabled}"/>
+			<AppBarButton x:Uid="ShareAppBarButton"
+							  Icon="ReShare"
+							  Label="share"
+							  Command="{Binding ShareCommand}"/>
 
 			<AppBarButton x:Uid="OpenInWebAppBarButton"
 						  Icon="World"
@@ -359,10 +365,17 @@
 			<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding RefreshCommand}" />
 
 			<CommandBar.SecondaryCommands>
-				<AppBarButton x:Uid="ShareAppBarButton"
-							  Icon="ReShare"
-							  Label="share"
-							  Command="{Binding ShareCommand}"/>
+				<AppBarToggleButton x:Uid="SetReadAppBarButton"
+								Label="read"
+								Icon="Read" 
+								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}"
+								IsEnabled="{Binding CurrentItemReadEnabled}" />
+
+				<AppBarToggleButton x:Uid="SetStarAppBarButton"
+								Label="star"
+								Icon="Favorite"
+								IsChecked="{Binding CurrentItemStarred, Mode=TwoWay}"
+								IsEnabled="{Binding CurrentItemStarredEnabled}"/>
 
 				<AppBarButton x:Uid="MarkAllAsReadAppBarButton" 
 							  Label="mark all as read"

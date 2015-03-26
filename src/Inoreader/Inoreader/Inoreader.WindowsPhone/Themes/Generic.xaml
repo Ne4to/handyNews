@@ -393,18 +393,20 @@
 										   TextTrimming="WordEllipsis" 
 										   MaxLines="2" />
 
-								<RichTextBlock Grid.Column="0" x:Name="ExpandedTextBlock" IsTextSelectionEnabled="False" Visibility="Collapsed">
-									<interactivity:Interaction.Behaviors>
-										<behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HtmlContent}" />
-									</interactivity:Interaction.Behaviors>
-								</RichTextBlock>
+								<StackPanel Grid.Column="1" 
+															HorizontalAlignment="Right" 
+															VerticalAlignment="Top">
 
-								<controls:StarControl Grid.Column="1" 
+									<controls:StarControl
 																Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
 																Width="15" 
-																Height="15" 
-																HorizontalAlignment="Right" 
-																VerticalAlignment="Top" />
+																Height="15" />
+
+									<controls:SaveControl 
+																Visibility="{Binding Saved, Converter={StaticResource BooleanToVisibilityConverter}}"
+																Width="15" 
+																Height="15" />
+								</StackPanel>
 							</Grid>
 						</StackPanel>
 

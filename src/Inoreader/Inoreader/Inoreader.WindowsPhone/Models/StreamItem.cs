@@ -8,8 +8,6 @@ namespace Inoreader.Models
 	[DataContract]
 	public class StreamItem : BindableBaseEx
 	{
-		private string _shortPlainText;
-
 		#region Fields
 
 		[DataMember]
@@ -23,6 +21,9 @@ namespace Inoreader.Models
 
 		[DataMember]
 		private bool _starred;
+
+		[DataMember]
+		private bool _saved;
 
 		#endregion
 
@@ -42,20 +43,6 @@ namespace Inoreader.Models
 
 		[DataMember]
 		public string Content { get; set; }
-
-		public string ShortPlainText
-		{
-			get
-			{
-				if (_shortPlainText == null)
-				{
-					var parser = new HtmlParser();
-					_shortPlainText = parser.GetPlainText(Content, 200);
-				}
-				
-				return _shortPlainText;
-			}
-		}
 
 		public bool Unread
 		{
@@ -79,6 +66,12 @@ namespace Inoreader.Models
 		{
 			get { return _starred; }
 			set { SetProperty(ref _starred, value); }
+		}
+
+		public bool Saved
+		{
+			get { return _saved; }
+			set { SetProperty(ref _saved, value); }
 		}
 
 		#endregion

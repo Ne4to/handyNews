@@ -68,7 +68,7 @@
 					  DisplayMemberPath="Title" />
 
 				<Slider Header="font size" HorizontalAlignment="Stretch" 
-					x:Uid="SettingsFontSizeSlider"
+					x:Uid="SettingsFontSizeSlider" x:Name="SettingsFontSizeSlider"
 					Minimum="11" Maximum="22" Value="{Binding FontSize, Mode=TwoWay}" />
 				<TextBlock TextWrapping="WrapWholeWords" TextTrimming="WordEllipsis" MaxLines="3" 
 					   FontSize="{Binding ElementName=SettingsFontSizeSlider, Path=Value}"

@@ -29,6 +29,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly TelemetryClient _telemetryClient;
 		private readonly CacheManager _cacheManager;
 		private readonly TagsManager _tagsManager;
+		private readonly LocalCacheManager _localCacheManager;
 		private readonly bool _showNewestFirst;
 		private readonly bool _autoMarkAsRead;
 		private string _streamId;
@@ -43,16 +44,17 @@ namespace Inoreader.ViewModels.Pages
 		private bool _currentItemStarredEnabled;
 		private StreamItem _currentItem;
 		private bool _isOffline;
-		
+
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
 		private DelegateCommand _openWebCommand;
 		private ICommand _refreshCommand;
+		private DelegateCommand _saveCommand;
 		private DelegateCommand _shareCommand;
 		private ICommand _readItemCommand;
 		private ICommand _starItemCommand;
 		private ICommand _markAllAsReadCommand;
-		
+
 		#endregion
 
 		#region Properties
@@ -137,6 +139,11 @@ namespace Inoreader.ViewModels.Pages
 			get { return _refreshCommand ?? (_refreshCommand = new DelegateCommand(OnRefresh)); }
 		}
 
+		public ICommand SaveCommand
+		{
+			get { return _saveCommand ?? (_saveCommand = new DelegateCommand(OnSave, CanSave)); }
+		}
+
 		public ICommand ShareCommand
 		{
 			get { return _shareCommand ?? (_shareCommand = new DelegateCommand(OnShare, CanShare)); }
@@ -164,7 +171,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] CacheManager cacheManager,
 			[NotNull] TagsManager tagsManager,
-			[NotNull] AppSettingsService settingsService)
+			[NotNull] AppSettingsService settingsService,
+			[NotNull] LocalCacheManager localCacheManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
@@ -172,12 +180,14 @@ namespace Inoreader.ViewModels.Pages
 			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
+			if (localCacheManager == null) throw new ArgumentNullException("localCacheManager");
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryClient = telemetryClient;
 			_cacheManager = cacheManager;
 			_tagsManager = tagsManager;
+			_localCacheManager = localCacheManager;
 			_showNewestFirst = settingsService.ShowNewestFirst;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
 
@@ -332,6 +342,7 @@ namespace Inoreader.ViewModels.Pages
 			CurrentItemStarredEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
 			RaiseOpenWebCommandCanExecuteChanged();
 			RaiseShareCommandCanExecuteChanged();
+			RaiseSaveCommandCanExecuteChanged();
 
 			if (Items != null)
 				await _cacheManager.SaveStreamAsync(Items.GetSate());
@@ -347,6 +358,12 @@ namespace Inoreader.ViewModels.Pages
 		{
 			if (_shareCommand != null)
 				_shareCommand.RaiseCanExecuteChanged();
+		}
+
+		private void RaiseSaveCommandCanExecuteChanged()
+		{
+			if (_saveCommand != null)
+				_saveCommand.RaiseCanExecuteChanged();
 		}
 
 		private void OnItemsScroll(object obj)
@@ -378,6 +395,7 @@ namespace Inoreader.ViewModels.Pages
 			CurrentItemStarredEnabled = _currentItem != null;
 			RaiseOpenWebCommandCanExecuteChanged();
 			RaiseShareCommandCanExecuteChanged();
+			RaiseSaveCommandCanExecuteChanged();
 		}
 
 		private void OnSelectItem(object obj)
@@ -404,6 +422,7 @@ namespace Inoreader.ViewModels.Pages
 				CurrentItemStarredEnabled = _currentItem != null;
 				RaiseOpenWebCommandCanExecuteChanged();
 				RaiseShareCommandCanExecuteChanged();
+				RaiseSaveCommandCanExecuteChanged();
 			}
 			else
 			{
@@ -433,6 +452,32 @@ namespace Inoreader.ViewModels.Pages
 			LoadData();
 		}
 
+		private async void OnSave()
+		{
+			try
+			{
+				if (_currentItem.Saved)
+				{
+					_currentItem.Saved = false;
+					await _localCacheManager.DeleteAsync(_currentItem.Id);
+				}
+				else
+				{
+					_currentItem.Saved = true;
+					await _localCacheManager.AddAsync(_currentItem);
+				}
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+			}
+		}
+
+		private bool CanSave()
+		{			
+			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+		}
+
 		private void OnShare()
 		{
 			DataTransferManager.ShowShareUI();
@@ -459,7 +504,7 @@ namespace Inoreader.ViewModels.Pages
 			}
 		}
 
-		private void OnStarItem(object o)
+		private async void OnStarItem(object o)
 		{
 			var item = o as StreamItem;
 			if (item == null || item is EmptySpaceStreamItem)
@@ -471,14 +516,14 @@ namespace Inoreader.ViewModels.Pages
 			if (item == _currentItem)
 			{
 				SetCurrentItemStarred(item.Starred);
-			}
+			}			
 		}
 
 		private async void OnMarkAllAsRead()
 		{
 			if (Items == null)
 				return;
-			
+
 			var dlg = new MessageDialog(Strings.Resources.MarkAllAsReadDialogContent);
 			dlg.Commands.Add(new UICommand(Strings.Resources.DialogCommandYes) { Id = 1 });
 			dlg.Commands.Add(new UICommand(Strings.Resources.DialogCommandNo) { Id = 0 });

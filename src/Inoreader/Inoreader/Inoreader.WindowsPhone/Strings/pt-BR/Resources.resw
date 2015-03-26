@@ -322,4 +322,13 @@ Isto não pode ser desfeito!</value>
   <data name="YoutubeVideoTitle" xml:space="preserve">
     <value>Vídeo do YouTube</value>
   </data>
+  <data name="SaveAppBarCommand.Label" xml:space="preserve">
+    <value>salvar</value>
+  </data>
+  <data name="SavedAppBarButton.Label" xml:space="preserve">
+    <value>os salvos</value>
+  </data>
+  <data name="SavedPageHeader.Text" xml:space="preserve">
+    <value>Os salvos</value>
+  </data>
 </root>

@@ -42,10 +42,15 @@ namespace Inoreader.Behaviors
 
 		private void UpdateTextBlock(RichTextBlock richTextBlock)
 		{
-			var parser = new HtmlParser();
+			var builder = new RichTextBlockBuilder();
 			IList<Image> images;
-			var paragraph = parser.GetParagraph((string) HtmlContent, out images);
-			richTextBlock.Blocks.Add(paragraph);
+			var paragraphs = builder.GetParagraphs((string) HtmlContent, out images);
+
+			foreach (var paragraph in paragraphs)
+			{
+				richTextBlock.Blocks.Add(paragraph);	
+			}
+			
 			_created = true;
 
 			var imageManager = ServiceLocator.Current.GetInstance<ImageManager>();

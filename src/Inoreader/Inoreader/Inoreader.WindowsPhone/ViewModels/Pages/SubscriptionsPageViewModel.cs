@@ -23,6 +23,7 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _aboutPageCommand;
 		private ICommand _signOutCommand;
 		private ICommand _starsCommand;
+		private ICommand _savedCommand;
 
 		public SubscriptionsViewModel Subscriptions { get; private set; }
 
@@ -44,6 +45,11 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand StarsCommand
 		{
 			get { return _starsCommand ?? (_starsCommand = new DelegateCommand(OnStars)); }
+		}
+
+		public ICommand SavedCommand
+		{
+			get { return _savedCommand ?? (_savedCommand = new DelegateCommand(OnSaved)); }
 		}
 
 		public SubscriptionsPageViewModel(IUnityContainer container, INavigationService navigationService, ApiClient apiClient,
@@ -102,6 +108,11 @@ namespace Inoreader.ViewModels.Pages
 		{
 			var pageToken = _appSettingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
 			_navigationService.Navigate(pageToken, SpecialTags.Starred);
+		}
+		
+		private void OnSaved()
+		{
+			_navigationService.Navigate(PageTokens.Saved, null);
 		}
 	}
 }

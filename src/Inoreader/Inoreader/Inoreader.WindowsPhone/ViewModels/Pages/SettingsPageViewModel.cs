@@ -52,13 +52,21 @@ namespace Inoreader.ViewModels.Pages
 		public Lang SelectedLang
 		{
 			get { return _selectedLang; }
-			set { SetProperty(ref _selectedLang, value); }
+			set
+			{
+				if (SetProperty(ref _selectedLang, value))
+					SaveLang();
+			}
 		}
 
 		public bool HideEmptySubscriptions
 		{
 			get { return _hideEmptySubscriptions; }
-			set { SetProperty(ref _hideEmptySubscriptions, value); }
+			set
+			{
+				if (SetProperty(ref _hideEmptySubscriptions, value))
+					SaveHideEmptySubscriptions();
+			}
 		}
 
 		public ulong TotalCacheSize
@@ -82,7 +90,11 @@ namespace Inoreader.ViewModels.Pages
 		public ShowOrderItem SelectedShowOrder
 		{
 			get { return _selectedShowOrder; }
-			set { SetProperty(ref _selectedShowOrder, value); }
+			set
+			{
+				if (SetProperty(ref _selectedShowOrder, value))
+					SaveShowOrder();
+			}
 		}
 
 		public List<StreamViewItem> StreamViewItems
@@ -94,13 +106,21 @@ namespace Inoreader.ViewModels.Pages
 		public StreamViewItem SelectedStreamView
 		{
 			get { return _selectedStreamView; }
-			set { SetProperty(ref _selectedStreamView, value); }
+			set
+			{
+				if (SetProperty(ref _selectedStreamView, value))
+					SaveStreamView();
+			}
 		}
 
 		public double FontSize
 		{
 			get { return _fontSize; }
-			set { SetProperty(ref _fontSize, value); }
+			set
+			{
+				if (SetProperty(ref _fontSize, value))
+					SaveFontSize();
+			}
 		}
 
 		public bool TextJustification
@@ -110,6 +130,7 @@ namespace Inoreader.ViewModels.Pages
 			{
 				SetProperty(ref _textJustification, value);
 				TextAlignment = TextJustification ? TextAlignment.Justify : TextAlignment.Left;
+				SaveTextJustification();
 			}
 		}
 
@@ -122,7 +143,11 @@ namespace Inoreader.ViewModels.Pages
 		public bool AutoMarkAsRead
 		{
 			get { return _autoMarkAsRead; }
-			set { SetProperty(ref _autoMarkAsRead, value); }
+			set
+			{
+				if (SetProperty(ref _autoMarkAsRead, value))
+					SaveAutoMarkAsRead();
+			}
 		}
 
 		#endregion
@@ -201,20 +226,10 @@ namespace Inoreader.ViewModels.Pages
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
-			SaveLang();
-			SaveHideEmptySubscriptions();
-			SaveStreamView();
-			SaveShowOrder();
-			SaveFontSize();
-			SaveTextJustification();
-			SaveAutoMarkAsRead();
-
-			_settingsService.Save();
-
 			if (!suspending && _clearCacheComand != null)
 				_clearCacheComand.Dispose();
 		}
-		
+
 		private void SaveLang()
 		{
 			if (_settingsService.DisplayCulture == SelectedLang.Name)
@@ -226,6 +241,7 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.DisplayCulture = SelectedLang.Name;
+			_settingsService.Save();
 		}
 
 		private void SaveHideEmptySubscriptions()
@@ -239,6 +255,7 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.HideEmptySubscriptions = HideEmptySubscriptions;
+			_settingsService.Save();
 		}
 
 		private void SaveStreamView()
@@ -252,6 +269,7 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.StreamView = SelectedStreamView.View;
+			_settingsService.Save();
 		}
 
 		private void SaveShowOrder()
@@ -265,6 +283,7 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.ShowNewestFirst = SelectedShowOrder.Value;
+			_settingsService.Save();
 		}
 
 		private void SaveFontSize()
@@ -278,8 +297,9 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.FontSize = FontSize;
+			_settingsService.Save();
 		}
-		
+
 		private void SaveTextJustification()
 		{
 			if (TextJustification == (_settingsService.TextAlignment == TextAlignment.Justify))
@@ -293,6 +313,7 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.TextAlignment = newValue;
+			_settingsService.Save();
 		}
 
 		private void SaveAutoMarkAsRead()
@@ -306,6 +327,7 @@ namespace Inoreader.ViewModels.Pages
 			_telemetryClient.TrackEvent(eventTelemetry);
 
 			_settingsService.AutoMarkAsRead = AutoMarkAsRead;
+			_settingsService.Save();
 		}
 
 		private async void OnClearCache(object obj)

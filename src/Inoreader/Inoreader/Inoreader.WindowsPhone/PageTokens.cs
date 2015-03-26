@@ -9,5 +9,6 @@
 		public const string About = "About";
 		public const string Settings = "Settings";
 		public const string Subscriptions = "Subscriptions";
+		public const string Saved = "Saved";
 	}
 }

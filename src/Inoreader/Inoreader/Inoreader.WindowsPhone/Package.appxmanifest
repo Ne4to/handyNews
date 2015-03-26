@@ -30,6 +30,5 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClientServer" />
-    <Capability Name="picturesLibrary" />
   </Capabilities>
 </Package>

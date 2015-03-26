@@ -292,4 +292,13 @@
   <data name="YoutubeVideoTitle" xml:space="preserve">
     <value>YouTube видео</value>
   </data>
+  <data name="SaveAppBarCommand.Label" xml:space="preserve">
+    <value>сохранить</value>
+  </data>
+  <data name="SavedAppBarButton.Label" xml:space="preserve">
+    <value>сохр.</value>
+  </data>
+  <data name="SavedPageHeader.Text" xml:space="preserve">
+    <value>Сохраненные</value>
+  </data>
 </root>

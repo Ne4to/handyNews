@@ -120,7 +120,9 @@
     <Compile Include="Services\ILexeme.cs" />
     <Compile Include="Services\ImageManager.cs" />
     <Compile Include="Services\LiteralLexeme.cs" />
+    <Compile Include="Services\LocalCacheManager.cs" />
     <Compile Include="Services\NetworkManager.cs" />
+    <Compile Include="Services\RichTextBlockBuilder.cs" />
     <Compile Include="Services\SpecialTags.cs" />
     <Compile Include="Services\StringParameters.cs" />
     <Compile Include="Services\TagsManager.cs" />
@@ -142,6 +144,7 @@
     <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\ListStreamPageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\SavedPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
     <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
@@ -157,6 +160,9 @@
     </Compile>
     <Compile Include="Views\Controls\ReadControl.xaml.cs">
       <DependentUpon>ReadControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\SaveControl.xaml.cs">
+      <DependentUpon>SaveControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\StarControl.xaml.cs">
       <DependentUpon>StarControl.xaml</DependentUpon>
@@ -193,6 +199,9 @@
     <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Views\Pages\ListStreamPage.xaml.cs">
       <DependentUpon>ListStreamPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\SavedPage.xaml.cs">
+      <DependentUpon>SavedPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
@@ -278,6 +287,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Controls\SaveControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Controls\StarControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -319,6 +332,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\ListStreamPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\SavedPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

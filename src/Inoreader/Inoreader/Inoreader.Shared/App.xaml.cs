@@ -39,7 +39,7 @@ namespace Inoreader
 		{
 			InitializeComponent();
 
-			Suspending += App_Suspending;
+			Suspending += App_Suspending;			
 		}
 
 		protected override Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
@@ -61,7 +61,7 @@ namespace Inoreader
 		protected override async Task OnInitializeAsync(IActivatedEventArgs args)
 		{
 			await base.OnInitializeAsync(args);
-			
+
 			_container.RegisterInstance<ISessionStateService>(SessionStateService);
 			_container.RegisterInstance<INavigationService>(NavigationService);
 
@@ -76,7 +76,7 @@ namespace Inoreader
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
 			var strData = await FileIO.ReadTextAsync(file);
 			var data = JObject.Parse(strData);
-
+			
 			var appId = data["AppId"].ToString();
 			var appKey = data["AppKey"].ToString();
 			_apiClient = new ApiClient(appId, appKey);
@@ -85,6 +85,9 @@ namespace Inoreader
 			_cacheManager = new CacheManager(TelemetryClient);
 			await _cacheManager.InitAsync();
 			_container.RegisterInstance(_cacheManager);
+
+			var localCacheManager = new LocalCacheManager(null);
+			_container.RegisterInstance(localCacheManager);
 
 			var tagsManagerState = await _cacheManager.LoadTagsManagerStateAsync();
 			_tagsManager = new TagsManager(tagsManagerState, _apiClient, TelemetryClient, _container.Resolve<NetworkManager>());
@@ -107,6 +110,7 @@ namespace Inoreader
 
 			var deferral = e.SuspendingOperation.GetDeferral();
 
+			// TODO manual close does not work
 			var state = _tagsManager.GetState();
 			await _cacheManager.SaveTagsManagerStateAsync(state);
 
@@ -131,7 +135,7 @@ namespace Inoreader
 					return;
 				}
 			}
-
+			
 			base.OnHardwareButtonsBackPressed(sender, e);
 		}
 

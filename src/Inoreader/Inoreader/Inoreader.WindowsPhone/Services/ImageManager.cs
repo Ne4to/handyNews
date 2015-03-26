@@ -64,7 +64,10 @@ namespace Inoreader.Services
 
 		public static void UpdateImageSize(Image image, double maxImageWidth)
 		{
-			var imgSource = (BitmapImage)image.Source;
+			var imgSource = image.Source as BitmapImage;
+			if (imgSource == null)
+				return;
+
 			var width = Math.Min(imgSource.PixelWidth, maxImageWidth);
 
 			if (!(Math.Abs(width) > 0.1D))
