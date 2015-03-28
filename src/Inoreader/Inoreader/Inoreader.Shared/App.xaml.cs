@@ -38,8 +38,6 @@ namespace Inoreader
 		public App()
 		{
 			InitializeComponent();
-
-			Suspending += App_Suspending;			
 		}
 
 		protected override Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
@@ -76,7 +74,7 @@ namespace Inoreader
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
 			var strData = await FileIO.ReadTextAsync(file);
 			var data = JObject.Parse(strData);
-			
+
 			var appId = data["AppId"].ToString();
 			var appKey = data["AppKey"].ToString();
 			_apiClient = new ApiClient(appId, appKey);
@@ -93,10 +91,9 @@ namespace Inoreader
 			var savedStreamManager = new SavedStreamManager(localStorageManager);
 			_container.RegisterInstance(savedStreamManager);
 
-			var tagsManagerState = await _cacheManager.LoadTagsManagerStateAsync();
-			_tagsManager = new TagsManager(tagsManagerState, _apiClient, TelemetryClient, _container.Resolve<NetworkManager>());
+			_tagsManager = _container.Resolve<TagsManager>();
 			_container.RegisterInstance(_tagsManager);
-			_tagsManager.ProcessQueue();			
+			_tagsManager.ProcessQueue();
 
 			Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = _appSettingsService.DisplayCulture;
 
@@ -105,20 +102,6 @@ namespace Inoreader
 
 			ViewModelLocationProvider.SetDefaultViewModelFactory(ViewModelFactory);
 			ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(ViewModelTypeResolver);
-		}
-
-		async void App_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
-		{
-			if (_tagsManager == null || _cacheManager == null)
-				return;
-
-			var deferral = e.SuspendingOperation.GetDeferral();
-
-			// TODO manual close does not work
-			var state = _tagsManager.GetState();
-			await _cacheManager.SaveTagsManagerStateAsync(state);
-
-			deferral.Complete();
 		}
 
 		protected override void OnHardwareButtonsBackPressed(object sender, BackPressedEventArgs e)
@@ -133,13 +116,13 @@ namespace Inoreader
 				{
 					if (!navigateBackwards.NavigateBack())
 					{
-						e.Handled = true;					
+						e.Handled = true;
 					}
 
 					return;
 				}
 			}
-			
+
 			base.OnHardwareButtonsBackPressed(sender, e);
 		}
 
@@ -169,7 +152,7 @@ namespace Inoreader
 			SessionStateService.RegisterKnownType(typeof(SubscriptionItem));
 			SessionStateService.RegisterKnownType(typeof(CategoryItem));
 			SessionStateService.RegisterKnownType(typeof(List<TreeItemBase>));
-			
+
 			// Stream page state
 			SessionStateService.RegisterKnownType(typeof(StreamItem));
 			SessionStateService.RegisterKnownType(typeof(EmptySpaceStreamItem));
