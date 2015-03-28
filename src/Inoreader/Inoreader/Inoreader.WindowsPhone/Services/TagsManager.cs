@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Inoreader.Annotations;
 using Inoreader.Api;
 using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Inoreader.Services
 {
@@ -18,222 +14,132 @@ namespace Inoreader.Services
 
 		private readonly ApiClient _apiClient;
 		private readonly TelemetryClient _telemetryClient;
+		private readonly LocalStorageManager _localStorageManager;
 
-		private readonly LinkedList<TagAction> _queue;
-		private readonly object _queueLock = new object();
-		private int _currentBusy = 0;
+		private int _currentBusy = FalseValue;
 
-		public TagsManager(TagsManagerState state, [NotNull] ApiClient apiClient, [NotNull] TelemetryClient telemetryClient,
-			[NotNull] NetworkManager networkManager)
+		public TagsManager([NotNull] ApiClient apiClient,
+			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] NetworkManager networkManager,
+			[NotNull] LocalStorageManager localStorageManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (networkManager == null) throw new ArgumentNullException("networkManager");
+			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
+			_localStorageManager = localStorageManager;
 
-			_queue = state != null ? new LinkedList<TagAction>(state.Actions) : new LinkedList<TagAction>();
 			networkManager.NetworkChanged += networkManager_NetworkChanged;
 		}
 
 		void networkManager_NetworkChanged(object sender, NetworkChangedEventArgs e)
 		{
 			if (e.Connected)
-				ProcessQueue();	
+				ProcessQueue();
 		}
 
-		public TagsManagerState GetState()
+		public async void MarkAsRead(string id)
 		{
-			TagAction[] actions;
-			lock (_queueLock)
+			await AddTagInternalAsync(id, SpecialTags.Read).ConfigureAwait(false);
+		}
+
+		public async void MarkAsUnreadTagAction(string id)
+		{
+			await RemoveTagInternalAsync(id, SpecialTags.Read).ConfigureAwait(false);
+		}
+
+		public async void AddToStarred(string id)
+		{
+			await AddTagInternalAsync(id, SpecialTags.Starred).ConfigureAwait(false);
+		}
+
+		public async void RemoveFromStarred(string id)
+		{
+			await RemoveTagInternalAsync(id, SpecialTags.Starred).ConfigureAwait(false);
+		}
+
+		private async Task AddTagInternalAsync(string id, string tag)
+		{
+			try
 			{
-				actions = _queue.ToArray();
+				await _apiClient.AddTagAsync(tag, id).ConfigureAwait(false);
+				return;
+			}
+			catch (Exception ex)
+			{
+				_telemetryClient.TrackException(ex);
 			}
 
-			return new TagsManagerState
+			try
 			{
-				Actions = actions
-			};
+				_localStorageManager.AddTagAction(id, tag, TagActionKind.Add);
+			}
+			catch (Exception ex)
+			{
+				_telemetryClient.TrackException(ex);
+			}
 		}
 
-		private void AddItem(TagAction item)
+		private async Task RemoveTagInternalAsync(string id, string tag)
 		{
-			lock (_queueLock)
+			try
 			{
-				_queue.AddLast(item);
+				await _apiClient.RemoveTagAsync(tag, id).ConfigureAwait(false);
+				return;
+			}
+			catch (Exception ex)
+			{
+				_telemetryClient.TrackException(ex);
 			}
 
-			ProcessQueue();
-		}
-
-		public void MarkAsRead(string id)
-		{
-			var item = new MarkAsReadTagAction
+			try
 			{
-				Id = id
-			};
-
-			AddItem(item);
-		}
-
-		public void MarkAsUnreadTagAction(string id)
-		{
-			var item = new MarkAsUnreadTagAction
-			{
-				Id = id
-			};
-
-			AddItem(item);
-		}
-
-		public void AddToStarred(string id)
-		{
-			var item = new MarkAsStarredTagAction
-			{
-				Id = id
-			};
-
-			AddItem(item);
-		}
-
-		public void RemoveFromStarred(string id)
-		{
-			var item = new MarkAsUnstarredTagAction
-			{
-				Id = id
-			};
-
-			AddItem(item);
-		}
-
-		private TagAction GetNext()
-		{
-			TagAction result = null;
-
-			lock (_queueLock)
-			{
-				if (_queue.Count != 0)
-				{
-					result = _queue.First.Value;
-					_queue.RemoveFirst();
-				}
+				_localStorageManager.AddTagAction(id, tag, TagActionKind.Remove);
 			}
-
-			return result;
+			catch (Exception ex)
+			{
+				_telemetryClient.TrackException(ex);
+			}
 		}
 
 		public async void ProcessQueue()
 		{
 			if (Interlocked.CompareExchange(ref _currentBusy, TrueValue, FalseValue) != FalseValue)
 				return;
-			
-			TagAction action = null;
 
 			try
 			{
 				while (true)
 				{
-					action = GetNext();
+					var action = _localStorageManager.GetNextTagAction();
 					if (action == null)
 						return;
 
-					await action.ExecuteAsync(_apiClient, _telemetryClient).ConfigureAwait(false);
+					switch (action.Kind)
+					{
+						case TagActionKind.Add:
+							await _apiClient.AddTagAsync(action.Tag, action.ItemId).ConfigureAwait(false);
+							break;
+
+						case TagActionKind.Remove:
+							await _apiClient.RemoveTagAsync(action.Tag, action.ItemId).ConfigureAwait(false);
+							break;
+					}
+
+					_localStorageManager.DeleteTagAction(action.Id);
 				}
 			}
 			catch (Exception ex)
 			{
-				if (action != null)
-				{
-					lock (_queueLock)
-					{
-						_queue.AddFirst(action);
-					}					
-				}
-
 				_telemetryClient.TrackExceptionFull(ex);
 			}
 			finally
 			{
 				_currentBusy = FalseValue;
 			}
-		}
-	}
-
-	[DataContract]
-	public class TagsManagerState
-	{
-		[DataMember]
-		public TagAction[] Actions { get; set; }
-	}
-
-	[DataContract]
-	public abstract class TagAction
-	{
-		public abstract Task ExecuteAsync(ApiClient apiClient, TelemetryClient telemetryClient);
-	}
-
-	[DataContract]
-	public class MarkAsReadTagAction : TagAction
-	{
-		[DataMember]
-		public string Id { get; set; }
-
-		public override Task ExecuteAsync(ApiClient apiClient, TelemetryClient telemetryClient)
-		{
-			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsRead);
-			eventTelemetry.Properties.Add("AsRead", true.ToString());
-			telemetryClient.TrackEvent(eventTelemetry);
-
-			return apiClient.AddTagAsync(SpecialTags.Read, Id);
-		}
-	}
-
-	[DataContract]
-	public class MarkAsUnreadTagAction : TagAction
-	{
-		[DataMember]
-		public string Id { get; set; }
-
-		public override Task ExecuteAsync(ApiClient apiClient, TelemetryClient telemetryClient)
-		{
-			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsRead);
-			eventTelemetry.Properties.Add("AsRead", false.ToString());
-			telemetryClient.TrackEvent(eventTelemetry);
-
-			return apiClient.RemoveTagAsync(SpecialTags.Read, Id);
-		}
-	}
-
-	[DataContract]
-	public class MarkAsStarredTagAction : TagAction
-	{
-		[DataMember]
-		public string Id { get; set; }
-
-		public override Task ExecuteAsync(ApiClient apiClient, TelemetryClient telemetryClient)
-		{
-			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsStarred);
-			eventTelemetry.Properties.Add("Starred", true.ToString());
-			telemetryClient.TrackEvent(eventTelemetry);
-
-			return apiClient.AddTagAsync(SpecialTags.Starred, Id);
-		}
-	}
-
-	[DataContract]
-	public class MarkAsUnstarredTagAction : TagAction
-	{
-		[DataMember]
-		public string Id { get; set; }
-
-		public override Task ExecuteAsync(ApiClient apiClient, TelemetryClient telemetryClient)
-		{
-			var eventTelemetry = new EventTelemetry(TelemetryEvents.MarkAsStarred);
-			eventTelemetry.Properties.Add("Starred", false.ToString());
-			telemetryClient.TrackEvent(eventTelemetry);
-
-			return apiClient.RemoveTagAsync(SpecialTags.Starred, Id);
 		}
 	}
 }
