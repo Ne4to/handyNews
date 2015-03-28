@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.Phone.UI.Input;
 using Windows.Storage;
+using Windows.UI.Notifications;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -102,6 +103,8 @@ namespace Inoreader
 
 			ViewModelLocationProvider.SetDefaultViewModelFactory(ViewModelFactory);
 			ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(ViewModelTypeResolver);
+
+			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
 		}
 
 		protected override void OnHardwareButtonsBackPressed(object sender, BackPressedEventArgs e)

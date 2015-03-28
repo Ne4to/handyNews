@@ -30,7 +30,7 @@ namespace Inoreader.Services
 					statement.Step();
 				}
 
-				using (var statement = connection.Prepare(@"CREATE TABLE IN NOT EXISTS TAG_ACTION (ID INTEGER PRIMARY KEY NOT NULL AUTOINCREMENT,
+				using (var statement = connection.Prepare(@"CREATE TABLE IF NOT EXISTS TAG_ACTION (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 							ITEM_ID TEXT,
 							TAG TEXT,
 							ACTION_KIND INTEGER);"))

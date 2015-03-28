@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Data.Html;
-using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -290,18 +289,12 @@ namespace Inoreader.ViewModels.Details
 				_isRoot = true;
 			}
 
-			UpdateBadge(unreadCount);
-			var unreadAllItem = unreadCount.UnreadCounts.FirstOrDefault(uc => uc.Id.EndsWith("/state/com.google/reading-list", StringComparison.OrdinalIgnoreCase));
-			int totalUnreadCount = unreadAllItem != null ? unreadAllItem.Count : TreeItems.Sum(ti => ti.UnreadCount);
+			var allItem = TreeItems.FirstOrDefault(t => t.Id == SpecialTags.Read);
+			int totalUnreadCount = allItem != null ? allItem.UnreadCount : 0;
 			_tileManager.UpdateAsync(totalUnreadCount);
 
 			await _cacheManager.SaveSubscriptionsAsync(_rootItems);
-		}
-
-		private void UpdateBadge(UnreadCountResponse unreadCount)
-		{
-			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
-		}
+		}	
 
 		private void HideEmpty(List<TreeItemBase> allItems)
 		{
