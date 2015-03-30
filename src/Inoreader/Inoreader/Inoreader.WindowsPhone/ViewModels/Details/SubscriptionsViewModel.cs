@@ -289,8 +289,7 @@ namespace Inoreader.ViewModels.Details
 				_isRoot = true;
 			}
 
-			var allItem = TreeItems.FirstOrDefault(t => t.Id == SpecialTags.Read);
-			int totalUnreadCount = allItem != null ? allItem.UnreadCount : 0;
+			int totalUnreadCount = allItems.OfType<SubscriptionItem>().Sum(t => t.UnreadCount);
 			_tileManager.UpdateAsync(totalUnreadCount);
 
 			await _cacheManager.SaveSubscriptionsAsync(_rootItems);

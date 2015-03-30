@@ -242,7 +242,8 @@
 		<ListView Grid.Row="1" 
 				  ItemsSource="{Binding Items}" 
 				  IsItemClickEnabled="True"
-				  ItemContainerStyle="{StaticResource ListViewItemStyle1}">
+				  ItemContainerStyle="{StaticResource ListViewItemStyle1}"
+				  x:Name="ItemsListView">
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<Grid Background="#FEFEFE">

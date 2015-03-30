@@ -44,6 +44,7 @@ namespace Inoreader.ViewModels.Pages
 		private bool _currentItemStarredEnabled;
 		private StreamItem _currentItem;
 		private bool _isOffline;
+		private bool _allArticles;
 
 		private ICommand _itemsScrollCommand;
 		private ICommand _selectItemCommand;
@@ -53,6 +54,8 @@ namespace Inoreader.ViewModels.Pages
 		private DelegateCommand _shareCommand;
 		private ICommand _readItemCommand;
 		private ICommand _starItemCommand;
+		private ICommand _allArticlesCommand;
+		private ICommand _unreadArticlesCommand;
 		private ICommand _markAllAsReadCommand;
 
 		#endregion
@@ -115,6 +118,12 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _isOffline, value); }
 		}
 
+		public bool AllArticles
+		{
+			get { return _allArticles; }
+			set { SetProperty(ref _allArticles, value); }
+		}
+
 		#endregion
 
 		#region Commands
@@ -157,6 +166,16 @@ namespace Inoreader.ViewModels.Pages
 		public ICommand StarItemCommand
 		{
 			get { return _starItemCommand ?? (_starItemCommand = new DelegateCommand<object>(OnStarItem)); }
+		}
+
+		public ICommand AllArticlesCommand
+		{
+			get { return _allArticlesCommand ?? (_allArticlesCommand = new DelegateCommand(OnAllArticles)); }
+		}
+
+		public ICommand UnreadArticlesCommand
+		{
+			get { return _unreadArticlesCommand ?? (_unreadArticlesCommand = new DelegateCommand(OnUnreadArticles)); }
 		}
 
 		public ICommand MarkAllAsReadCommand
@@ -317,7 +336,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private async Task LoadDataInternalAsync()
 		{
-			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, b => IsBusy = b);
+			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, AllArticles, b => IsBusy = b);
 			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			Title = await streamItems.InitAsync();
 			if (_isStarsList)
@@ -517,6 +536,18 @@ namespace Inoreader.ViewModels.Pages
 			{
 				SetCurrentItemStarred(item.Starred);
 			}			
+		}
+
+		private void OnAllArticles()
+		{
+			AllArticles = true;
+			OnRefresh();
+		}
+
+		private void OnUnreadArticles()
+		{
+			AllArticles = false;
+			OnRefresh();
 		}
 
 		private async void OnMarkAllAsRead()

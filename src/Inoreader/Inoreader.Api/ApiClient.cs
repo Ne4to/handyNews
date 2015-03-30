@@ -125,10 +125,13 @@ namespace Inoreader.Api
 			return GetAsync<UnreadCountResponse>(@"https://www.inoreader.com/reader/api/0/unread-count?output=json");
 		}
 
-		public Task<StreamResponse> GetStreamAsync(string id, bool showNewestFirst = true, int count = 20, string continuation = null)
+		public Task<StreamResponse> GetStreamAsync(string id, bool showNewestFirst = true, int count = 20, string continuation = null, bool includeRead = false)
 		{
-			var uri = String.Format("https://www.inoreader.com/reader/api/0/stream/contents/{0}?n={1}&xt=user/-/state/com.google/read&output=json&r={2}", WebUtility.UrlEncode(id), count, showNewestFirst ? "n" : "o");
-			
+			var uri = String.Format("https://www.inoreader.com/reader/api/0/stream/contents/{0}?n={1}&output=json&r={2}", WebUtility.UrlEncode(id), count, showNewestFirst ? "n" : "o");
+
+			if (!includeRead)
+				uri += "&xt=user/-/state/com.google/read";
+
 			if (continuation != null)
 				uri += "&c=" + continuation;
 			

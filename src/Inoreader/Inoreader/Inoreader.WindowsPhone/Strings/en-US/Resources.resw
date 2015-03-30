@@ -331,4 +331,10 @@ This cannot be undone!</value>
   <data name="SavedPageHeader.Text" xml:space="preserve">
     <value>Saved</value>
   </data>
+  <data name="AllArticlesAppBarButton.Label" xml:space="preserve">
+    <value>all articles</value>
+  </data>
+  <data name="UnreadArticlesAppBarButton.Label" xml:space="preserve">
+    <value>unread articles</value>
+  </data>
 </root>

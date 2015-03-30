@@ -43,10 +43,11 @@ namespace Inoreader.Models
 		}
 
 		bool _busy;
+		private bool _allArticles;
 
 		public event EventHandler LoadMoreItemsError;
 
-		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, TelemetryClient telemetryClient, Action<bool> onBusy)
+		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, TelemetryClient telemetryClient, bool allArticles, Action<bool> onBusy)
 			: base(10)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -59,6 +60,7 @@ namespace Inoreader.Models
 			_telemetryClient = telemetryClient;
 			_onBusy = onBusy;
 			_showNewestFirst = showNewestFirst;
+			_allArticles = allArticles;
 		}
 
 		public StreamItemCollection([NotNull] StreamItemCollectionState state,
@@ -108,7 +110,8 @@ namespace Inoreader.Models
 								 Content = it.summary.content,
 								 WebUri = GetWebUri(it),
 								 Starred = it.categories != null
-										   && it.categories.Any(c => c.EndsWith("/state/com.google/starred", StringComparison.OrdinalIgnoreCase))
+										   && it.categories.Any(c => c.EndsWith("/state/com.google/starred", StringComparison.OrdinalIgnoreCase)),
+								 Unread = it.categories != null && !it.categories.Any(c => c.EndsWith("/state/com.google/read"))
 							 };
 			return itemsQuery;
 		}
@@ -134,7 +137,7 @@ namespace Inoreader.Models
 			{
 				var stopwatch = Stopwatch.StartNew();
 
-				stream = await _apiClient.GetStreamAsync(_streamId, _showNewestFirst, count, continuation);
+				stream = await _apiClient.GetStreamAsync(_streamId, _showNewestFirst, count, continuation, _allArticles);
 				_streamTimestamp = stream.updated;
 
 				stopwatch.Stop();

@@ -332,6 +332,16 @@
 								IsChecked="{Binding CurrentItemStarred, Mode=TwoWay}"
 								IsEnabled="{Binding CurrentItemStarredEnabled}"/>
 
+				<AppBarButton x:Uid="AllArticlesAppBarButton"
+							  Label="all articles"
+							  Command="{Binding AllArticlesCommand}"
+							  Visibility="{Binding AllArticles, Converter={StaticResource BooleanToInverseVisibilityConverter}}"/>
+
+				<AppBarButton x:Uid="UnreadArticlesAppBarButton"
+							  Label="unread articles"
+							  Command="{Binding UnreadArticlesCommand}"
+							  Visibility="{Binding AllArticles, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
 				<AppBarButton x:Uid="MarkAllAsReadAppBarButton" 
 							  Label="mark all as read"
 							  Command="{Binding MarkAllAsReadCommand}"/>

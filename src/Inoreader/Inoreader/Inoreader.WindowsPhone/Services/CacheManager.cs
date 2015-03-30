@@ -21,7 +21,6 @@ namespace Inoreader.Services
 
 		#endregion
 
-
 		#region Fields
 
 		private readonly TelemetryClient _telemetryClient;

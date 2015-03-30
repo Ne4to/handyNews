@@ -7,7 +7,7 @@
     mc:Ignorable="d" Width="150" Height="150">
 
 	<Grid Background="#33537F">
-		<Image ImageOpened="ImageBrush_OnImageOpened" Source="ms-appx:///Assets/Logo.png" Width="150" Height="150" />
+		<Image ImageOpened="ImageBrush_OnImageOpened" Source="ms-appx:///Assets/Logo.scale-240.png" Width="150" Height="150" />
 
 		<Grid Background="Black" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Top" Height="Auto" Width="Auto">
 			<TextBlock x:Name="CounterText" Text="1234" Margin="2,3,2,0" Foreground="White" FontSize="18" FontWeight="SemiBold" />
