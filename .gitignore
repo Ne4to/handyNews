@@ -17,3 +17,5 @@
 *.suo
 *.DotSettings
 /src/Inoreader/Inoreader/Inoreader.WindowsPhone/BundleArtifacts
+/src/Inoreader/Inoreader/Inoreader.WindowsPhone/Assets/DebugSignInData.json
+/src/Inoreader/Inoreader/Inoreader.WindowsPhone/Assets/ApiAuth.json

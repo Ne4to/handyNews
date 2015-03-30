@@ -146,6 +146,7 @@
     <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\ListStreamPageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\SavedItemPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SavedPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
@@ -201,6 +202,9 @@
     <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Views\Pages\ListStreamPage.xaml.cs">
       <DependentUpon>ListStreamPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\SavedItemPage.xaml.cs">
+      <DependentUpon>SavedItemPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\SavedPage.xaml.cs">
       <DependentUpon>SavedPage.xaml</DependentUpon>
@@ -337,6 +341,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Pages\SavedItemPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Pages\SavedPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -428,9 +436,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\DebugSignInData.json" />
-    <Content Include="_ApplicationInsights.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

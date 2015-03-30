@@ -9,7 +9,25 @@ namespace Inoreader.Services
 {
 	public class ImageManager
 	{
+		// 36 = 6 (unread rectangle) + 5*2 (margin 5,0) + 20 (star control)
+		public const double StremPageImageHorizontalPadding = 36D;
+		// 10 = 5*2 (margin 5,0)
+		public const double SavedPageImageHorizontalPadding = 10D;
+		
 		private readonly Dictionary<RichTextBlock, IList<Image>> _allBlocks = new Dictionary<RichTextBlock, IList<Image>>();
+
+		public static readonly DependencyProperty ImageHorizontalPaddingProperty = DependencyProperty.RegisterAttached(
+			"ImageHorizontalPadding", typeof (double), typeof (ImageManager), new PropertyMetadata(default(double)));
+
+		public static void SetImageHorizontalPadding(DependencyObject element, double value)
+		{
+			element.SetValue(ImageHorizontalPaddingProperty, value);
+		}
+
+		public static double GetImageHorizontalPadding(DependencyObject element)
+		{
+			return (double) element.GetValue(ImageHorizontalPaddingProperty);
+		}
 
 		public ImageManager()
 		{
@@ -40,8 +58,7 @@ namespace Inoreader.Services
 
 		public static double GetMaxImageWidth(DisplayInformation display)
 		{
-			// 36 = 6 (unread rectangle) + 5*2 (margin 5,0) + 20 (star control)
-			var maxImageWidth = Window.Current.Bounds.Width - 36D;
+			var maxImageWidth = Window.Current.Bounds.Width;
 
 			if (display.CurrentOrientation == DisplayOrientations.Landscape
 			    || display.CurrentOrientation == DisplayOrientations.LandscapeFlipped)
@@ -81,7 +98,7 @@ namespace Inoreader.Services
 
 		private void DisplayInformation_OrientationChanged(DisplayInformation display, object args)
 		{
-			var maxImageWidth = GetMaxImageWidth(display);
+			var maxImageWidth = GetMaxImageWidth(display) - StremPageImageHorizontalPadding;
 
 			foreach (var list in _allBlocks.Values)
 			{

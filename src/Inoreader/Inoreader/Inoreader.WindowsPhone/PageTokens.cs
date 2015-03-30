@@ -10,5 +10,6 @@
 		public const string Settings = "Settings";
 		public const string Subscriptions = "Subscriptions";
 		public const string Saved = "Saved";
+		public const string SavedItem = "SavedItem";
 	}
 }

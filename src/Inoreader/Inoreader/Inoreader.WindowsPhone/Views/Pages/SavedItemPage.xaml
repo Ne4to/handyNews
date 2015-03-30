@@ -1,0 +1,46 @@
+﻿<storeApps:VisualStateAwarePage
+    x:Class="Inoreader.Views.Pages.SavedItemPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:storeApps="using:Microsoft.Practices.Prism.StoreApps"
+    xmlns:mvvm="using:Microsoft.Practices.Prism.Mvvm"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:Inoreader.Behaviors"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+	mvvm:ViewModelLocator.AutoWireViewModel="true">
+
+	<ScrollViewer VerticalScrollBarVisibility="Auto" 
+				  VerticalScrollMode="Auto"
+				  HorizontalScrollBarVisibility="Disabled"
+				  HorizontalScrollMode="Disabled">
+		<StackPanel>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+
+				<TextBlock Text="{Binding Item.Title}" 
+				   Style="{StaticResource PageHeaderTextStyle}" 
+				   TextWrapping="WrapWholeWords"				   
+				   TextTrimming="WordEllipsis"
+				   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=PageHeaderFontSize}"/>
+
+				<TextBlock Grid.Column="1" Margin="5"
+				   Text="{Binding Item.Published, Converter={StaticResource SmartDateToStringConverter}}"
+				   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamDateFontSize}"
+				   FontWeight="SemiLight" />
+			</Grid>
+
+			<RichTextBlock IsTextSelectionEnabled="False"
+						    Margin="5,0">
+				<interactivity:Interaction.Behaviors>
+					<behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding Item.Content}" />
+				</interactivity:Interaction.Behaviors>
+			</RichTextBlock>
+		</StackPanel>
+	</ScrollViewer>
+</storeApps:VisualStateAwarePage>

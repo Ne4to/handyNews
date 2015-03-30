@@ -143,12 +143,17 @@ namespace Inoreader.Services
 		private Image CreateImage(string src)
 		{
 			var image = new Image();
+			var imgPadding = src.StartsWith("ms-appdata")
+				? ImageManager.SavedPageImageHorizontalPadding
+				: ImageManager.StremPageImageHorizontalPadding;
+			ImageManager.SetImageHorizontalPadding(image, imgPadding);
 			_allImages.Add(image);
 
 			image.ImageOpened += (sender, args) =>
 			{
 				var img = (Image)sender;
-				ImageManager.UpdateImageSize(img, _maxImageWidth);
+				var padding = ImageManager.GetImageHorizontalPadding(img);
+				ImageManager.UpdateImageSize(img, _maxImageWidth - padding);
 			};
 
 			image.ImageFailed += (sender, args) =>
@@ -167,12 +172,9 @@ namespace Inoreader.Services
 					if (!t.Result.IsSuccessStatusCode)
 						return;
 
-					var file =
-						await
-							ApplicationData.Current.TemporaryFolder.CreateFileAsync(Path.GetRandomFileName(),
-								CreationCollisionOption.GenerateUniqueName);
+					var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Path.GetRandomFileName(), CreationCollisionOption.GenerateUniqueName).AsTask().ConfigureAwait(false);
 
-					using (var stream = await file.OpenStreamForWriteAsync())
+					using (var stream = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
 					{
 						await t.Result.Content.CopyToAsync(stream);
 					}
@@ -180,7 +182,7 @@ namespace Inoreader.Services
 					await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
 					{
 						image.Source = new BitmapImage(new Uri("ms-appdata:///temp/" + file.Name));
-					});
+					}).AsTask().ConfigureAwait(false);
 				}, TaskContinuationOptions.OnlyOnRanToCompletion);
 			}
 
@@ -511,7 +513,7 @@ namespace Inoreader.Services
 			hyperlink.Inlines.Add(new Run { Text = Strings.Resources.YoutubeVideoTitle, FontSize = _appSettings.FontSize, FontStyle = FontStyle.Italic });
 
 			inlines.Add(hyperlink);
-			
+
 			inlines.Add(new LineBreak());
 			inlines.Add(inlineUiContainer);
 			inlines.Add(new LineBreak());
