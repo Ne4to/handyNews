@@ -213,8 +213,7 @@ namespace Inoreader.ViewModels.Details
 							select new CategoryItem
 							{
 								Id = tag.Id,
-								SortId = tag.SortId,
-								UnreadCount = GetUnreadCount(unreadCountDictionary, tag.Id)
+								SortId = tag.SortId,								
 							};
 
 			var categories = catsQuery.ToList();
@@ -232,6 +231,8 @@ namespace Inoreader.ViewModels.Details
 									  from c in s.Categories
 									  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
 									  select HtmlUtilities.ConvertToText(c.Label)).FirstOrDefault();
+
+				categoryItem.UnreadCount = categoryItem.Subscriptions.Sum(t => t.UnreadCount);
 
 				var readAllItem = new SubscriptionItem
 				{
@@ -256,12 +257,13 @@ namespace Inoreader.ViewModels.Details
 			var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
 			allItems.AddRange(singleItems);
 
+			int totalUnreadCount = allItems.OfType<SubscriptionItem>().Sum(t => t.UnreadCount);
 			var readAllRootItem = new SubscriptionItem
 			{
 				Id = SpecialTags.Read,
 				IconUrl = ReadAllIconUrl,
 				Title = Strings.Resources.ReadAllSubscriptionItem,
-				UnreadCount = allItems.Sum(s => s.UnreadCount)
+				UnreadCount = totalUnreadCount
 			};
 			allItems.Insert(0, readAllRootItem);
 
@@ -271,7 +273,6 @@ namespace Inoreader.ViewModels.Details
 			}
 
 			_rootItems = allItems;
-
 
 			var cat = _rootItems.OfType<CategoryItem>()
 				.FirstOrDefault(c => !_isRoot && String.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
@@ -288,8 +289,7 @@ namespace Inoreader.ViewModels.Details
 				TreeItems = _rootItems;
 				_isRoot = true;
 			}
-
-			int totalUnreadCount = allItems.OfType<SubscriptionItem>().Sum(t => t.UnreadCount);
+			
 			_tileManager.UpdateAsync(totalUnreadCount);
 
 			await _cacheManager.SaveSubscriptionsAsync(_rootItems);

@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Data.Html;
 using Windows.Foundation;
 using Windows.UI.Xaml.Data;
 using Inoreader.Annotations;
@@ -106,7 +107,7 @@ namespace Inoreader.Models
 							 {
 								 Id = it.id,
 								 Published = UnixTimeStampToDateTime(it.published),
-								 Title = it.title,
+								 Title = HtmlUtilities.ConvertToText(it.title),
 								 Content = it.summary.content,
 								 WebUri = GetWebUri(it),
 								 Starred = it.categories != null

@@ -137,13 +137,11 @@
     </Compile>
     <Compile Include="TelemetryEvents.cs" />
     <Compile Include="Models\CategoryItem.cs" />
-    <Compile Include="ViewModels\Details\HubMenuViewModel.cs" />
     <Compile Include="Models\SubscriptionItem.cs" />
     <Compile Include="Models\TreeItemBase.cs" />
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
     <Compile Include="Models\EmptySpaceStreamItem.cs" />
     <Compile Include="ViewModels\Pages\ExpandedStreamPageViewModel.cs" />
-    <Compile Include="ViewModels\Pages\HubPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\ListStreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SavedItemPageViewModel.cs" />
@@ -196,9 +194,6 @@
     <Compile Include="Views\Pages\ExpandedStreamPage.xaml.cs">
       <DependentUpon>ExpandedStreamPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Pages\HubPage.xaml.cs">
-      <DependentUpon>HubPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Views\Pages\ListStreamPage.xaml.cs">
       <DependentUpon>ListStreamPage.xaml</DependentUpon>
@@ -216,9 +211,6 @@
       <DependentUpon>SignInPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Views\Pages\StreamPage.xaml.cs">
-      <DependentUpon>StreamPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Pages\SubscriptionsPage.xaml.cs">
       <DependentUpon>SubscriptionsPage.xaml</DependentUpon>
     </Compile>
@@ -333,10 +325,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Pages\HubPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\Pages\ListStreamPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -356,10 +344,6 @@
     <Page Include="Views\Pages\SignInPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Pages\StreamPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\SubscriptionsPage.xaml">
       <SubType>Designer</SubType>
