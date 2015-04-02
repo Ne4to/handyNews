@@ -27,7 +27,7 @@ namespace Inoreader
 		/// <summary>
 		/// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
 		/// </summary>
-		public readonly TelemetryClient TelemetryClient = new TelemetryClient();
+		private readonly TelemetryClient _telemetryClient = new TelemetryClient();
 
 		// New up the singleton container that will be used for type resolution in the app
 		readonly IUnityContainer _container = new UnityContainer();
@@ -68,7 +68,7 @@ namespace Inoreader
 			_container.RegisterType<NetworkManager>(new ContainerControlledLifetimeManager());
 			_container.RegisterType<TileManager>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_appSettingsService);
-			_container.RegisterInstance(TelemetryClient);
+			_container.RegisterInstance(_telemetryClient);
 			_container.RegisterType<ImageManager>(new ContainerControlledLifetimeManager());
 
 			var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
@@ -81,11 +81,11 @@ namespace Inoreader
 			_apiClient = new ApiClient(appId, appKey);
 			_container.RegisterInstance(_apiClient);
 
-			var localStorageManager = new LocalStorageManager();
+			var localStorageManager = new LocalStorageManager(_telemetryClient);
 			localStorageManager.Init();
 			_container.RegisterInstance(localStorageManager);
 
-			_cacheManager = new CacheManager(TelemetryClient);
+			_cacheManager = new CacheManager(_telemetryClient);
 			await _cacheManager.InitAsync();
 			_container.RegisterInstance(_cacheManager);
 

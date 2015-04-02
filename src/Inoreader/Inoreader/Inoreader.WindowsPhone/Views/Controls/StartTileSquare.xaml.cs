@@ -27,7 +27,7 @@ namespace Inoreader.Views.Controls
 			get { return _taskCompletionSource.Task; }
 		}
 
-		public StartTileSquare(int count)
+		public StartTileSquare(long count)
 		{
 			this.InitializeComponent();
 			CounterText.Text = count.ToString();

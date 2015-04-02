@@ -33,7 +33,7 @@ namespace Inoreader.Services
 			_telemetryClient = telemetryClient;
 		}
 
-		public async void UpdateAsync(int count)
+		public async void UpdateAsync(long count)
 		{
 			try
 			{

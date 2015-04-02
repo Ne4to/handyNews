@@ -35,9 +35,9 @@ namespace Inoreader.ViewModels.Details
 		private readonly ApiClient _apiClient;
 		private readonly TelemetryClient _telemetryClient;
 		private readonly AppSettingsService _settingsService;
-		private readonly CacheManager _cacheManager;
 		private readonly TileManager _tileManager;
 		private readonly AppSettingsService _appSettingsService;
+		private readonly LocalStorageManager _localStorageManager;
 
 		private bool _isBusy;
 		private bool _isOffline;
@@ -104,25 +104,25 @@ namespace Inoreader.ViewModels.Details
 			[NotNull] ApiClient apiClient,
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] AppSettingsService settingsService,
-			[NotNull] CacheManager cacheManager,
 			[NotNull] TileManager tileManager, 
-			[NotNull] AppSettingsService appSettingsService)
+			[NotNull] AppSettingsService appSettingsService,
+			[NotNull] LocalStorageManager localStorageManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
-			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 			if (tileManager == null) throw new ArgumentNullException("tileManager");
 			if (appSettingsService == null) throw new ArgumentNullException("appSettingsService");
+			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
 			_settingsService = settingsService;
-			_cacheManager = cacheManager;
 			_tileManager = tileManager;
 			_appSettingsService = appSettingsService;
+			_localStorageManager = localStorageManager;
 
 			Application.Current.Resuming += Application_Resuming;
 		}
@@ -163,7 +163,7 @@ namespace Inoreader.ViewModels.Details
 			IsOffline = true;
 
 			IsBusy = true;
-			var cacheData = await _cacheManager.LoadSubscriptionsAsync();
+			var cacheData = await _localStorageManager.LoadSubscriptionsAsync();
 			IsBusy = false;
 
 			if (cacheData != null)
@@ -257,7 +257,7 @@ namespace Inoreader.ViewModels.Details
 			var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
 			allItems.AddRange(singleItems);
 
-			int totalUnreadCount = allItems.Sum(t => t.UnreadCount);
+			var totalUnreadCount = allItems.Sum(t => t.UnreadCount);
 			var readAllRootItem = new SubscriptionItem
 			{
 				Id = SpecialTags.Read,
@@ -290,9 +290,8 @@ namespace Inoreader.ViewModels.Details
 				_isRoot = true;
 			}
 			
-			_tileManager.UpdateAsync(totalUnreadCount);
-
-			await _cacheManager.SaveSubscriptionsAsync(_rootItems);
+			_tileManager.UpdateAsync(totalUnreadCount);		
+			await _localStorageManager.SaveSubscriptionsAsync(_rootItems);
 		}	
 
 		private void HideEmpty(List<TreeItemBase> allItems)

@@ -32,7 +32,7 @@ namespace Inoreader.Views.Controls
 			get { return _taskCompletionSource.Task; }
 		}
 
-		public StartTileWide(int count)
+		public StartTileWide(long count)
 		{
 			this.InitializeComponent();
 

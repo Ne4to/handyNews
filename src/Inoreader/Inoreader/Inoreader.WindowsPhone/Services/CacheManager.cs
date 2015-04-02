@@ -16,7 +16,6 @@ namespace Inoreader.Services
 		#region Constants
 
 		private const string CacheFolderName = "Cache";
-		private const string SubscriptionsFileName = "Subscriptions.data";
 		private const string StreamIndexFileName = "StreamIndex.data";
 
 		#endregion
@@ -26,7 +25,6 @@ namespace Inoreader.Services
 		private readonly TelemetryClient _telemetryClient;
 		private readonly StorageFolder _rootCacheFolder;
 		private Dictionary<string, string> _streamIndex;
-		private readonly DataContractSerializer _subscriptionsSerializer;
 		private readonly DataContractSerializer _streamIndexSerializer;
 		private readonly DataContractSerializer _streamSerializer;
 
@@ -39,17 +37,9 @@ namespace Inoreader.Services
 
 			_rootCacheFolder = ApplicationData.Current.LocalCacheFolder;
 
-			var knownTypes = new[]
-			{
-				typeof(TreeItemBase),
-				typeof(SubscriptionItem),
-				typeof(CategoryItem)
-			};
-			_subscriptionsSerializer = new DataContractSerializer(typeof(List<TreeItemBase>), knownTypes);
-
 			_streamIndexSerializer = new DataContractSerializer(typeof(Dictionary<string, string>));
 
-			knownTypes = new[]
+			var knownTypes = new[]
 			{
 				typeof(StreamItem),
 				typeof(EmptySpaceStreamItem)			
@@ -110,17 +100,6 @@ namespace Inoreader.Services
 			{
 				_telemetryClient.TrackExceptionFull(ex);
 			}
-		}
-
-		public Task<bool> SaveSubscriptionsAsync(List<TreeItemBase> items)
-		{
-			return SaveAsync(items, SubscriptionsFileName, _subscriptionsSerializer);
-		}
-
-		public Task<List<TreeItemBase>> LoadSubscriptionsAsync()
-		{
-			_telemetryClient.TrackEvent(TelemetryEvents.LoadSubscriptionsFromCache);
-			return LoadAsync<List<TreeItemBase>>(SubscriptionsFileName, _subscriptionsSerializer);
 		}
 
 		public async Task<bool> SaveStreamAsync(StreamItemCollectionState streamState)
