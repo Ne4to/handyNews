@@ -393,6 +393,12 @@
 										   TextTrimming="WordEllipsis" 
 										   MaxLines="2" />
 
+								<RichTextBlock Grid.Column="0" x:Name="ExpandedTextBlock" IsTextSelectionEnabled="False" Visibility="Collapsed">
+									<interactivity:Interaction.Behaviors>
+										<behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=HtmlContent}" />
+									</interactivity:Interaction.Behaviors>
+								</RichTextBlock>
+
 								<StackPanel Grid.Column="1" 
 															HorizontalAlignment="Right" 
 															VerticalAlignment="Top">

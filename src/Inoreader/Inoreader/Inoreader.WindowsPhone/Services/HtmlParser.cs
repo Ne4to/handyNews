@@ -21,6 +21,7 @@ namespace Inoreader.Services
 			if (html == null)
 				return String.Empty;
 
+			html = RemoveAdRegex.Replace(html, String.Empty);
 			var x = HtmlUtilities.ConvertToText(html);
 			var builder = new StringBuilder(x);
 			builder.Replace('\r', ' ');

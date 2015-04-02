@@ -103,14 +103,10 @@ namespace Inoreader
 
 			ViewModelLocationProvider.SetDefaultViewModelFactory(ViewModelFactory);
 			ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(ViewModelTypeResolver);
-
-			BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
 		}
 
 		protected override void OnHardwareButtonsBackPressed(object sender, BackPressedEventArgs e)
 		{
-			TelemetryClient.TrackEvent(TelemetryEvents.HardwareButtonsBackPressed);
-
 			var view = ((Frame)Window.Current.Content).Content as IView;
 			if (view != null)
 			{
