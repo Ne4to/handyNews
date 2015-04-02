@@ -257,7 +257,7 @@ namespace Inoreader.ViewModels.Details
 			var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
 			allItems.AddRange(singleItems);
 
-			int totalUnreadCount = allItems.OfType<SubscriptionItem>().Sum(t => t.UnreadCount);
+			int totalUnreadCount = allItems.Sum(t => t.UnreadCount);
 			var readAllRootItem = new SubscriptionItem
 			{
 				Id = SpecialTags.Read,
