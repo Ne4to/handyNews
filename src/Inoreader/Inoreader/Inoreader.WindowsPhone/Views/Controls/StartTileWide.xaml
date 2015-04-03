@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Width="310" Height="150">
 
-	<Grid Background="#33537F">
+	<Grid Background="Transparent">
 		<Image Source="ms-appx:///Assets/WideLogo.scale-240.png" ImageOpened="ImageBrush_OnImageOpened" Width="310" Height="150" />
 		
 		<Grid Background="Black" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Top" Height="Auto" Width="Auto">

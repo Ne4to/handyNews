@@ -93,7 +93,7 @@ namespace Inoreader.Services
 				var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
 
 				encoder.SetPixelData(BitmapPixelFormat.Bgra8,
-					BitmapAlphaMode.Ignore,
+					BitmapAlphaMode.Straight,
 					(uint)image.PixelWidth, (uint)image.PixelHeight,
 					dpi, dpi, bytes);
 				
@@ -124,7 +124,7 @@ namespace Inoreader.Services
 				canvas = new Canvas();
 				canvas.Name = DrawCanvasName;
 				canvas.Opacity = 0;
-				canvas.Background = new SolidColorBrush(Colors.White);
+				canvas.Background = new SolidColorBrush(Colors.Transparent);
 				canvas.IsHitTestVisible = false;
 
 				if (grid.ColumnDefinitions.Count > 1)
