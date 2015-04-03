@@ -217,7 +217,9 @@ namespace Inoreader.Services
 					if (href.StartsWith(@"https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
 						return;
 
-					strParams.NavigateUri = href;
+					Uri tmp;
+					if (Uri.TryCreate(href, UriKind.Absolute, out tmp))
+						strParams.NavigateUri = href;
 				}
 			}
 

@@ -461,7 +461,8 @@ namespace Inoreader.ViewModels.Pages
 
 		private bool CanOpenWeb()
 		{
-			return _currentItem != null && !String.IsNullOrEmpty(_currentItem.WebUri);
+			Uri tmp;
+			return _currentItem != null && !String.IsNullOrEmpty(_currentItem.WebUri) && Uri.TryCreate(_currentItem.WebUri, UriKind.Absolute, out tmp);
 		}
 
 		private async void OnOpenWeb()
