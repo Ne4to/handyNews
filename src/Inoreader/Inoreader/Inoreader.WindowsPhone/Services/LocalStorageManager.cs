@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Inoreader.Annotations;
 using Inoreader.Models;
+using Inoreader.Models.States;
 using Microsoft.ApplicationInsights;
 using SQLitePCL;
 
@@ -30,6 +31,8 @@ namespace Inoreader.Services
 		{
 			using (var connection = new SQLiteConnection(DatabaseFilename))
 			{
+				EnableForeignKeys(connection);
+
 				using (var statement = connection.Prepare(@"CREATE TABLE IF NOT EXISTS SAVED_STREAM_ITEM (ID TEXT PRIMARY KEY NOT NULL, 
 																			TITLE TEXT, 
 																			PUBLISHED TEXT, 
@@ -65,6 +68,40 @@ namespace Inoreader.Services
 				{
 					statement.Step();
 				}
+
+				using (var statement = connection.Prepare(@"CREATE TABLE IF NOT EXISTS STREAM_COLLECTION (STREAM_ID TEXT PRIMARY KEY NOT NULL, CONTINUATION TEXT, SHOW_NEWEST_FIRST INTEGER, STREAM_TIMESTAMP INTEGER, FAULT INTEGER);"))
+				{
+					statement.Step();
+				}
+
+				using (var statement = connection.Prepare(@"CREATE TABLE IF NOT EXISTS STREAM_ITEM (ID TEXT PRIMARY KEY NOT NULL, STREAM_ID TEXT REFERENCES STREAM_COLLECTION(STREAM_ID) ON DELETE CASCADE, PUBLISHED TEXT, TITLE TEXT, WEB_URI TEXT, CONTENT TEXT, UNREAD INTEGER, NEED_SET_READ_EXPLICITLY INTEGER, IS_SELECTED INTEGER, STARRED INTEGER, SAVED INTEGER);"))
+				{
+					statement.Step();
+				}
+			}
+		}
+
+		private void EnableForeignKeys(SQLiteConnection connection)
+		{
+			using (var statement = connection.Prepare(@"PRAGMA foreign_keys = ON;"))
+			{
+				statement.Step();
+			}
+		}
+
+		private void BeginTransaction(SQLiteConnection connection)
+		{
+			using (var statement = connection.Prepare("Begin Transaction"))
+			{
+				statement.Step();
+			}
+		}
+
+		private void CommitTransaction(SQLiteConnection connection)
+		{
+			using (var statement = connection.Prepare("Commit Transaction"))
+			{
+				statement.Step();
 			}
 		}
 
@@ -213,20 +250,14 @@ namespace Inoreader.Services
 				{
 					using (var connection = new SQLiteConnection(DatabaseFilename))
 					{
-						using (var statement = connection.Prepare("Begin Transaction"))
-						{
-							statement.Step();
-						}
+						BeginTransaction(connection);
 
 						ClearSubscriptions(connection);
 						SaveSubscriptionCategories(cats, connection);
 						SaveSubscriptionItems(subItems, connection);
 						SaveSubscriptionLinks(catItemsLinks, connection);
 
-						using (var statement = connection.Prepare("Commit Transaction"))
-						{
-							statement.Step();
-						}
+						CommitTransaction(connection);
 					}
 				}
 				catch (Exception e)
@@ -341,12 +372,12 @@ namespace Inoreader.Services
 
 			return Task.Run(() =>
 			{
-				List<CategoryItem> cats;
-				List<SubscriptionItem> items;
-				List<Tuple<string, string>> links;
-
 				try
 				{
+					List<CategoryItem> cats;
+					List<SubscriptionItem> items;
+					List<Tuple<string, string>> links;
+
 					using (var connection = new SQLiteConnection(DatabaseFilename))
 					{
 						cats = LoadSubscriptionCategories(connection);
@@ -473,6 +504,84 @@ namespace Inoreader.Services
 
 		#endregion
 
+		#region Stream collection
+
+		public Task SaveStreamCollectionAsync(StreamItemCollectionState collection)
+		{
+			if (collection == null) throw new ArgumentNullException("collection");
+
+			return Task.Run(() =>
+			{
+				using (var connection = new SQLiteConnection(DatabaseFilename))
+				{
+					EnableForeignKeys(connection);
+
+					BeginTransaction(connection);
+
+					DeleteStreamCollection(connection, collection.StreamId);
+					SaveStreamCollection(connection, collection);
+					SaveStreamCollectionItems(connection, collection);
+					
+					CommitTransaction(connection);
+				}
+			});
+		}
+
+		private void DeleteStreamCollection(SQLiteConnection connection, string streamId)
+		{
+			using (var statement = connection.Prepare("DELETE FROM STREAM_COLLECTION WHERE STREAM_ID = @STREAM_ID;"))
+			{
+				statement.Bind("@STREAM_ID", streamId);
+				statement.Step();
+			}
+		}
+
+		private void SaveStreamCollection(SQLiteConnection connection, StreamItemCollectionState collection)
+		{
+			using (var statement = connection.Prepare(@"INSERT INTO STREAM_COLLECTION(STREAM_ID, CONTINUATION, SHOW_NEWEST_FIRST, STREAM_TIMESTAMP, FAULT) 
+																			VALUES(@STREAM_ID, @CONTINUATION, @SHOW_NEWEST_FIRST, @STREAM_TIMESTAMP, @FAULT);"))
+			{
+				statement.Bind("@STREAM_ID", collection.StreamId);
+				statement.Bind("@CONTINUATION", collection.Continuation);
+				statement.Bind("@SHOW_NEWEST_FIRST", collection.ShowNewestFirst ? 1 : 0);
+				statement.Bind("@STREAM_TIMESTAMP", collection.StreamTimestamp);
+				statement.Bind("@FAULT", collection.Fault ? 1 : 0);
+
+				statement.Step();
+			}
+		}
+
+		private void SaveStreamCollectionItems(SQLiteConnection connection, StreamItemCollectionState collection)
+		{
+			using (var statement = connection.Prepare(@"INSERT INTO STREAM_ITEM(ID, STREAM_ID, PUBLISHED, TITLE, WEB_URI, CONTENT, UNREAD, NEED_SET_READ_EXPLICITLY, IS_SELECTED, STARRED, SAVED) VALUES(@ID, @STREAM_ID, @PUBLISHED, @TITLE, @WEB_URI, @CONTENT, @UNREAD, @NEED_SET_READ_EXPLICITLY, @IS_SELECTED, @STARRED, @SAVED);"))
+			{
+				foreach (var item in collection.Items)
+				{
+					if (item is EmptySpaceStreamItem)
+						continue;
+
+					statement.Bind("@ID", item.Id);
+					statement.Bind("@STREAM_ID", collection.StreamId);
+					statement.Bind("@PUBLISHED", item.Title);
+					statement.Bind("@TITLE", item.Title);
+					statement.Bind("@WEB_URI", item.WebUri);
+					statement.Bind("@CONTENT", item.Content);
+					statement.Bind("@UNREAD", item.Unread ? 1 : 0);
+					statement.Bind("@NEED_SET_READ_EXPLICITLY", item.NeedSetReadExplicitly ? 1 : 0);
+					statement.Bind("@IS_SELECTED", item.IsSelected ? 1 : 0);
+					statement.Bind("@STARRED", item.Starred ? 1 : 0);
+					statement.Bind("@SAVED", item.Saved ? 1 : 0);
+
+					statement.Step();
+
+					// Resets the statement, to that it can be used again (with different parameters).
+					statement.Reset();
+					statement.ClearBindings();
+				}
+			}
+		}
+
+		#endregion
 	}
 
 	public class SavedStreamItem

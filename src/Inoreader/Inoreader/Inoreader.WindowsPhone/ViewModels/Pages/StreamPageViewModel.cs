@@ -30,6 +30,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly CacheManager _cacheManager;
 		private readonly TagsManager _tagsManager;
 		private readonly SavedStreamManager _savedStreamManager;
+		private readonly LocalStorageManager _localStorageManager;
 		private readonly bool _showNewestFirst;
 		private readonly bool _autoMarkAsRead;
 		private string _streamId;
@@ -191,7 +192,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] CacheManager cacheManager,
 			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService,
-			[NotNull] SavedStreamManager savedStreamManager)
+			[NotNull] SavedStreamManager savedStreamManager, 
+			[NotNull] LocalStorageManager localStorageManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
@@ -200,6 +202,7 @@ namespace Inoreader.ViewModels.Pages
 			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
+			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
@@ -207,6 +210,8 @@ namespace Inoreader.ViewModels.Pages
 			_cacheManager = cacheManager;
 			_tagsManager = tagsManager;
 			_savedStreamManager = savedStreamManager;
+			_localStorageManager = localStorageManager;
+
 			_showNewestFirst = settingsService.ShowNewestFirst;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
 
@@ -364,7 +369,11 @@ namespace Inoreader.ViewModels.Pages
 			RaiseSaveCommandCanExecuteChanged();
 
 			if (Items != null)
-				await _cacheManager.SaveStreamAsync(Items.GetSate());
+			{
+				var streamItemCollectionState = Items.GetSate();
+				await _cacheManager.SaveStreamAsync(streamItemCollectionState);
+				await _localStorageManager.SaveStreamCollectionAsync(streamItemCollectionState);
+			}
 		}
 
 		private void RaiseOpenWebCommandCanExecuteChanged()

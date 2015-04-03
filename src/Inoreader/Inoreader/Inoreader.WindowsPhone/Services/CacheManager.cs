@@ -58,6 +58,7 @@ namespace Inoreader.Services
 		{
 			try
 			{
+				// SELECT SUM(LENGTH(CAST(CONTENT AS BLOB))) FROM STREAM_ITEM;
 				var cacheFolder = await _rootCacheFolder.GetFolderAsync(CacheFolderName).AsTask().ConfigureAwait(false);
 				var files = await cacheFolder.GetFilesAsync().AsTask().ConfigureAwait(false);
 

@@ -1,7 +1,5 @@
 using System;
 using System.Runtime.Serialization;
-using Inoreader.Services;
-using Microsoft.Practices.Prism.Mvvm;
 
 namespace Inoreader.Models
 {
