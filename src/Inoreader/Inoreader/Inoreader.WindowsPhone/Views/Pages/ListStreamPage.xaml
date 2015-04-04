@@ -14,7 +14,7 @@
     xmlns:converters="using:Inoreader.Converters"
     xmlns:controls="using:Inoreader.Views.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
 
 	<storeApps:VisualStateAwarePage.Resources>

@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 03/31/2015 02:10:25
+// 	Generated: 04/05/2015 00:52:22
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Strings
@@ -237,6 +237,17 @@ namespace Inoreader.Strings
             get
             {
                 return resourceLoader.GetString("YoutubeVideoTitle");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "show animated Gif"
+        /// </summary>
+        public static string AnimatedGifTitle
+        {
+            get
+            {
+                return resourceLoader.GetString("AnimatedGifTitle");
             }
         }
     }

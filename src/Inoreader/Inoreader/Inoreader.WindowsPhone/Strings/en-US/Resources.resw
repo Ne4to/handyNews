@@ -337,4 +337,7 @@ This cannot be undone!</value>
   <data name="UnreadArticlesAppBarButton.Label" xml:space="preserve">
     <value>unread articles</value>
   </data>
+  <data name="AnimatedGifTitle" xml:space="preserve">
+    <value>show animated Gif</value>
+  </data>
 </root>

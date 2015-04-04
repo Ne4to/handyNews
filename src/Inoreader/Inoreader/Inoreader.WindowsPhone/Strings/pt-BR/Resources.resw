@@ -337,4 +337,7 @@ Isto não pode ser desfeito!</value>
   <data name="UnreadArticlesAppBarButton.Label" xml:space="preserve">
     <value>não lido</value>
   </data>
+  <data name="AnimatedGifTitle" xml:space="preserve">
+    <value>visualizar Gif animado</value>
+  </data>
 </root>

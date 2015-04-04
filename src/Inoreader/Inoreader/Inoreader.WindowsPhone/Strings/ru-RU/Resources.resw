@@ -307,4 +307,7 @@
   <data name="UnreadArticlesAppBarButton.Label" xml:space="preserve">
     <value>непрочитанные</value>
   </data>
+  <data name="AnimatedGifTitle" xml:space="preserve">
+    <value>показать анимированный Gif</value>
+  </data>
 </root>

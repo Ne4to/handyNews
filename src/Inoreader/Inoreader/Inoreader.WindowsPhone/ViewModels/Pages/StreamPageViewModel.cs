@@ -190,7 +190,7 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService,
-			[NotNull] SavedStreamManager savedStreamManager, 
+			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -232,16 +232,11 @@ namespace Inoreader.ViewModels.Pages
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
-			if (suspending)
-			{
-				if (viewModelState != null)
-					SaveState(viewModelState);
-			}
-			else
-			{
-				DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
-				dataTransferManager.DataRequested -= dataTransferManager_DataRequested;
-			}
+			if (viewModelState != null)
+				SaveState(viewModelState);
+
+			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+			dataTransferManager.DataRequested -= dataTransferManager_DataRequested;
 		}
 
 		private void SaveState(Dictionary<string, object> viewModelState)
@@ -337,6 +332,8 @@ namespace Inoreader.ViewModels.Pages
 
 		private async Task LoadDataInternalAsync()
 		{
+			await _localStorageManager.ClearTempFilesAsync();
+
 			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, AllArticles, b => IsBusy = b);
 			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			Title = await streamItems.InitAsync();
@@ -499,7 +496,7 @@ namespace Inoreader.ViewModels.Pages
 		}
 
 		private bool CanSave()
-		{			
+		{
 			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
 		}
 
@@ -541,7 +538,7 @@ namespace Inoreader.ViewModels.Pages
 			if (item == _currentItem)
 			{
 				SetCurrentItemStarred(item.Starred);
-			}			
+			}
 		}
 
 		private void OnAllArticles()

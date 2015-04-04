@@ -26,8 +26,6 @@ namespace Inoreader.ViewModels.Pages
 		private List<Lang> _languages;
 		private Lang _selectedLang;
 		private bool _hideEmptySubscriptions;
-		private ulong _totalCacheSize;
-		private bool _isCacheBusy;
 		private List<ShowOrderItem> _showOrderItems;
 		private ShowOrderItem _selectedShowOrder;
 		private List<StreamViewItem> _streamViewItems;
@@ -36,8 +34,6 @@ namespace Inoreader.ViewModels.Pages
 		private bool _textJustification;
 		private TextAlignment _textAlignment;
 		private bool _autoMarkAsRead;
-
-		private ReactiveCommand<object> _clearCacheComand;
 
 		#endregion
 
@@ -67,18 +63,6 @@ namespace Inoreader.ViewModels.Pages
 				if (SetProperty(ref _hideEmptySubscriptions, value))
 					SaveHideEmptySubscriptions();
 			}
-		}
-
-		public ulong TotalCacheSize
-		{
-			get { return _totalCacheSize; }
-			set { SetProperty(ref _totalCacheSize, value); }
-		}
-
-		public bool IsCacheBusy
-		{
-			get { return _isCacheBusy; }
-			set { SetProperty(ref _isCacheBusy, value); }
 		}
 
 		public List<ShowOrderItem> ShowOrderItems
@@ -152,21 +136,6 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public ICommand ClearCacheCommand
-		{
-			get
-			{
-				if (_clearCacheComand == null)
-				{
-					var canExecute = this.WhenAny(vm => vm.TotalCacheSize, vm => vm.IsCacheBusy, (ts, cb) => ts.Value != 0UL && !cb.Value);
-					_clearCacheComand = ReactiveCommand.Create(canExecute);
-					_clearCacheComand.Subscribe(OnClearCache);
-				}
-
-				return _clearCacheComand;
-			}
-		}
-
 		public SettingsPageViewModel([NotNull] AppSettingsService settingsService,
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] LocalStorageManager localStorageManager)
@@ -182,7 +151,7 @@ namespace Inoreader.ViewModels.Pages
 			_initialDisplayCulture = _settingsService.DisplayCulture;
 		}
 
-		public override async void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
+		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
 		{
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
@@ -216,19 +185,6 @@ namespace Inoreader.ViewModels.Pages
 			FontSize = _settingsService.FontSize;
 			TextJustification = _settingsService.TextAlignment == TextAlignment.Justify;
 			AutoMarkAsRead = _settingsService.AutoMarkAsRead;
-
-			IsCacheBusy = true;
-			TotalCacheSize = await _localStorageManager.GetTotalCacheSizeAsync();
-			IsCacheBusy = false;
-		}
-
-		public override void OnNavigatedFrom(Dictionary<string, object> viewModelState, bool suspending)
-		{
-			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
-			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
-
-			if (!suspending && _clearCacheComand != null)
-				_clearCacheComand.Dispose();
 		}
 
 		private void SaveLang()
@@ -329,16 +285,6 @@ namespace Inoreader.ViewModels.Pages
 
 			_settingsService.AutoMarkAsRead = AutoMarkAsRead;
 			_settingsService.Save();
-		}
-
-		private async void OnClearCache(object obj)
-		{
-			IsCacheBusy = true;
-
-			await _localStorageManager.ClearCacheAsync();
-			TotalCacheSize = 0UL;
-
-			IsCacheBusy = false;
 		}
 	}
 

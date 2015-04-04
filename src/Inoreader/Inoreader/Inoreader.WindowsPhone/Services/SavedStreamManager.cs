@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -43,7 +44,7 @@ namespace Inoreader.Services
 		public async Task AddAsync(StreamItem item)
 		{
 			var folderName = Guid.NewGuid().ToString("N");
-			
+
 			var parser = new HtmlParser();
 			var plainText = parser.GetPlainText(item.Content, 200);
 
@@ -63,7 +64,7 @@ namespace Inoreader.Services
 				ImageFolder = folderName
 			};
 
-			_items.Value.Add(savedItem);		
+			_items.Value.Add(savedItem);
 			_storageManager.Save(savedItem);
 		}
 
@@ -84,37 +85,48 @@ namespace Inoreader.Services
 				if (fixedImages.Any(s => String.Equals(s, src, StringComparison.OrdinalIgnoreCase)))
 					continue;
 
-				var fileName = Guid.NewGuid().ToString("N");
-				if (!await DownloadImageAsync(src, folder, fileName).ConfigureAwait(false))
+				var fileName = await DownloadImageAsync(src, folder).ConfigureAwait(false);
+				if (fileName == null)
 					continue;
-				
+
 				fixedImages.Add(src);
 
 				var newSrc = String.Format("ms-appdata:///local/{0}/{1}/{2}", CacheFolderName, folder.Name, fileName);
-				localHtml.Replace(src, newSrc);				
+				localHtml.Replace(src, newSrc);
 			}
 
 			return localHtml.ToString();
 		}
 
-		private async Task<bool> DownloadImageAsync(string src, StorageFolder folder, string fileName)
+		private async Task<string> DownloadImageAsync(string src, StorageFolder folder)
 		{
 			var client = new HttpClient();
-			byte[] buffer;
-			
+			HttpResponseMessage response;
+
 			try
 			{
-				buffer = await client.GetByteArrayAsync(src).ConfigureAwait(false);
+				response = await client.GetAsync(src).ConfigureAwait(false);
 			}
 			catch (Exception)
 			{
-				return false;
+				return null;
 			}
 
-			var file = await folder.CreateFileAsync(fileName).AsTask().ConfigureAwait(false);
-			await FileIO.WriteBytesAsync(file, buffer).AsTask().ConfigureAwait(false);
+			if (!response.IsSuccessStatusCode)
+				return null;
 
-			return true;
+			bool isGif = response.Content.Headers.ContentType.MediaType == @"image/gif" || src.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
+			var fileName = Guid.NewGuid().ToString("N");
+			if (isGif)
+				fileName += ".gif";
+
+			var file = await folder.CreateFileAsync(fileName).AsTask().ConfigureAwait(false);
+			using (var stream = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
+			{
+				await response.Content.CopyToAsync(stream).ConfigureAwait(false);
+			}
+
+			return fileName;
 		}
 
 		public async Task DeleteAsync([NotNull] string itemId)
@@ -127,7 +139,7 @@ namespace Inoreader.Services
 
 			_items.Value.Remove(item);
 			_storageManager.DeleteSavedStreamItem(item.Id);
-			
+
 			var cacheFolder = await _rootCacheFolder.CreateFolderAsync(CacheFolderName, CreationCollisionOption.OpenIfExists).AsTask().ConfigureAwait(false);
 
 			var folder = await cacheFolder.GetFolderAsync(item.ImageFolder).AsTask().ConfigureAwait(false);

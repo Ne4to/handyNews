@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Inoreader.Annotations;
 using Inoreader.Models;
 using Inoreader.Models.States;
@@ -657,6 +658,7 @@ namespace Inoreader.Services
 		public Task<ulong> GetTotalCacheSizeAsync()
 		{
 			return Task.Run(() => GetTotalCacheSizeInternal());
+			//return GetTempFilesSizeAsync();
 		}
 
 		private ulong GetTotalCacheSizeInternal()
@@ -681,6 +683,28 @@ namespace Inoreader.Services
 			}
 		}
 
+		private async Task<ulong> GetTempFilesSizeAsync()
+		{
+			try
+			{
+				var tempSize = 0UL;
+
+				var folder = ApplicationData.Current.TemporaryFolder;
+				var files = await folder.GetFilesAsync().AsTask().ConfigureAwait(false);
+				foreach (var storageFile in files)
+				{
+					tempSize += (await storageFile.GetBasicPropertiesAsync().AsTask().ConfigureAwait(false)).Size;
+				}
+
+				return tempSize;
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+				return 0UL;
+			}
+		}
+
 		public Task ClearCacheAsync()
 		{
 			return Task.Run(() => ClearCacheInternal());
@@ -696,6 +720,23 @@ namespace Inoreader.Services
 					{
 						statement.Step();
 					}
+				}
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+			}
+		}
+
+		public async Task ClearTempFilesAsync()
+		{
+			try
+			{
+				var folder = ApplicationData.Current.TemporaryFolder;
+				var files = await folder.GetFilesAsync().AsTask().ConfigureAwait(false);
+				foreach (var storageFile in files)
+				{
+					await storageFile.DeleteAsync().AsTask().ConfigureAwait(false);
 				}
 			}
 			catch (Exception e)

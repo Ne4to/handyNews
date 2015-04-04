@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Graphics.Display;
+using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
@@ -14,6 +15,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
 using Microsoft.ApplicationInsights;
+using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Microsoft.Practices.ServiceLocation;
 
 namespace Inoreader.Services
@@ -91,17 +93,7 @@ namespace Inoreader.Services
 
 					if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
 					{
-						var image = CreateImage(tagLexeme);
-						if (image == null)
-							continue;
-
-						var inlineUiContainer = new InlineUIContainer
-						{
-							Child = image
-						};
-
-						paragraph.Inlines.Add(inlineUiContainer);
-						paragraph.Inlines.Add(new LineBreak());
+						AddImage(paragraph.Inlines, tagLexeme, null);
 						continue;
 					}
 
@@ -131,16 +123,16 @@ namespace Inoreader.Services
 			}
 		}
 
-		private Image CreateImage(HtmlTagLexeme tagLexeme)
+		private void AddImage(InlineCollection inlines, HtmlTagLexeme tagLexeme, string navigationUri)
 		{
 			var src = tagLexeme.Attributes["src"];
 			if (src.StartsWith("https://www.inoreader.com/b/", StringComparison.OrdinalIgnoreCase))
-				return null;
+				return;
 
-			return CreateImage(src);
+			AddImage(inlines, src, navigationUri);
 		}
 
-		private Image CreateImage(string src)
+		private async void AddImage(InlineCollection inlines, string src, string navigationUri)
 		{
 			var image = new Image();
 			var imgPadding = src.StartsWith("ms-appdata")
@@ -149,6 +141,13 @@ namespace Inoreader.Services
 			ImageManager.SetImageHorizontalPadding(image, imgPadding);
 			_allImages.Add(image);
 
+			var inlineUiContainer = new InlineUIContainer
+			{
+				Child = image
+			};
+			inlines.Add(inlineUiContainer);
+			inlines.Add(new LineBreak());
+
 			image.ImageOpened += (sender, args) =>
 			{
 				var img = (Image)sender;
@@ -156,37 +155,130 @@ namespace Inoreader.Services
 				ImageManager.UpdateImageSize(img, _maxImageWidth - padding);
 			};
 
-			image.ImageFailed += (sender, args) =>
+			if (!String.IsNullOrWhiteSpace(navigationUri))
 			{
+				image.IsTapEnabled = true;
+				var navigateUri = new Uri(navigationUri);
 
-			};
+				image.Tapped += async (sender, args) =>
+				{
+					args.Handled = true;
+					await Launcher.LaunchUriAsync(navigateUri);
+				};
+			}
 
 			if (src.StartsWith("ms-appdata"))
 			{
 				image.Source = new BitmapImage(new Uri(src));
+
+				var isGif = src.EndsWith(".gif");
+				if (isGif)
+				{
+					var linkIndex = inlines.Count;
+					var isValidGif = await CheckGifAsync(src);
+					if (isValidGif)
+					{
+						if (String.IsNullOrWhiteSpace(navigationUri))
+						{
+							AddGifNavigation(image, src);
+						}
+
+						AddGifHyperlink(inlines, linkIndex, src);
+					}
+				}
 			}
 			else
 			{
-				_httpClient.GetAsync(src).ContinueWith(async t =>
+				var response = await _httpClient.GetAsync(src);
+				if (!response.IsSuccessStatusCode)
+					return;
+
+				bool isGif = response.Content.Headers.ContentType.MediaType == @"image/gif" || src.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
+				var tempFileName = Path.GetRandomFileName();
+				if (isGif)
+					tempFileName += ".gif";
+
+				var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(tempFileName, CreationCollisionOption.GenerateUniqueName);
+
+				using (var stream = await file.OpenStreamForWriteAsync())
 				{
-					if (!t.Result.IsSuccessStatusCode)
-						return;
+					await response.Content.CopyToAsync(stream);
+				}
 
-					var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Path.GetRandomFileName(), CreationCollisionOption.GenerateUniqueName).AsTask().ConfigureAwait(false);
+				var localCopyUri = new Uri("ms-appdata:///temp/" + file.Name);
 
-					using (var stream = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
+				if (isGif)
+				{
+					var linkIndex = inlines.Count;
+					var isValidGif = await CheckGifAsync(localCopyUri.AbsoluteUri);
+					if (isValidGif)
 					{
-						await t.Result.Content.CopyToAsync(stream).ConfigureAwait(false);
+						if (String.IsNullOrWhiteSpace(navigationUri))
+						{
+							AddGifNavigation(image, localCopyUri.AbsoluteUri);
+						}
+
+						AddGifHyperlink(inlines, linkIndex, localCopyUri.AbsoluteUri);
 					}
+				}
 
-					await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-					{
-						image.Source = new BitmapImage(new Uri("ms-appdata:///temp/" + file.Name));
-					}).AsTask().ConfigureAwait(false);
-				}, TaskContinuationOptions.OnlyOnRanToCompletion);
+				image.Source = new BitmapImage(localCopyUri);
 			}
+		}
 
-			return image;
+		private void AddGifNavigation(Image image, string src)
+		{
+			_dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+			{
+				image.IsTapEnabled = true;
+				image.Tapped += (sender, args) =>
+				{
+					args.Handled = true;
+					var ns = ServiceLocator.Current.GetInstance<INavigationService>();
+					ns.Navigate(PageTokens.GifImage, src);
+				};
+			});
+		}
+
+		private void AddGifHyperlink(InlineCollection inlines, int linkIndex, string src)
+		{
+			var hyperlink = new Hyperlink();
+			hyperlink.Click += (sender, args) =>
+			{
+				var ns = ServiceLocator.Current.GetInstance<INavigationService>();
+				ns.Navigate(PageTokens.GifImage, src);
+			};
+
+			hyperlink.Inlines.Add(new Run
+			{
+				Text = Strings.Resources.AnimatedGifTitle,
+				FontSize = _appSettings.FontSize,
+				FontStyle = FontStyle.Italic
+			});
+
+			inlines.Insert(linkIndex, hyperlink);
+			inlines.Insert(linkIndex + 1, new LineBreak());
+		}
+
+		private async Task<bool> CheckGifAsync(string src)
+		{
+			try
+			{
+				var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(src));
+				using (var stream = await file.OpenReadAsync())
+				{
+					var decoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, stream);
+
+					if (decoder.FrameCount <= 1)
+						return false;
+				}
+				return true;
+			}
+			catch (Exception e)
+			{
+				_telemetry.TrackException(e);
+				return false;
+			}
 		}
 
 		private void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex, StringParameters strParams)
@@ -239,6 +331,8 @@ namespace Inoreader.Services
 				strParams.Italic = true;
 			}
 
+			TryAddYoutubeVideo(startL, inlines);
+
 			for (int index = lexemeIndex + 1; index < closeIndex; index++)
 			{
 				var lexeme = lexemes[index];
@@ -282,29 +376,10 @@ namespace Inoreader.Services
 					&& tagLexeme.IsOpen
 					&& tagLexeme.IsClose)
 				{
-					var image = CreateImage(tagLexeme);
-					if (image != null)
-					{
-						var inlineUiContainer = new InlineUIContainer
-						{
-							Child = image
-						};
-
-						inlines.Add(inlineUiContainer);
-						inlines.Add(new LineBreak());
-
-						if (!String.IsNullOrWhiteSpace(strParams.NavigateUri))
-						{
-							image.IsTapEnabled = true;
-							var navigateUri = new Uri(strParams.NavigateUri);
-
-							image.Tapped += async (sender, args) =>
-							{
-								await Launcher.LaunchUriAsync(navigateUri);
-							};
-						}
-					}
+					AddImage(inlines, tagLexeme, strParams.NavigateUri);
 				}
+
+				TryAddYoutubeVideo(tagLexeme, inlines);
 
 				if (tagLexeme.IsOpen && !tagLexeme.IsClose)
 				{
@@ -481,15 +556,26 @@ namespace Inoreader.Services
 			}
 		}
 
+		readonly List<String> _youtubeAllVideos = new List<string>();
+
 		private void AddYoutubeLink(string videoLink, InlineCollection inlines)
 		{
 			videoLink = videoLink.Trim();
+			if (_youtubeAllVideos.Contains(videoLink))
+				return;
+			_youtubeAllVideos.Add(videoLink);
+
 			foreach (var testLink in YoutubeLinks)
 			{
 				if (videoLink.StartsWith(testLink, StringComparison.OrdinalIgnoreCase))
 				{
 					var id = videoLink.Substring(testLink.Length).Replace("/", string.Empty);
+					var questionIndex = id.IndexOf('?');
+					if (questionIndex != -1)
+						id = id.Substring(0, questionIndex);
+
 					AddYoutubeLink(id, videoLink, inlines);
+					return;
 				}
 			}
 		}
@@ -498,26 +584,12 @@ namespace Inoreader.Services
 		{
 			var imageUrl = String.Format(YoutubePreviewFormat, id);
 
+			AddImage(inlines, imageUrl, videoLink);
+
 			var navigateUri = new Uri(videoLink);
-			var image = CreateImage(imageUrl);
-			image.IsTapEnabled = true;
-			image.Tapped += async (sender, args) =>
-			{
-				await Launcher.LaunchUriAsync(navigateUri);
-			};
-
-			var inlineUiContainer = new InlineUIContainer
-			{
-				Child = image
-			};
-
 			var hyperlink = new Hyperlink { NavigateUri = navigateUri };
 			hyperlink.Inlines.Add(new Run { Text = Strings.Resources.YoutubeVideoTitle, FontSize = _appSettings.FontSize, FontStyle = FontStyle.Italic });
-
 			inlines.Add(hyperlink);
-
-			inlines.Add(new LineBreak());
-			inlines.Add(inlineUiContainer);
 			inlines.Add(new LineBreak());
 		}
 	}
