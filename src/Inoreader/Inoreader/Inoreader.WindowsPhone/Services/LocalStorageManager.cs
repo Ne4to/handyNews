@@ -518,7 +518,6 @@ namespace Inoreader.Services
 
 					BeginTransaction(connection);
 
-					DeleteStreamCollection(connection, collection.StreamId);
 					SaveStreamCollection(connection, collection);
 					SaveStreamCollectionItems(connection, collection);
 					
@@ -527,18 +526,9 @@ namespace Inoreader.Services
 			});
 		}
 
-		private void DeleteStreamCollection(SQLiteConnection connection, string streamId)
-		{
-			using (var statement = connection.Prepare("DELETE FROM STREAM_COLLECTION WHERE STREAM_ID = @STREAM_ID;"))
-			{
-				statement.Bind("@STREAM_ID", streamId);
-				statement.Step();
-			}
-		}
-
 		private void SaveStreamCollection(SQLiteConnection connection, StreamItemCollectionState collection)
 		{
-			using (var statement = connection.Prepare(@"INSERT INTO STREAM_COLLECTION(STREAM_ID, CONTINUATION, SHOW_NEWEST_FIRST, STREAM_TIMESTAMP, FAULT) 
+			using (var statement = connection.Prepare(@"INSERT OR REPLACE INTO STREAM_COLLECTION(STREAM_ID, CONTINUATION, SHOW_NEWEST_FIRST, STREAM_TIMESTAMP, FAULT) 
 																			VALUES(@STREAM_ID, @CONTINUATION, @SHOW_NEWEST_FIRST, @STREAM_TIMESTAMP, @FAULT);"))
 			{
 				statement.Bind("@STREAM_ID", collection.StreamId);
@@ -553,7 +543,7 @@ namespace Inoreader.Services
 
 		private void SaveStreamCollectionItems(SQLiteConnection connection, StreamItemCollectionState collection)
 		{
-			using (var statement = connection.Prepare(@"INSERT INTO STREAM_ITEM(ID, STREAM_ID, PUBLISHED, TITLE, WEB_URI, CONTENT, UNREAD, NEED_SET_READ_EXPLICITLY, IS_SELECTED, STARRED, SAVED) VALUES(@ID, @STREAM_ID, @PUBLISHED, @TITLE, @WEB_URI, @CONTENT, @UNREAD, @NEED_SET_READ_EXPLICITLY, @IS_SELECTED, @STARRED, @SAVED);"))
+			using (var statement = connection.Prepare(@"INSERT OR REPLACE INTO STREAM_ITEM(ID, STREAM_ID, PUBLISHED, TITLE, WEB_URI, CONTENT, UNREAD, NEED_SET_READ_EXPLICITLY, IS_SELECTED, STARRED, SAVED) VALUES(@ID, @STREAM_ID, @PUBLISHED, @TITLE, @WEB_URI, @CONTENT, @UNREAD, @NEED_SET_READ_EXPLICITLY, @IS_SELECTED, @STARRED, @SAVED);"))
 			{
 				foreach (var item in collection.Items)
 				{
