@@ -43,21 +43,25 @@ namespace Inoreader.Services
 
 		public async void MarkAsRead(string id)
 		{
+			await _localStorageManager.SetCachedItemAsReadAsync(id, true).ConfigureAwait(false);
 			await AddTagInternalAsync(id, SpecialTags.Read).ConfigureAwait(false);
 		}
 
 		public async void MarkAsUnreadTagAction(string id)
 		{
+			await _localStorageManager.SetCachedItemAsReadAsync(id, false).ConfigureAwait(false);
 			await RemoveTagInternalAsync(id, SpecialTags.Read).ConfigureAwait(false);
 		}
 
 		public async void AddToStarred(string id)
 		{
+			await _localStorageManager.SetCachedItemAsStarredAsync(id, true).ConfigureAwait(false);
 			await AddTagInternalAsync(id, SpecialTags.Starred).ConfigureAwait(false);
 		}
 
 		public async void RemoveFromStarred(string id)
 		{
+			await _localStorageManager.SetCachedItemAsStarredAsync(id, false).ConfigureAwait(false);
 			await RemoveTagInternalAsync(id, SpecialTags.Starred).ConfigureAwait(false);
 		}
 

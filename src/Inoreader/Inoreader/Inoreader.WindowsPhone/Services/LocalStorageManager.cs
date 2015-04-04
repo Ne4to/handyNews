@@ -15,12 +15,6 @@ namespace Inoreader.Services
 		private readonly TelemetryClient _telemetryClient;
 		private const string DatabaseFilename = "data.db";
 
-		//INTEGER = 1,
-		//FLOAT = 2,
-		//TEXT = 3,
-		//BLOB = 4,
-		//NULL = 5,
-
 		public LocalStorageManager(TelemetryClient telemetryClient)
 		{
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
@@ -201,8 +195,7 @@ namespace Inoreader.Services
 		{
 			using (var connection = new SQLiteConnection(DatabaseFilename))
 			{
-				using (
-					var statement = connection.Prepare(@"SELECT ID, ITEM_ID, TAG, ACTION_KIND FROM TAG_ACTION ORDER BY ID LIMIT 1;"))
+				using (var statement = connection.Prepare(@"SELECT ID, ITEM_ID, TAG, ACTION_KIND FROM TAG_ACTION ORDER BY ID LIMIT 1;"))
 				{
 					if (statement.Step() != SQLiteResult.ROW)
 						return null;
@@ -510,7 +503,12 @@ namespace Inoreader.Services
 		{
 			if (collection == null) throw new ArgumentNullException("collection");
 
-			return Task.Run(() =>
+			return Task.Run(() => { SaveStreamCollectionInternal(collection); });
+		}
+
+		private void SaveStreamCollectionInternal(StreamItemCollectionState collection)
+		{
+			try
 			{
 				using (var connection = new SQLiteConnection(DatabaseFilename))
 				{
@@ -520,10 +518,14 @@ namespace Inoreader.Services
 
 					SaveStreamCollection(connection, collection);
 					SaveStreamCollectionItems(connection, collection);
-					
+
 					CommitTransaction(connection);
 				}
-			});
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+			}
 		}
 
 		private void SaveStreamCollection(SQLiteConnection connection, StreamItemCollectionState collection)
@@ -552,7 +554,7 @@ namespace Inoreader.Services
 
 					statement.Bind("@ID", item.Id);
 					statement.Bind("@STREAM_ID", collection.StreamId);
-					statement.Bind("@PUBLISHED", item.Title);
+					statement.Bind("@PUBLISHED", item.Published.ToString("O"));
 					statement.Bind("@TITLE", item.Title);
 					statement.Bind("@WEB_URI", item.WebUri);
 					statement.Bind("@CONTENT", item.Content);
@@ -568,6 +570,189 @@ namespace Inoreader.Services
 					statement.Reset();
 					statement.ClearBindings();
 				}
+			}
+		}
+
+		public Task<StreamItemCollectionState> LoadStreamCollectionAsync(string streamId)
+		{
+			return Task.Run(() => LoadStreamCollectionInternal(streamId));
+		}
+
+		private StreamItemCollectionState LoadStreamCollectionInternal(string streamId)
+		{
+			try
+			{
+				using (var connection = new SQLiteConnection(DatabaseFilename))
+				{
+					EnableForeignKeys(connection);
+
+					var result = LoadStreamCollection(connection, streamId);
+
+					if (result == null)
+						return null;
+
+					result.Items = LoadStreamCollectionItems(connection, streamId);
+					return result;
+				}
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+				return null;
+			}
+		}
+
+		private StreamItemCollectionState LoadStreamCollection(SQLiteConnection connection, string streamId)
+		{
+			using (var statement = connection.Prepare(@"SELECT CONTINUATION, SHOW_NEWEST_FIRST, STREAM_TIMESTAMP, FAULT FROM STREAM_COLLECTION WHERE STREAM_ID = @STREAM_ID;"))
+			{
+				statement.Bind("@STREAM_ID", streamId);
+
+				if (statement.Step() != SQLiteResult.ROW)
+					return null;
+
+				return new StreamItemCollectionState
+				{
+					StreamId = streamId,
+					Continuation = (string)statement[0],
+					ShowNewestFirst = statement.GetInteger(1) == 1,
+					StreamTimestamp = (int)statement.GetInteger(2),
+					Fault = statement.GetInteger(3) == 1
+				};
+			}
+		}
+
+		private StreamItem[] LoadStreamCollectionItems(SQLiteConnection connection, string streamId)
+		{
+			List<StreamItem> items = new List<StreamItem>();
+
+			using (var statement = connection.Prepare(@"SELECT ID, PUBLISHED, TITLE, WEB_URI, CONTENT, UNREAD, NEED_SET_READ_EXPLICITLY, IS_SELECTED, STARRED, SAVED FROM STREAM_ITEM WHERE STREAM_ID = @STREAM_ID;"))
+			{
+				statement.Bind("@STREAM_ID", streamId);
+
+				while (statement.Step() == SQLiteResult.ROW)
+				{
+					var item = new StreamItem
+					{
+						Id = (string)statement[0],
+						Published = DateTimeOffset.Parse((string)statement[1]),
+						Title = (string)statement[2],
+						WebUri = (string)statement[3],
+						Content = (string)statement[4],
+						Unread = statement.GetInteger(5) == 1,
+						NeedSetReadExplicitly = statement.GetInteger(6) == 1,
+						IsSelected = statement.GetInteger(7) == 1,
+						Starred = statement.GetInteger(8) == 1,
+						Saved = statement.GetInteger(9) == 1,
+					};
+					items.Add(item);
+				}
+			}
+
+			items.Add(new EmptySpaceStreamItem());
+
+			return items.ToArray();
+		}
+
+		public Task<ulong> GetTotalCacheSizeAsync()
+		{
+			return Task.Run(() => GetTotalCacheSizeInternal());
+		}
+
+		private ulong GetTotalCacheSizeInternal()
+		{
+			try
+			{
+				using (var connection = new SQLiteConnection(DatabaseFilename))
+				{
+					using (var statement = connection.Prepare(@"SELECT SUM(LENGTH(CAST(CONTENT AS BLOB))) FROM STREAM_ITEM;"))
+					{
+						if (statement.Step() != SQLiteResult.ROW)
+							return 0UL;
+
+						return (ulong)statement.GetInteger(0);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+				return 0UL;
+			}
+		}
+
+		public Task ClearCacheAsync()
+		{
+			return Task.Run(() => ClearCacheInternal());
+		}
+
+		private void ClearCacheInternal()
+		{
+			try
+			{
+				using (var connection = new SQLiteConnection(DatabaseFilename))
+				{
+					using (var statement = connection.Prepare(@"DELETE FROM STREAM_ITEM;"))
+					{
+						statement.Step();
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+			}
+		}
+
+		public Task SetCachedItemAsReadAsync(string id, bool newValue)
+		{
+			return Task.Run(() => SetCachedItemAsReadInternal(id, newValue));
+		}
+
+		private void SetCachedItemAsReadInternal(string id, bool newValue)
+		{
+			try
+			{
+				using (var connection = new SQLiteConnection(DatabaseFilename))
+				{
+					using (var statement = connection.Prepare(@"UPDATE STREAM_ITEM SET UNREAD = @UNREAD WHERE ID = @ID;"))
+					{
+						statement.Bind("@ID", id);
+						statement.Bind("@UNREAD", newValue ? 0 : 1);
+
+						statement.Step();
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
+			}
+		}
+
+		public Task SetCachedItemAsStarredAsync(string id, bool newValue)
+		{
+			return Task.Run(() => SetCachedItemAsStarredInternal(id, newValue));
+		}
+
+		private void SetCachedItemAsStarredInternal(string id, bool newValue)
+		{
+			try
+			{
+				using (var connection = new SQLiteConnection(DatabaseFilename))
+				{
+					using (var statement = connection.Prepare(@"UPDATE STREAM_ITEM SET STARRED = @STARRED WHERE ID = @ID;"))
+					{
+						statement.Bind("@ID", id);
+						statement.Bind("@STARRED", newValue ? 1 : 0);
+
+						statement.Step();
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				_telemetryClient.TrackException(e);
 			}
 		}
 

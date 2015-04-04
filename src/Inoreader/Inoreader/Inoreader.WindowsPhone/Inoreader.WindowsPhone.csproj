@@ -111,7 +111,6 @@
     <Compile Include="Resources\StreamItemTemplateSelector.cs" />
     <Compile Include="Resources\StylesContainer.cs" />
     <Compile Include="Resources\SubscriptionItemTemplateSelector.cs" />
-    <Compile Include="Services\CacheManager.cs" />
     <Compile Include="Services\Extensions.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CredentialService.cs" />

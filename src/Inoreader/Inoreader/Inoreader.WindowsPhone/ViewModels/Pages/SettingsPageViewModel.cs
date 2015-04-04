@@ -20,7 +20,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private readonly AppSettingsService _settingsService;
 		private readonly TelemetryClient _telemetryClient;
-		private readonly CacheManager _cacheManager;
+		private readonly LocalStorageManager _localStorageManager;
 		private readonly string _initialDisplayCulture;
 
 		private List<Lang> _languages;
@@ -169,15 +169,16 @@ namespace Inoreader.ViewModels.Pages
 
 		public SettingsPageViewModel([NotNull] AppSettingsService settingsService,
 			[NotNull] TelemetryClient telemetryClient,
-			[NotNull] CacheManager cacheManager)
+			[NotNull] LocalStorageManager localStorageManager)
 		{
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
-			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
-
+			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
+			
 			_settingsService = settingsService;
 			_telemetryClient = telemetryClient;
-			_cacheManager = cacheManager;
+			_localStorageManager = localStorageManager;
+
 			_initialDisplayCulture = _settingsService.DisplayCulture;
 		}
 
@@ -217,7 +218,7 @@ namespace Inoreader.ViewModels.Pages
 			AutoMarkAsRead = _settingsService.AutoMarkAsRead;
 
 			IsCacheBusy = true;
-			TotalCacheSize = await _cacheManager.GetTotalCacheSizeAsync();
+			TotalCacheSize = await _localStorageManager.GetTotalCacheSizeAsync();
 			IsCacheBusy = false;
 		}
 
@@ -334,7 +335,7 @@ namespace Inoreader.ViewModels.Pages
 		{
 			IsCacheBusy = true;
 
-			await _cacheManager.ClearCacheAsync();
+			await _localStorageManager.ClearCacheAsync();
 			TotalCacheSize = 0UL;
 
 			IsCacheBusy = false;

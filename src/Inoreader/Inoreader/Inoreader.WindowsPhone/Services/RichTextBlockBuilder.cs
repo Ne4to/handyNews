@@ -176,7 +176,7 @@ namespace Inoreader.Services
 
 					using (var stream = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
 					{
-						await t.Result.Content.CopyToAsync(stream);
+						await t.Result.Content.CopyToAsync(stream).ConfigureAwait(false);
 					}
 
 					await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>

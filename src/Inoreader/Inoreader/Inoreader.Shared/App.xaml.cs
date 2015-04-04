@@ -34,8 +34,7 @@ namespace Inoreader
 		private ApiClient _apiClient;
 		readonly AppSettingsService _appSettingsService = new AppSettingsService();
 		private TagsManager _tagsManager;
-		private CacheManager _cacheManager;
-
+		
 		public App()
 		{
 			InitializeComponent();
@@ -84,10 +83,6 @@ namespace Inoreader
 			var localStorageManager = new LocalStorageManager(_telemetryClient);
 			localStorageManager.Init();
 			_container.RegisterInstance(localStorageManager);
-
-			_cacheManager = new CacheManager(_telemetryClient);
-			await _cacheManager.InitAsync();
-			_container.RegisterInstance(_cacheManager);
 
 			var savedStreamManager = new SavedStreamManager(localStorageManager);
 			_container.RegisterInstance(savedStreamManager);

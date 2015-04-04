@@ -27,7 +27,6 @@ namespace Inoreader.ViewModels.Pages
 		private readonly ApiClient _apiClient;
 		private readonly INavigationService _navigationService;
 		private readonly TelemetryClient _telemetryClient;
-		private readonly CacheManager _cacheManager;
 		private readonly TagsManager _tagsManager;
 		private readonly SavedStreamManager _savedStreamManager;
 		private readonly LocalStorageManager _localStorageManager;
@@ -189,7 +188,6 @@ namespace Inoreader.ViewModels.Pages
 		public StreamPageViewModel([NotNull] ApiClient apiClient,
 			[NotNull] INavigationService navigationService,
 			[NotNull] TelemetryClient telemetryClient,
-			[NotNull] CacheManager cacheManager,
 			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] SavedStreamManager savedStreamManager, 
@@ -198,7 +196,6 @@ namespace Inoreader.ViewModels.Pages
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
-			if (cacheManager == null) throw new ArgumentNullException("cacheManager");
 			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
@@ -207,7 +204,6 @@ namespace Inoreader.ViewModels.Pages
 			_apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryClient = telemetryClient;
-			_cacheManager = cacheManager;
 			_tagsManager = tagsManager;
 			_savedStreamManager = savedStreamManager;
 			_localStorageManager = localStorageManager;
@@ -320,7 +316,7 @@ namespace Inoreader.ViewModels.Pages
 			IsOffline = true;
 
 			IsBusy = true;
-			var cacheData = await _cacheManager.LoadStreamAsync(_streamId);
+			var cacheData = await _localStorageManager.LoadStreamCollectionAsync(_streamId);
 			IsBusy = false;
 
 			if (cacheData != null)
@@ -371,7 +367,7 @@ namespace Inoreader.ViewModels.Pages
 			if (Items != null)
 			{
 				var streamItemCollectionState = Items.GetSate();
-				await _cacheManager.SaveStreamAsync(streamItemCollectionState);
+				//await _cacheManager.SaveStreamAsync(streamItemCollectionState);
 				await _localStorageManager.SaveStreamCollectionAsync(streamItemCollectionState);
 			}
 		}
