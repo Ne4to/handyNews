@@ -108,7 +108,7 @@ namespace Inoreader.Services
 
 			using (var connection = new SQLiteConnection(DatabaseFilename))
 			{
-				using (var statement = connection.Prepare(@"INSERT INTO SAVED_STREAM_ITEM(ID, TITLE, PUBLISHED, WEBURI, SHORT_CONTENT, CONTENT, IMAGE_FOLDER) 
+				using (var statement = connection.Prepare(@"INSERT OR REPLACE INTO SAVED_STREAM_ITEM(ID, TITLE, PUBLISHED, WEBURI, SHORT_CONTENT, CONTENT, IMAGE_FOLDER) 
 																			VALUES(@ID, @TITLE, @PUBLISHED, @WEBURI, @SHORT_CONTENT, @CONTENT, @IMAGE_FOLDER);"))
 				{
 					statement.Bind("@ID", item.Id);
@@ -739,10 +739,8 @@ namespace Inoreader.Services
 					await storageFile.DeleteAsync().AsTask().ConfigureAwait(false);
 				}
 			}
-			catch (Exception e)
-			{
-				_telemetryClient.TrackException(e);
-			}
+			// ReSharper disable once EmptyGeneralCatchClause
+			catch (Exception) { }
 		}
 
 		public Task SetCachedItemAsReadAsync(string id, bool newValue)

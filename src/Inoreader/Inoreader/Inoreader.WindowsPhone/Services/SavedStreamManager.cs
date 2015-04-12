@@ -43,6 +43,9 @@ namespace Inoreader.Services
 
 		public async Task AddAsync(StreamItem item)
 		{
+			if (_items.Value.Any(t => t.Id == item.Id))
+				return;
+
 			var folderName = Guid.NewGuid().ToString("N");
 
 			var parser = new HtmlParser();

@@ -193,7 +193,7 @@ namespace Inoreader.Services
 				if (!response.IsSuccessStatusCode)
 					return;
 
-				bool isGif = response.Content.Headers.ContentType.MediaType == @"image/gif" || src.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
+				bool isGif = (response.Content.Headers.ContentType != null && response.Content.Headers.ContentType.MediaType == @"image/gif") || src.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
 				var tempFileName = Path.GetRandomFileName();
 				if (isGif)
 					tempFileName += ".gif";
