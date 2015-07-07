@@ -7,6 +7,7 @@ namespace Inoreader.Models
 		public string Id { get; set; }
 		public string SortId { get; set; }
 		public string Title { get; set; }
+		public string PageTitle { get; set; }
 		
 		public long UnreadCount
 		{

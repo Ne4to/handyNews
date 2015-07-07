@@ -87,7 +87,7 @@ namespace Inoreader.Models
 			AddRange(state.Items);
 		}
 
-		public async Task<string> InitAsync()
+		public async Task InitAsync()
 		{
 			var stream = await LoadAsync(10, null);
 			_continuation = stream.continuation;
@@ -96,8 +96,6 @@ namespace Inoreader.Models
 			AddRange(itemsQuery);
 			Add(new EmptySpaceStreamItem());
 			OnPropertyChanged("Count");
-
-			return stream.title;
 		}
 
 		private static IEnumerable<StreamItem> GetItems(StreamResponse stream)

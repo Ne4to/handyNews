@@ -16,6 +16,7 @@ using Inoreader.Api.Exceptions;
 using Inoreader.Api.Models;
 using Inoreader.Models;
 using Inoreader.Services;
+using Inoreader.ViewModels.Pages;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -240,6 +241,7 @@ namespace Inoreader.ViewModels.Details
 					SortId = categoryItem.SortId,
 					IconUrl = ReadAllIconUrl,
 					Title = Strings.Resources.ReadAllSubscriptionItem,
+					PageTitle = categoryItem.Title,
 					UnreadCount = categoryItem.UnreadCount
 				};
 
@@ -263,6 +265,7 @@ namespace Inoreader.ViewModels.Details
 				Id = SpecialTags.Read,
 				IconUrl = ReadAllIconUrl,
 				Title = Strings.Resources.ReadAllSubscriptionItem,
+				PageTitle = Strings.Resources.ReadAllSubscriptionItem,
 				UnreadCount = totalUnreadCount
 			};
 			allItems.Insert(0, readAllRootItem);
@@ -313,6 +316,7 @@ namespace Inoreader.ViewModels.Details
 				HtmlUrl = s.HtmlUrl,
 				IconUrl = s.IconUrl,
 				Title = HtmlUtilities.ConvertToText(s.Title),
+				PageTitle = HtmlUtilities.ConvertToText(s.Title),
 				FirstItemMsec = s.FirstItemMsec,
 				UnreadCount = GetUnreadCount(unreadCountDictionary, s.Id)
 			};
@@ -342,7 +346,12 @@ namespace Inoreader.ViewModels.Details
 				if (subscriptionItem != null)
 				{
 					var pageToken = _appSettingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
-					_navigationService.Navigate(pageToken, subscriptionItem.Id);
+					var navParam = new StreamPageNavigationParameter
+					{
+						StreamId = subscriptionItem.Id,
+						Title = subscriptionItem.PageTitle
+					};
+					_navigationService.Navigate(pageToken, navParam.ToJson());
 				}
 			}
 		}

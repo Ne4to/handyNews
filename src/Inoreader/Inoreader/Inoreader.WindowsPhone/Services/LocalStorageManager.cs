@@ -443,6 +443,7 @@ namespace Inoreader.Services
 						Id = statement.GetText(0),
 						SortId = statement.GetText(1),
 						Title = statement.GetText(2),
+						PageTitle = statement.GetText(2),
 						UnreadCount = statement.GetInteger(3)
 					};
 
@@ -466,6 +467,7 @@ namespace Inoreader.Services
 						Id = (string)statement[0],
 						SortId = (string)statement[1],
 						Title = (string)statement[2],
+						PageTitle = (string)statement[2],
 						UnreadCount = (long)statement[3],
 						Url = (string)statement[4],
 						HtmlUrl = (string)statement[5],

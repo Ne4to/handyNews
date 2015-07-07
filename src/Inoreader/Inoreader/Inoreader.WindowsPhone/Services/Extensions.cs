@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Windows.Storage;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Inoreader.Services
 {
@@ -53,6 +55,26 @@ namespace Inoreader.Services
 			}
 
 			return date.AddDays(-1 * diff).Date;
+		}
+
+		public static string ToJson(this object obj)
+		{
+			return JObject.FromObject(obj).ToString(Formatting.None);
+		}
+
+		public static T FromJson<T>(this string jsonString, bool supressErrors = false)
+		{
+			try
+			{
+				return JObject.Parse(jsonString).ToObject<T>();
+			}
+			catch (Exception)
+			{
+				if (supressErrors)
+					return default(T);
+
+				throw;
+			}
 		}
 	}
 }

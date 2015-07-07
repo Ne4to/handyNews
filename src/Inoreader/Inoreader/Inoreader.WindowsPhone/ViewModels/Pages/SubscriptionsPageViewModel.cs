@@ -107,7 +107,12 @@ namespace Inoreader.ViewModels.Pages
 		private void OnStars()
 		{
 			var pageToken = _appSettingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
-			_navigationService.Navigate(pageToken, SpecialTags.Starred);
+			var navParam = new StreamPageNavigationParameter
+			{
+				StreamId = SpecialTags.Starred,
+				Title = Strings.Resources.StartPageHeader
+			};
+			_navigationService.Navigate(pageToken, navParam.ToJson());
 		}
 		
 		private void OnSaved()

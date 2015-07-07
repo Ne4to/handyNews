@@ -220,9 +220,22 @@ namespace Inoreader.ViewModels.Pages
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
-			_streamId = (string)navigationParameter;
-			_isStarsList = _streamId == SpecialTags.Starred;
+			var navParam = ((string) navigationParameter).FromJson<StreamPageNavigationParameter>(true);
 
+			// backward compatibility (issue #62)
+			if (navParam == null)
+			{
+				_streamId = (string)navigationParameter;
+				_isStarsList = _streamId == SpecialTags.Starred;
+				Title = _streamId;	
+			}
+			else
+			{
+				_streamId = navParam.StreamId;
+				_isStarsList = _streamId == SpecialTags.Starred;
+				Title = navParam.Title;	
+			}
+			
 			if (!RestoreState(viewModelState))
 				LoadData();
 		}
@@ -256,8 +269,10 @@ namespace Inoreader.ViewModels.Pages
 		{
 			if (viewModelState == null)
 				return false;
-
-			Title = viewModelState.GetValue<string>("Title");
+			
+			object stateValue;
+			if (viewModelState.TryGetValue("Title", out stateValue))
+				Title = (string)stateValue;
 
 			_currentItemRead = viewModelState.GetValue<bool>("CurrentItemRead");
 			OnPropertyChanged("CurrentItemRead");
@@ -336,10 +351,8 @@ namespace Inoreader.ViewModels.Pages
 
 			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, AllArticles, b => IsBusy = b);
 			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
-			Title = await streamItems.InitAsync();
-			if (_isStarsList)
-				Title = Strings.Resources.StartPageHeader;
-
+			await streamItems.InitAsync();
+			
 			Items = streamItems;
 			_currentItem = Items.FirstOrDefault();
 
@@ -682,5 +695,11 @@ namespace Inoreader.ViewModels.Pages
 
 			dataPackage.SetHtmlFormat(_currentItem.Content);
 		}
+	}
+
+	public class StreamPageNavigationParameter
+	{
+		public string Title { get; set; }
+		public string StreamId { get; set; }
 	}
 }
