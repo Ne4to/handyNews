@@ -1,4 +1,4 @@
-# [Unofficial] Inoreader Free
+# [Unofficial] handy News
 Free Windows Phone 8.1 client for www.inoreader.com
 
 ### Features
