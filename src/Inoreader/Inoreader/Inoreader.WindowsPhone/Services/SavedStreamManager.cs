@@ -118,11 +118,8 @@ namespace Inoreader.Services
 			if (!response.IsSuccessStatusCode)
 				return null;
 
-			bool isGif = response.Content.Headers.ContentType.MediaType == @"image/gif" || src.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
 			var fileName = Guid.NewGuid().ToString("N");
-			if (isGif)
-				fileName += ".gif";
-
+			
 			var file = await folder.CreateFileAsync(fileName).AsTask().ConfigureAwait(false);
 			using (var stream = await file.OpenStreamForWriteAsync().ConfigureAwait(false))
 			{

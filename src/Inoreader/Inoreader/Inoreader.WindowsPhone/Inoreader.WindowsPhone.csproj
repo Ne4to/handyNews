@@ -88,7 +88,6 @@
   <ItemGroup>
     <Compile Include="Behaviors\DataContextPresenter.cs" />
     <Compile Include="Behaviors\DependencyPropertyChangedHelper.cs" />
-    <Compile Include="Behaviors\GifExtensions.cs" />
     <Compile Include="Behaviors\ItemsScrollBehavior.cs" />
     <Compile Include="Behaviors\RichTextBlockHtmlBehavior.cs" />
     <Compile Include="Converters\BooleanToBrushConverter.cs" />
@@ -115,7 +114,6 @@
     <Compile Include="Services\Extensions.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CredentialService.cs" />
-    <Compile Include="Services\GifBuilder.cs" />
     <Compile Include="Services\HtmlParser.cs" />
     <Compile Include="Services\HtmlTagLexeme.cs" />
     <Compile Include="Services\ICredentialService.cs" />
@@ -143,7 +141,6 @@
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
     <Compile Include="Models\EmptySpaceStreamItem.cs" />
     <Compile Include="ViewModels\Pages\ExpandedStreamPageViewModel.cs" />
-    <Compile Include="ViewModels\Pages\GifImagePageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\ListStreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SavedItemPageViewModel.cs" />
@@ -189,9 +186,6 @@
     </Compile>
     <Compile Include="Views\Details\OfflineBar.xaml.cs">
       <DependentUpon>OfflineBar.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Pages\GifImagePage.xaml.cs">
-      <DependentUpon>GifImagePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
@@ -322,10 +316,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Pages\GifImagePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\Pages\AboutPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -449,8 +439,8 @@
     <SDKReference Include="Microsoft.VCLibs, version=12.0">
       <Name>Microsoft Visual C++ 2013 Runtime Package for Windows Phone</Name>
     </SDKReference>
-    <SDKReference Include="SQLite.WP81, version=3.8.7.2">
-      <Name>SQLite for Windows Phone 8.1 %28SQLite.WP81, version=3.8.7.2%29</Name>
+    <SDKReference Include="SQLite.WP81, Version=3.8.10.2">
+      <Name>SQLite for Windows Phone 8.1 %28SQLite.WP81, Version=3.8.10.2%29</Name>
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
