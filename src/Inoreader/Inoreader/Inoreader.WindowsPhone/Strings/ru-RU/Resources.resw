@@ -144,7 +144,7 @@
     <value>Бесплатный клиент для RSS аггрегатора www.inoreader.com</value>
   </data>
   <data name="AppDisplayName" xml:space="preserve">
-    <value>Inoreader Free</value>
+    <value>handy News</value>
   </data>
   <data name="ErrorDialogTitle" xml:space="preserve">
     <value>Ошибка</value>
@@ -171,7 +171,7 @@
     <value>веб</value>
   </data>
   <data name="PageHeaderTitle.Text" xml:space="preserve">
-    <value>Inoreader Free</value>
+    <value>handy News</value>
   </data>
   <data name="ReadAllSubscriptionItem" xml:space="preserve">
     <value>Читать все</value>

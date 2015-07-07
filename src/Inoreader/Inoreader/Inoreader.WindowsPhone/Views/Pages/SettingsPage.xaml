@@ -21,7 +21,7 @@
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
+		<TextBlock x:Uid="PageHeaderTitle" Text="handy News" Style="{StaticResource PageHeaderTextStyle}" />
 
 		<ScrollViewer Grid.Row="1"
 					  VerticalScrollBarVisibility="Auto" 

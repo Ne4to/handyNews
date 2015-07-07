@@ -146,7 +146,7 @@
     <comment>manifest file</comment>
   </data>
   <data name="AppDisplayName" xml:space="preserve">
-    <value>Inoreader Free</value>
+    <value>handy News</value>
     <comment>manifest file</comment>
   </data>
   <data name="ErrorDialogTitle" xml:space="preserve">
@@ -182,7 +182,7 @@
     <comment>application bar button</comment>
   </data>
   <data name="PageHeaderTitle.Text" xml:space="preserve">
-    <value>Inoreader Free</value>
+    <value>handy News</value>
   </data>
   <data name="ReadAllSubscriptionItem" xml:space="preserve">
     <value>Leia tudo</value>

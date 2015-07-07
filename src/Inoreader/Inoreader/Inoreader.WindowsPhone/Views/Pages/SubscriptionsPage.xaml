@@ -97,7 +97,7 @@
 		</Grid.RowDefinitions>
 
 		<Grid>
-			<TextBlock x:Uid="PageHeaderTitle" Text="Inoreader Free" Style="{StaticResource PageHeaderTextStyle}" />
+			<TextBlock x:Uid="PageHeaderTitle" Text="handy News" Style="{StaticResource PageHeaderTextStyle}" />
 			<details:OfflineBar Visibility="{Binding Subscriptions.IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
 			<ProgressBar Visibility="{Binding Subscriptions.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
