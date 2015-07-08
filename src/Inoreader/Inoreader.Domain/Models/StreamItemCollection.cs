@@ -127,7 +127,6 @@ namespace Inoreader.Domain.Models
 			return q.FirstOrDefault();
 		}
 
-		public const string GetStreamResponseTime = "GetStream ResponseTime";
 		private async Task<StreamResponse> LoadAsync(int count, string continuation)
 		{
 			StreamResponse stream;
@@ -141,7 +140,7 @@ namespace Inoreader.Domain.Models
 				_streamTimestamp = stream.updated;
 
 				stopwatch.Stop();
-				_telemetryClient.TrackMetric(GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
+				_telemetryClient.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
 			}
 			finally
 			{

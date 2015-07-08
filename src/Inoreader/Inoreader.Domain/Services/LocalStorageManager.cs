@@ -359,11 +359,10 @@ namespace Inoreader.Domain.Services
 				}
 			}
 		}
-
-		public const string LoadSubscriptionsFromCache = "Cache.LoadSubscriptions";
+		
 		public Task<List<TreeItemBase>> LoadSubscriptionsAsync()
 		{
-			_telemetryClient.TrackEvent(LoadSubscriptionsFromCache);
+			_telemetryClient.TrackEvent(TelemetryEvents.LoadSubscriptionsFromCache);
 
 			return Task.Run(() =>
 			{

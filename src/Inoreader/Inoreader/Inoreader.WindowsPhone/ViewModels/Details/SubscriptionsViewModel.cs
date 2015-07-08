@@ -27,18 +27,15 @@ namespace Inoreader.ViewModels.Details
 	// ReSharper disable once ClassNeverInstantiated.Global
 	public class SubscriptionsViewModel : BindableBase
 	{
-		private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
-
 		#region Fields
 
-		private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 		private readonly INavigationService _navigationService;
 		private readonly ApiClient _apiClient;
 		private readonly TelemetryClient _telemetryClient;
 		private readonly AppSettingsService _settingsService;
 		private readonly TileManager _tileManager;
-		private readonly AppSettingsService _appSettingsService;
 		private readonly LocalStorageManager _localStorageManager;
+		private readonly SubscriptionsManager _subscriptionsManager;
 
 		private bool _isBusy;
 		private bool _isOffline;
@@ -106,24 +103,24 @@ namespace Inoreader.ViewModels.Details
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] TileManager tileManager, 
-			[NotNull] AppSettingsService appSettingsService,
-			[NotNull] LocalStorageManager localStorageManager)
+			[NotNull] LocalStorageManager localStorageManager,
+			[NotNull] SubscriptionsManager subscriptionsManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (tileManager == null) throw new ArgumentNullException("tileManager");
-			if (appSettingsService == null) throw new ArgumentNullException("appSettingsService");
 			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
+			if (subscriptionsManager == null) throw new ArgumentNullException("subscriptionsManager");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
 			_telemetryClient = telemetryClient;
 			_settingsService = settingsService;
 			_tileManager = tileManager;
-			_appSettingsService = appSettingsService;
 			_localStorageManager = localStorageManager;
+			_subscriptionsManager = subscriptionsManager;
 
 			Application.Current.Resuming += Application_Resuming;
 		}
@@ -135,13 +132,24 @@ namespace Inoreader.ViewModels.Details
 
 		public async void LoadSubscriptions()
 		{
+			List<TreeItemBase> subscriptionItems = null;
+			
 			IsBusy = true;
 
 			Exception error = null;
 			try
 			{
 				IsOffline = false;
-				await LoadSubscriptionsInternalAsync();
+				
+				subscriptionItems = await _subscriptionsManager.LoadSubscriptionsAsync();
+
+				var readAllItem = subscriptionItems.FirstOrDefault(t => t.Id == SpecialTags.Read);
+				if (readAllItem != null)
+				{
+					_tileManager.UpdateAsync(readAllItem.UnreadCount);	
+				}
+
+				await _localStorageManager.SaveSubscriptionsAsync(subscriptionItems);
 			}
 			catch (AuthenticationApiException)
 			{
@@ -159,19 +167,20 @@ namespace Inoreader.ViewModels.Details
 				IsBusy = false;
 			}
 
-			if (error == null) return;
-
-			IsOffline = true;
-
-			IsBusy = true;
-			var cacheData = await _localStorageManager.LoadSubscriptionsAsync();
-			IsBusy = false;
-
-			if (cacheData != null)
+			if (subscriptionItems == null)
 			{
-				_rootItems = cacheData;
+				IsOffline = true;
 
-				var cat = cacheData.OfType<CategoryItem>()
+				IsBusy = true;
+				subscriptionItems = await _localStorageManager.LoadSubscriptionsAsync();
+				IsBusy = false;
+			}
+
+			if (subscriptionItems != null)
+			{
+				_rootItems = subscriptionItems;
+
+				var cat = subscriptionItems.OfType<CategoryItem>()
 					.FirstOrDefault(c => !_isRoot && String.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
 
 				if (cat != null)
@@ -188,144 +197,11 @@ namespace Inoreader.ViewModels.Details
 				}
 			}
 
-			MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
-			await msgbox.ShowAsync();
-		}
-
-		private async Task LoadSubscriptionsInternalAsync()
-		{
-			var stopwatch = Stopwatch.StartNew();
-
-			var tags = await _apiClient.GetTagsAsync();
-			var subscriptions = await _apiClient.GetSubscriptionsAsync();
-			var unreadCount = await _apiClient.GetUnreadCountAsync();
-
-			stopwatch.Stop();
-			_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
-
-			var unreadCountDictionary = new Dictionary<string, int>();
-			foreach (var unreadcount in unreadCount.UnreadCounts)
+			if (error != null)
 			{
-				unreadCountDictionary[unreadcount.Id] = unreadcount.Count;
+				var msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
+				await msgbox.ShowAsync();
 			}
-
-			var catsQuery = from tag in tags.Tags
-							where CategoryRegex.IsMatch(tag.Id)
-							select new CategoryItem
-							{
-								Id = tag.Id,
-								SortId = tag.SortId,								
-							};
-
-			var categories = catsQuery.ToList();
-
-			foreach (var categoryItem in categories)
-			{
-				var subsQuery = from s in subscriptions.Subscriptions
-								where s.Categories != null
-									  && s.Categories.Any(c => String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
-								orderby s.Title// descending 
-								select CreateSubscriptionItem(s, unreadCountDictionary);
-
-				categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
-				categoryItem.Title = (from s in subscriptions.Subscriptions
-									  from c in s.Categories
-									  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
-									  select HtmlUtilities.ConvertToText(c.Label)).FirstOrDefault();
-
-				categoryItem.UnreadCount = categoryItem.Subscriptions.Sum(t => t.UnreadCount);
-
-				var readAllItem = new SubscriptionItem
-				{
-					Id = categoryItem.Id,
-					SortId = categoryItem.SortId,
-					IconUrl = ReadAllIconUrl,
-					Title = Strings.Resources.ReadAllSubscriptionItem,
-					PageTitle = categoryItem.Title,
-					UnreadCount = categoryItem.UnreadCount
-				};
-
-				categoryItem.Subscriptions.Insert(0, readAllItem);
-			}
-
-			// hide empty groups
-			categories.RemoveAll(c => c.Subscriptions.Count == 0);
-
-			var singleItems = (from s in subscriptions.Subscriptions
-							   where s.Categories == null || s.Categories.Length == 0
-							   orderby s.Title
-							   select CreateSubscriptionItem(s, unreadCountDictionary)).ToList();
-
-			var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
-			allItems.AddRange(singleItems);
-
-			var totalUnreadCount = allItems.Sum(t => t.UnreadCount);
-			var readAllRootItem = new SubscriptionItem
-			{
-				Id = SpecialTags.Read,
-				IconUrl = ReadAllIconUrl,
-				Title = Strings.Resources.ReadAllSubscriptionItem,
-				PageTitle = Strings.Resources.ReadAllSubscriptionItem,
-				UnreadCount = totalUnreadCount
-			};
-			allItems.Insert(0, readAllRootItem);
-
-			if (_settingsService.HideEmptySubscriptions)
-			{
-				HideEmpty(allItems);
-			}
-
-			_rootItems = allItems;
-
-			var cat = _rootItems.OfType<CategoryItem>()
-				.FirstOrDefault(c => !_isRoot && String.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
-
-			if (cat != null)
-			{
-				SubscriptionsHeader = cat.Title;
-				TreeItems = new List<TreeItemBase>(cat.Subscriptions);
-				_isRoot = false;
-			}
-			else
-			{
-				SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
-				TreeItems = _rootItems;
-				_isRoot = true;
-			}
-			
-			_tileManager.UpdateAsync(totalUnreadCount);		
-			await _localStorageManager.SaveSubscriptionsAsync(_rootItems);
-		}	
-
-		private void HideEmpty(List<TreeItemBase> allItems)
-		{
-			allItems.RemoveAll(c => c.UnreadCount == 0);
-			foreach (var cat in allItems.OfType<CategoryItem>())
-			{
-				cat.Subscriptions.RemoveAll(c => c.UnreadCount == 0);
-			}
-		}
-
-		private static SubscriptionItem CreateSubscriptionItem(Subscription s, Dictionary<string, int> unreadCountDictionary)
-		{
-			return new SubscriptionItem
-			{
-				Id = s.Id,
-				SortId = s.SortId,
-				Url = s.Url,
-				HtmlUrl = s.HtmlUrl,
-				IconUrl = s.IconUrl,
-				Title = HtmlUtilities.ConvertToText(s.Title),
-				PageTitle = HtmlUtilities.ConvertToText(s.Title),
-				FirstItemMsec = s.FirstItemMsec,
-				UnreadCount = GetUnreadCount(unreadCountDictionary, s.Id)
-			};
-		}
-
-		private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)
-		{
-			int count;
-			return unreadCounts.TryGetValue(id, out count) ? count : 0;
 		}
 
 		private void OnItemClick(object args)
@@ -345,7 +221,7 @@ namespace Inoreader.ViewModels.Details
 				var subscriptionItem = clickEventArgs.ClickedItem as SubscriptionItem;
 				if (subscriptionItem != null)
 				{
-					var pageToken = _appSettingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
+					var pageToken = _settingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
 					var navParam = new StreamPageNavigationParameter
 					{
 						StreamId = subscriptionItem.Id,

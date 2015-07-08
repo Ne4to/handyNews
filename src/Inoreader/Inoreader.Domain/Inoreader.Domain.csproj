@@ -92,6 +92,7 @@
     <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Services\SpecialTags.cs" />
     <Compile Include="Services\StringParameters.cs" />
+    <Compile Include="Services\SubscriptionsManager.cs" />
     <Compile Include="Services\TagsManager.cs" />
     <Compile Include="Services\TileManager.cs" />
     <Compile Include="Services\VisualTreeUtilities.cs" />
@@ -100,6 +101,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="TelemetryEvents.cs" />
     <Compile Include="Views\Controls\StartTileSquare.xaml.cs">
       <DependentUpon>StartTileSquare.xaml</DependentUpon>
     </Compile>

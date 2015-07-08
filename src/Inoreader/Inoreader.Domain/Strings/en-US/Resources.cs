@@ -17,7 +17,7 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 07/08/2015 22:53:08
+// 	Generated: 07/08/2015 23:38:58
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
 namespace Inoreader.Domain.Strings
@@ -49,6 +49,17 @@ namespace Inoreader.Domain.Strings
             else
             {
                 resourceLoader = ResourceLoader.GetForCurrentView(currentAssemblyName + "/Resources");
+            }
+        }
+        
+        /// <summary>
+        /// Localized resource similar to "Read all"
+        /// </summary>
+        public static string ReadAllSubscriptionItem
+        {
+            get
+            {
+                return resourceLoader.GetString("ReadAllSubscriptionItem");
             }
         }
         
