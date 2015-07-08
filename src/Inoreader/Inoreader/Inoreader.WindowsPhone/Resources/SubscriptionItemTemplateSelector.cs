@@ -1,6 +1,6 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Inoreader.Models;
+using Inoreader.Domain.Models;
 
 namespace Inoreader.Resources
 {

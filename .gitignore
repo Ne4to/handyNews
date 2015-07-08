@@ -22,3 +22,7 @@
 /src/Inoreader/Inoreader.Tests/bin/Debug
 /src/Inoreader/Inoreader.Tests/obj/Debug
 /src/Inoreader/Inoreader.Tests/obj/Release
+*.xbf
+/src/Inoreader/Inoreader.Domain/bin
+/src/Inoreader/Inoreader.Domain/obj
+/src/Inoreader/Inoreader.Tests/obj/ARM/Debug

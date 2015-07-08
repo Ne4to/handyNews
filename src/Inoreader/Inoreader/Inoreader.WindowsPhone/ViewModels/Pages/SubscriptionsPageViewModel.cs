@@ -4,7 +4,7 @@ using System.Windows.Input;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
 using Inoreader.Api;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 using Inoreader.ViewModels.Details;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;

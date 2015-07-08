@@ -6,7 +6,7 @@ using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
