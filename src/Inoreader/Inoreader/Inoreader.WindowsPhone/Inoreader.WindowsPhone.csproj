@@ -125,7 +125,6 @@
     <Compile Include="ViewModels\Pages\SavedPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
-    <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
     <Compile Include="Views\Controls\EmptyStarControl.xaml.cs">
