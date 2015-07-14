@@ -6,7 +6,7 @@ using System.Windows.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Practices.Prism.Mvvm;

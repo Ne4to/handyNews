@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 
 namespace Inoreader.Views.Pages
 {

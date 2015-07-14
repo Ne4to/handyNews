@@ -76,12 +76,12 @@
 			<CommandBar.PrimaryCommands>
 				<AppBarButton Icon="Download" x:Uid="SavedAppBarButton" Label="saved" Command="{Binding SavedCommand}" />
 				<AppBarButton Icon="Favorite" x:Uid="StarsAppBarButton" Label="stars" Command="{Binding StarsCommand}" />
-				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding Subscriptions.RefreshCommand}" />
+				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding RefreshCommand}" />
 			</CommandBar.PrimaryCommands>
 			<CommandBar.SecondaryCommands>
 				<AppBarButton x:Uid="MarkAllAsReadAppBarButton" 
 							  Label="mark all as read"
-							  Command="{Binding Subscriptions.MarkAllAsReadCommand}"/>
+							  Command="{Binding MarkAllAsReadCommand}"/>
 
 				<AppBarButton x:Uid="SettingsAppBarButton" Label="settings" Command="{Binding SettingsPageCommand}" />
 				<AppBarButton x:Uid="AboutAppBarButton" Label="about" Command="{Binding AboutPageCommand}" />
@@ -98,14 +98,13 @@
 
 		<Grid>
 			<TextBlock x:Uid="PageHeaderTitle" Text="handy News" Style="{StaticResource PageHeaderTextStyle}" />
-			<details:OfflineBar Visibility="{Binding Subscriptions.IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
+			<details:OfflineBar Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-			<ProgressBar Visibility="{Binding Subscriptions.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+			<ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 		</Grid>
 
 		<ListView Grid.Row="1" 
-				  x:Name="TreeItemsListView"
-				  DataContext="{Binding Subscriptions}" 
+				  x:Name="TreeItemsListView"				  
 				  ItemsSource="{Binding TreeItems}"
 				  ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
 				  IsItemClickEnabled="True"
@@ -125,7 +124,7 @@
 
 		<TextBlock Grid.Row="1" 
 				   x:Uid="EverythingReadBlock"
-		           Visibility="{Binding Subscriptions.TreeItems.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
+		           Visibility="{Binding TreeItems.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
 				   Style="{StaticResource EverythingReadTextBlockStyle}" />		
 	</Grid>
 </storeApps:VisualStateAwarePage>

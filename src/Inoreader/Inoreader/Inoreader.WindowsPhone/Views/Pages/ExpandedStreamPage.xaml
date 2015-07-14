@@ -429,5 +429,10 @@
 				   x:Uid="EverythingReadBlock"
 		           Visibility="{Binding Items.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
 				   Style="{StaticResource EverythingReadTextBlockStyle}" />
+
+		<StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+			<AppBarButton Icon="Back" Click="BackButton_OnClick" Margin="0,0,5,0" Style="{StaticResource NextPrevButtonStyle}" />
+			<AppBarButton Icon="Forward" Click="ForwardButton_OnClick" Margin="5,0,0,0" Style="{StaticResource NextPrevButtonStyle}" />
+		</StackPanel>
 	</Grid>
 </storeApps:VisualStateAwarePage>

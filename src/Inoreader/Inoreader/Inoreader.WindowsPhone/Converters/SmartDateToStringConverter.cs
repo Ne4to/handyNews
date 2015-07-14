@@ -1,6 +1,6 @@
 ﻿using System;
 using Windows.UI.Xaml.Data;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 
 namespace Inoreader.Converters
 {
