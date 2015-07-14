@@ -64,13 +64,13 @@ namespace Inoreader.ViewModels.Pages
 		private async void OnSubmitBug()
 		{
 			_telemetryClient.TrackEvent(TelemetryEvents.SubmitBug);
-			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/InoreaderFree/issues/new"));
+			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/handyNews/issues/new"));
 		}
 		
 		private async void OnContribute()
 		{			
 			_telemetryClient.TrackEvent(TelemetryEvents.Contribute);
-			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/InoreaderFree"));
+			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/handyNews"));
 		}
 	}
 }
