@@ -1,7 +1,7 @@
 ﻿using System;
 using Windows.ApplicationModel;
 using Windows.UI.Xaml.Data;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
 

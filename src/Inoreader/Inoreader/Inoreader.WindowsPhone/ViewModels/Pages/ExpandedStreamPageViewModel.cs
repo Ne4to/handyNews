@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Inoreader.Annotations;
 using Inoreader.Api;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 

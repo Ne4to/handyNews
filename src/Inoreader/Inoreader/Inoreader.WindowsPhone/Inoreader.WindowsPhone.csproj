@@ -86,6 +86,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Behaviors\DataContextPresenter.cs" />
     <Compile Include="Behaviors\DependencyPropertyChangedHelper.cs" />
     <Compile Include="Behaviors\ItemsScrollBehavior.cs" />
@@ -104,42 +107,17 @@
     <Compile Include="Converters\StreamViewToVisibilityConverter.cs" />
     <Compile Include="Converters\UnreadCountStringConverter.cs" />
     <Compile Include="Converters\ZeroCountToVisibilityConverter.cs" />
-    <Compile Include="Models\BindableBaseEx.cs" />
-    <Compile Include="Models\States\StreamItemCollectionState.cs" />
     <Compile Include="PageTokens.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Resources\StreamItemTemplateSelector.cs" />
     <Compile Include="Resources\StylesContainer.cs" />
     <Compile Include="Resources\SubscriptionItemTemplateSelector.cs" />
-    <Compile Include="Services\Extensions.cs" />
-    <Compile Include="Services\AppSettingsService.cs" />
-    <Compile Include="Services\CredentialService.cs" />
-    <Compile Include="Services\HtmlParser.cs" />
-    <Compile Include="Services\HtmlTagLexeme.cs" />
-    <Compile Include="Services\ICredentialService.cs" />
-    <Compile Include="Services\ILexeme.cs" />
-    <Compile Include="Services\ImageManager.cs" />
-    <Compile Include="Services\LiteralLexeme.cs" />
-    <Compile Include="Services\SavedStreamManager.cs" />
-    <Compile Include="Services\LocalStorageManager.cs" />
-    <Compile Include="Services\NetworkManager.cs" />
-    <Compile Include="Services\RichTextBlockBuilder.cs" />
-    <Compile Include="Services\SpecialTags.cs" />
-    <Compile Include="Services\StringParameters.cs" />
-    <Compile Include="Services\TagsManager.cs" />
-    <Compile Include="Services\TileManager.cs" />
-    <Compile Include="Services\VisualTreeUtilities.cs" />
     <Compile Include="Strings\en-US\Resources.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resw</DependentUpon>
     </Compile>
     <Compile Include="TelemetryEvents.cs" />
-    <Compile Include="Models\CategoryItem.cs" />
-    <Compile Include="Models\SubscriptionItem.cs" />
-    <Compile Include="Models\TreeItemBase.cs" />
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
-    <Compile Include="Models\EmptySpaceStreamItem.cs" />
     <Compile Include="ViewModels\Pages\ExpandedStreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\ListStreamPageViewModel.cs" />
@@ -147,9 +125,6 @@
     <Compile Include="ViewModels\Pages\SavedPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SettingsPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SignInPageViewModel.cs" />
-    <Compile Include="ViewModels\Details\SubscriptionsViewModel.cs" />
-    <Compile Include="Models\StreamItem.cs" />
-    <Compile Include="Models\StreamItemCollection.cs" />
     <Compile Include="ViewModels\Pages\StreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SubscriptionsPageViewModel.cs" />
     <Compile Include="Views\Controls\EmptyStarControl.xaml.cs">
@@ -166,15 +141,6 @@
     </Compile>
     <Compile Include="Views\Controls\StarControl.xaml.cs">
       <DependentUpon>StarControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Controls\StartTileSquare.xaml.cs">
-      <DependentUpon>StartTileSquare.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Controls\StartTileSquareSmall.xaml.cs">
-      <DependentUpon>StartTileSquareSmall.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Controls\StartTileWide.xaml.cs">
-      <DependentUpon>StartTileWide.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\StreamListViewControl.cs" />
     <Compile Include="Views\Controls\SwipeControl.cs" />
@@ -193,7 +159,6 @@
     <Compile Include="Views\Pages\ExpandedStreamPage.xaml.cs">
       <DependentUpon>ExpandedStreamPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Views\Pages\ListStreamPage.xaml.cs">
       <DependentUpon>ListStreamPage.xaml</DependentUpon>
     </Compile>
@@ -260,6 +225,9 @@
     </PRIResource>
   </ItemGroup>
   <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
     <Page Include="Resources\Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -286,18 +254,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\StarControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Controls\StartTileSquare.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Controls\StartTileSquareSmall.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Controls\StartTileWide.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -445,6 +401,10 @@
       <Project>{12ec6b39-ac35-4909-b18a-54e427402552}</Project>
       <Name>Inoreader.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Inoreader.Domain\Inoreader.Domain.csproj">
+      <Project>{4192bef7-2c53-4945-a8b0-aaa923c5891d}</Project>
+      <Name>Inoreader.Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
@@ -452,7 +412,6 @@
   <PropertyGroup Condition=" '$(TargetPlatformIdentifier)' == '' ">
     <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
   </PropertyGroup>
-  <Import Project="..\Inoreader.Shared\Inoreader.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.ApplicationInsights.0.12.0-build17386\build\portable-win81+wpa81\Microsoft.ApplicationInsights.targets" Condition="Exists('..\..\packages\Microsoft.ApplicationInsights.0.12.0-build17386\build\portable-win81+wpa81\Microsoft.ApplicationInsights.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

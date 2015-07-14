@@ -2,7 +2,7 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Inoreader.Services;
+using Inoreader.Domain.Services;
 using Microsoft.Practices.ServiceLocation;
 
 // The Templated Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234235
