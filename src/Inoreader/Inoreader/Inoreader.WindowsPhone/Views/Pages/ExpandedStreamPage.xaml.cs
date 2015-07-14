@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Windows.UI.Xaml;
 using Inoreader.Domain.Services;
 using Microsoft.Practices.Prism.Mvvm;
 
@@ -32,6 +33,16 @@ namespace Inoreader.Views.Pages
 				return;
 
 			_itemsState.Load(pageState, "ItemsListView_");
+		}
+
+		private void BackButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			ScrollUtils.ScrollItem(ItemsListView, -1);
+		}
+
+		private void ForwardButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			ScrollUtils.ScrollItem(ItemsListView, 1);
 		}
 	}
 }
