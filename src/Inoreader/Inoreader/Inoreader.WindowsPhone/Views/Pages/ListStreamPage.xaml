@@ -15,7 +15,7 @@
     xmlns:controls="using:Inoreader.Views.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
-	mvvm:ViewModelLocator.AutoWireViewModel="true">
+	mvvm:ViewModelLocator.AutoWireViewModel="true" x:Name="PageRoot">
 
 	<storeApps:VisualStateAwarePage.Resources>
 
@@ -355,15 +355,15 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBlock Text="{Binding Title}" 
+		<TextBlock Text="{Binding Title}" x:Name="PageHeader"
 				   Style="{StaticResource PageHeaderTextStyle}" 
 				   TextWrapping="WrapWholeWords"
-				   MaxLines="2" 
-				   TextTrimming="WordEllipsis"
-				   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=PageHeaderFontSize}"/>
-		<details:OfflineBar Grid.Row="0"
-		                    Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
-		<ProgressBar Grid.Row="0" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+				   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=PageHeaderFontSize}">
+
+			<TextBlock.RenderTransform>
+				<TranslateTransform x:Name="PageHeaderTranslateTransform" />
+			</TextBlock.RenderTransform>
+		</TextBlock>
 
 		<ListView Grid.Row="1" 
 				  x:Name="ItemsListView"
@@ -371,14 +371,30 @@
 				  ItemContainerStyle="{StaticResource ListViewItemStyle1}"
 				  ItemTemplateSelector="{StaticResource StreamItemListViewTemplateSelector}" 
 				  IsItemClickEnabled="True">
+
+			<ListView.Resources>
+				<behaviors:DataContextPresenter DataContext="{Binding ElementName=PageRoot}" x:Key="PagePresenter" />
+			</ListView.Resources>
+
 			<interactivity:Interaction.Behaviors>
-				<behaviors:ItemsScrollBehavior Command="{Binding ItemsScrollCommand}" />
+				<behaviors:ItemsScrollBehavior>
+					<behaviors:ScrollBehaviorCustomItem OffsetThreshold="40" 
+														LessThresholdStateName="ShowHeaderState"
+														GreateOrEqualThresholdStateName="HideHeaderState"
+														Control="{Binding DataContext, Source={StaticResource PagePresenter}}" />
+					<behaviors:ScrollBehaviorCommandItem Command="{Binding DataContext.ItemsScrollCommand, Source={StaticResource DataContextPresenter}}" />
+				</behaviors:ItemsScrollBehavior>
 				<core:EventTriggerBehavior EventName="ItemClick">
 					<core:InvokeCommandAction Command="{Binding SelectItemCommand}" 
 											  InputConverter="{StaticResource ItemClickEventArgsToItemConverter}" />
 				</core:EventTriggerBehavior>
 			</interactivity:Interaction.Behaviors>
 		</ListView>
+
+		<details:OfflineBar Grid.Row="0" Grid.RowSpan="2"
+		                    Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
+		<ProgressBar Grid.Row="0" Grid.RowSpan="2"
+					 Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
 		<TextBlock Grid.Row="1" 
 				   x:Uid="EverythingReadBlock"
@@ -389,5 +405,30 @@
 			<AppBarButton Icon="Back" Click="BackButton_OnClick" Margin="0,0,5,0" Style="{StaticResource NextPrevButtonStyle}" />
 			<AppBarButton Icon="Forward" Click="ForwardButton_OnClick" Margin="5,0,0,0" Style="{StaticResource NextPrevButtonStyle}" />
 		</StackPanel>
+
+		<VisualStateManager.VisualStateGroups>
+			<VisualStateGroup>
+				<VisualState x:Name="ShowHeaderState">
+
+				</VisualState>
+
+				<VisualState x:Name="HideHeaderState">
+					<Storyboard>
+						<DoubleAnimation Storyboard.TargetName="PageHeader" Storyboard.TargetProperty="Opacity" 
+										 To="0" Duration="0:0:0.2" />
+						<DoubleAnimation Storyboard.TargetProperty="Y" Storyboard.TargetName="PageHeaderTranslateTransform" 
+										 To="-25" Duration="0:0:0.2" />
+
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="PageHeader" Storyboard.TargetProperty="Visibility">
+							<DiscreteObjectKeyFrame KeyTime="0:0:0.2">
+								<DiscreteObjectKeyFrame.Value>
+									<Visibility>Collapsed</Visibility>
+								</DiscreteObjectKeyFrame.Value>
+							</DiscreteObjectKeyFrame>
+						</ObjectAnimationUsingKeyFrames>
+					</Storyboard>
+				</VisualState>
+			</VisualStateGroup>
+		</VisualStateManager.VisualStateGroups>
 	</Grid>
 </storeApps:VisualStateAwarePage>
