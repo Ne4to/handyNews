@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Popups;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
 using Inoreader.Api;
@@ -30,6 +32,8 @@ namespace Inoreader.ViewModels.Pages
 		private readonly TagsManager _tagsManager;
 		private readonly SavedStreamManager _savedStreamManager;
 		private readonly LocalStorageManager _localStorageManager;
+		private readonly NetworkManager _networkManager;
+		private readonly CoreDispatcher _dispatcher;
 		private readonly bool _showNewestFirst;
 		private readonly bool _autoMarkAsRead;
 		private string _streamId;
@@ -58,7 +62,7 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _unreadArticlesCommand;
 		private ICommand _markAllAsReadCommand;
 		private int _preloadItemCount;
-
+		
 		#endregion
 
 		#region Properties
@@ -192,7 +196,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
-			[NotNull] LocalStorageManager localStorageManager)
+			[NotNull] LocalStorageManager localStorageManager,
+			[NotNull] NetworkManager networkManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
@@ -201,6 +206,7 @@ namespace Inoreader.ViewModels.Pages
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
 			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
+			if (networkManager == null) throw new ArgumentNullException("networkManager");
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
@@ -208,6 +214,7 @@ namespace Inoreader.ViewModels.Pages
 			_tagsManager = tagsManager;
 			_savedStreamManager = savedStreamManager;
 			_localStorageManager = localStorageManager;
+			_networkManager = networkManager;
 
 			_showNewestFirst = settingsService.ShowNewestFirst;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
@@ -215,6 +222,15 @@ namespace Inoreader.ViewModels.Pages
 
 			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
 			dataTransferManager.DataRequested += dataTransferManager_DataRequested;
+
+			_dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+
+			_networkManager.NetworkChanged += _networkManager_NetworkChanged;
+		}
+
+		void _networkManager_NetworkChanged(object sender, NetworkChangedEventArgs e)
+		{
+			_dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsOffline = !e.Connected);			
 		}
 
 		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)
@@ -246,6 +262,11 @@ namespace Inoreader.ViewModels.Pages
 		{
 			// The base implementation uses RestorableStateAttribute and Reflection to save and restore state
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
+
+			if (!suspending)
+			{
+				_networkManager.NetworkChanged -= _networkManager_NetworkChanged;
+			}
 
 			if (viewModelState != null)
 				SaveState(viewModelState);
