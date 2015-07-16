@@ -29,6 +29,7 @@ namespace Inoreader.Domain.Services
 		public StreamView StreamView { get; set; }
 		public TextAlignment TextAlignment { get; set; }
 		public double FontSize { get; set; }
+		public int PreloadItemCount { get; set; }
 		
 		public double StreamTitleFontSize
 		{
@@ -89,6 +90,7 @@ namespace Inoreader.Domain.Services
 			FontSize = 11D;
 			TextAlignment = TextAlignment.Justify;
 			AutoMarkAsRead = StreamView == StreamView.ExpandedView;
+			PreloadItemCount = 10;
 
 			Load();
 		}
@@ -105,6 +107,7 @@ namespace Inoreader.Domain.Services
 			StreamView = (StreamView)container.GetValue("StreamView", (int)StreamView.ExpandedView);
 			FontSize = container.GetValue("FontSize", 11D);
 			TextAlignment = (TextAlignment)container.GetValue("TextAlignment", (int)TextAlignment.Justify);
+			PreloadItemCount = container.GetValue("PreloadItemCount", 10);
 			
 			// This setting did not exist in app version <= 1.1.3.15
 			// If user updates app do not change behaviour
@@ -125,6 +128,7 @@ namespace Inoreader.Domain.Services
 			container.Values["FontSize"] = FontSize;
 			container.Values["TextAlignment"] = (int)TextAlignment;
 			container.Values["AutoMarkAsRead"] = AutoMarkAsRead;
+			container.Values["PreloadItemCount"] = PreloadItemCount;
 		}
 	}
 

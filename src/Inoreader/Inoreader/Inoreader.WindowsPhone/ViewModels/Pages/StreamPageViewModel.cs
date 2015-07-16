@@ -57,6 +57,7 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _allArticlesCommand;
 		private ICommand _unreadArticlesCommand;
 		private ICommand _markAllAsReadCommand;
+		private int _preloadItemCount;
 
 		#endregion
 
@@ -210,6 +211,7 @@ namespace Inoreader.ViewModels.Pages
 
 			_showNewestFirst = settingsService.ShowNewestFirst;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
+			_preloadItemCount = settingsService.PreloadItemCount;
 
 			DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
 			dataTransferManager.DataRequested += dataTransferManager_DataRequested;
@@ -289,7 +291,7 @@ namespace Inoreader.ViewModels.Pages
 				return false;
 
 			_currentItem = itemsState.Items.FirstOrDefault(i => i.IsSelected);
-			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryClient, b => IsBusy = b);
+			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryClient, b => IsBusy = b, _preloadItemCount);
 			Items.LoadMoreItemsError += (sender, args) => IsOffline = true;
 
 			return true;
@@ -331,7 +333,7 @@ namespace Inoreader.ViewModels.Pages
 
 			if (cacheData != null)
 			{
-				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryClient, b => IsBusy = b);
+				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryClient, b => IsBusy = b, _preloadItemCount);
 				_currentItem = items.FirstOrDefault(i => i.IsSelected);
 				_currentItemRead = _currentItem != null && !_currentItem.Unread;
 				CurrentItemReadEnabled = _currentItem != null;
@@ -349,7 +351,7 @@ namespace Inoreader.ViewModels.Pages
 		{
 			await _localStorageManager.ClearTempFilesAsync();
 
-			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, AllArticles, b => IsBusy = b);
+			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, AllArticles, b => IsBusy = b, _preloadItemCount);
 			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			await streamItems.InitAsync();
 			
@@ -539,7 +541,7 @@ namespace Inoreader.ViewModels.Pages
 			}
 		}
 
-		private async void OnStarItem(object o)
+		private void OnStarItem(object o)
 		{
 			var item = o as StreamItem;
 			if (item == null || item is EmptySpaceStreamItem)

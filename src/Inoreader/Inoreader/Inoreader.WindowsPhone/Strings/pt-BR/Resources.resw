@@ -340,4 +340,7 @@ Isto não pode ser desfeito!</value>
   <data name="AnimatedGifTitle" xml:space="preserve">
     <value>visualizar Gif animado</value>
   </data>
+  <data name="SettingsPreloadItemCountSlider.Header" xml:space="preserve">
+    <value>Itens para pré-carregar</value>
+  </data>
 </root>

@@ -371,7 +371,7 @@
 								</Grid.ColumnDefinitions>						
 								
 								<TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Title}" 
-										   Style="{StaticResource StreamItemTitleStyle}"
+										   Style="{StaticResource StreamItemTitleStyle}" MaxLines="2"
 										   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=StreamTitleFontSize}" />
 
 								<TextBlock Grid.Column="1" 

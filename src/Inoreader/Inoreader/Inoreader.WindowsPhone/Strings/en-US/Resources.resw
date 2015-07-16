@@ -340,4 +340,7 @@ This cannot be undone!</value>
   <data name="AnimatedGifTitle" xml:space="preserve">
     <value>show animated Gif</value>
   </data>
+  <data name="SettingsPreloadItemCountSlider.Header" xml:space="preserve">
+    <value>Items to preload</value>
+  </data>
 </root>
