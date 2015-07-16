@@ -19,14 +19,16 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
-			[NotNull] LocalStorageManager localStorageManager)
+			[NotNull] LocalStorageManager localStorageManager,
+			[NotNull] NetworkManager networkManager)
 			: base(apiClient,
 				navigationService,
 				telemetryClient,
 				tagsManager,
 				settingsService,
 				savedStreamManager,
-				localStorageManager)
+				localStorageManager,
+				networkManager)
 		{
 		}
 	}

@@ -33,6 +33,7 @@ namespace Inoreader.ViewModels.Pages
 		private double _fontSize;
 		private bool _textJustification;
 		private TextAlignment _textAlignment;
+		private int _preloadItemCount;
 		private bool _autoMarkAsRead;
 
 		#endregion
@@ -131,6 +132,16 @@ namespace Inoreader.ViewModels.Pages
 			{
 				if (SetProperty(ref _autoMarkAsRead, value))
 					SaveAutoMarkAsRead();
+			}
+		}
+
+		public int PreloadItemCount
+		{
+			get { return _preloadItemCount; }
+			set
+			{
+				if (SetProperty(ref _preloadItemCount, value))
+					SavePreloadItemCount();
 			}
 		}
 
@@ -285,6 +296,20 @@ namespace Inoreader.ViewModels.Pages
 
 			_settingsService.AutoMarkAsRead = AutoMarkAsRead;
 			_settingsService.Save();
+		}
+
+		private void SavePreloadItemCount()
+		{
+			if (PreloadItemCount == _settingsService.PreloadItemCount)
+				return;
+
+			var eventTelemetry = new EventTelemetry(TelemetryEvents.ChangePreloadItemCount);
+			eventTelemetry.Properties.Add("OldValue", _settingsService.PreloadItemCount.ToString());
+			eventTelemetry.Properties.Add("NewValue", PreloadItemCount.ToString());
+			_telemetryClient.TrackEvent(eventTelemetry);
+
+			_settingsService.PreloadItemCount = PreloadItemCount;
+			_settingsService.Save(); 
 		}
 	}
 

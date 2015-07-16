@@ -9,6 +9,7 @@
 		public const string ChangeDisplayCulture = "ChangeDisplayCulture";
 		public const string ChangeHideEmptySubscriptions = "ChangeHideEmptySubscriptions";
 		public const string ChangeAutoMarkAsRead = "ChangeAutoMarkAsRead";
+		public const string ChangePreloadItemCount = "ChangePreloadItemCount";
 		public const string ChangeShowOrder = "ChangeShowOrder";
 		public const string ChangeFontSize = "ChangeFontSize";
 		public const string ChangeTextAlignment = "ChangeTextAlignment";

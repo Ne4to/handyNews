@@ -310,4 +310,7 @@
   <data name="AnimatedGifTitle" xml:space="preserve">
     <value>показать анимированный Gif</value>
   </data>
+  <data name="SettingsPreloadItemCountSlider.Header" xml:space="preserve">
+    <value>Загружать статей</value>
+  </data>
 </root>

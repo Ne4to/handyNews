@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using Windows.System.Threading;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -29,6 +31,8 @@ namespace Inoreader.ViewModels.Pages
 		private readonly TileManager _tileManager;
 		private readonly LocalStorageManager _localStorageManager;
 		private readonly SubscriptionsManager _subscriptionsManager;
+		private readonly NetworkManager _networkManager;
+		private readonly CoreDispatcher _dispatcher;
 
 		private bool _isBusy;
 		private bool _isOffline;
@@ -46,7 +50,7 @@ namespace Inoreader.ViewModels.Pages
 		private ICommand _itemClickCommand;
 		private ICommand _refreshCommand;
 		private ICommand _markAllAsReadCommand;
-
+		
 		#endregion
 
 		#region Properties
@@ -127,7 +131,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] TelemetryClient telemetryClient,
 			[NotNull] TileManager tileManager,
 			[NotNull] LocalStorageManager localStorageManager,
-			[NotNull] SubscriptionsManager subscriptionsManager)
+			[NotNull] SubscriptionsManager subscriptionsManager,
+			[NotNull] NetworkManager networkManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -136,6 +141,7 @@ namespace Inoreader.ViewModels.Pages
 			if (tileManager == null) throw new ArgumentNullException("tileManager");
 			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 			if (subscriptionsManager == null) throw new ArgumentNullException("subscriptionsManager");
+			if (networkManager == null) throw new ArgumentNullException("networkManager");
 
 			_navigationService = navigationService;
 			_apiClient = apiClient;
@@ -144,8 +150,17 @@ namespace Inoreader.ViewModels.Pages
 			_tileManager = tileManager;
 			_localStorageManager = localStorageManager;
 			_subscriptionsManager = subscriptionsManager;
+			_networkManager = networkManager;
+
+			_dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 
 			Application.Current.Resuming += Application_Resuming;
+			_networkManager.NetworkChanged += _networkManager_NetworkChanged;
+		}
+
+		void _networkManager_NetworkChanged(object sender, NetworkChangedEventArgs e)
+		{
+			_dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsOffline = !e.Connected);			
 		}
 
 		void Application_Resuming(object sender, object e)
@@ -321,7 +336,10 @@ namespace Inoreader.ViewModels.Pages
 			// If you do not use this attribute, do not invoke base impkementation to prevent execution this useless code.
 
 			if (!suspending)
+			{
 				Application.Current.Resuming -= Application_Resuming;
+				_networkManager.NetworkChanged -= _networkManager_NetworkChanged;
+			}
 
 			if (viewModelState != null)
 				SaveState(viewModelState);		

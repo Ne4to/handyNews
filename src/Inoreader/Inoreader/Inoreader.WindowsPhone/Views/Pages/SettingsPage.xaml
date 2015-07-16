@@ -79,6 +79,12 @@
 					  Content="text justification"
 					  IsChecked="{Binding TextJustification, Mode=TwoWay}" />
 
+				<Slider Header="Items to preload" HorizontalAlignment="Stretch" 
+						x:Uid="SettingsPreloadItemCountSlider" SnapsTo="StepValues" 
+						IsThumbToolTipEnabled="True" TickFrequency="5"						
+						Minimum="10" Maximum="50" StepFrequency="5" Value="{Binding PreloadItemCount, Mode=TwoWay}">
+				</Slider>
+
 			</StackPanel>
 
 		</ScrollViewer>

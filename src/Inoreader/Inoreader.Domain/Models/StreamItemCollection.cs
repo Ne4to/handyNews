@@ -22,8 +22,6 @@ namespace Inoreader.Domain.Models
 {
 	public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
 	{
-		private const uint MinLoadMoreItemsCount = 5U;
-
 		private readonly ApiClient _apiClient;
 		private readonly string _streamId;
 		private readonly bool _showNewestFirst;
@@ -45,11 +43,12 @@ namespace Inoreader.Domain.Models
 
 		bool _busy;
 		private bool _allArticles;
+		private readonly int _preloadItemsCount;
 
 		public event EventHandler LoadMoreItemsError;
 
-		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, TelemetryClient telemetryClient, bool allArticles, Action<bool> onBusy)
-			: base(10)
+		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, TelemetryClient telemetryClient, bool allArticles, Action<bool> onBusy, int preloadItemsCount)
+			: base(preloadItemsCount)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (streamId == null) throw new ArgumentNullException("streamId");
@@ -62,12 +61,14 @@ namespace Inoreader.Domain.Models
 			_onBusy = onBusy;
 			_showNewestFirst = showNewestFirst;
 			_allArticles = allArticles;
+			_preloadItemsCount = preloadItemsCount;
 		}
 
 		public StreamItemCollection([NotNull] StreamItemCollectionState state,
 			[NotNull] ApiClient apiClient,
 			[NotNull] TelemetryClient telemetryClient,
-			[NotNull] Action<bool> onBusy)
+			[NotNull] Action<bool> onBusy,
+			int preloadItemsCount)
 			: base(state.Items.Length)
 		{
 			if (state == null) throw new ArgumentNullException("state");
@@ -85,11 +86,12 @@ namespace Inoreader.Domain.Models
 			_streamTimestamp = state.StreamTimestamp;
 			_fault = state.Fault;
 			AddRange(state.Items);
+			_preloadItemsCount = preloadItemsCount;
 		}
 
 		public async Task InitAsync()
 		{
-			var stream = await LoadAsync(10, null);
+			var stream = await LoadAsync(_preloadItemsCount, null);
 			_continuation = stream.continuation;
 			var itemsQuery = GetItems(stream);
 
@@ -172,7 +174,7 @@ namespace Inoreader.Domain.Models
 
 			_busy = true;
 
-			var loadCount = Math.Max(count, MinLoadMoreItemsCount);
+			var loadCount = Math.Max(count, (uint)_preloadItemsCount);
 
 			return AsyncInfo.Run(c => LoadMoreItemsAsync(c, loadCount));
 		}
