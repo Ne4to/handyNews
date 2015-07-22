@@ -119,6 +119,7 @@
     <Compile Include="TelemetryEvents.cs" />
     <Compile Include="ViewModels\Pages\AboutPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\ExpandedStreamPageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\GifImagePageViewModel.cs" />
     <Compile Include="ViewModels\Pages\INavigateBackwards.cs" />
     <Compile Include="ViewModels\Pages\ListStreamPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\SavedItemPageViewModel.cs" />
@@ -161,6 +162,9 @@
     </Compile>
     <Compile Include="Views\Pages\ExpandedStreamPage.xaml.cs">
       <DependentUpon>ExpandedStreamPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\GifImagePage.xaml.cs">
+      <DependentUpon>GifImagePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\ListStreamPage.xaml.cs">
       <DependentUpon>ListStreamPage.xaml</DependentUpon>
@@ -281,6 +285,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\ExpandedStreamPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\GifImagePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

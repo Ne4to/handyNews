@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
 using Microsoft.ApplicationInsights;
+using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Microsoft.Practices.ServiceLocation;
 //using Microsoft.Practices.Prism.Mvvm.Interfaces;
 
@@ -175,7 +176,11 @@ namespace Inoreader.Domain.Services
 				if (!response.IsSuccessStatusCode)
 					return;
 
+				bool isGif = (response.Content.Headers.ContentType != null && response.Content.Headers.ContentType.MediaType == @"image/gif") || src.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
 				var tempFileName = Path.GetRandomFileName();
+				if (isGif)
+					tempFileName += ".gif";
+
 				var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(tempFileName, CreationCollisionOption.GenerateUniqueName);
 
 				using (var stream = await file.OpenStreamForWriteAsync())
@@ -183,9 +188,58 @@ namespace Inoreader.Domain.Services
 					await response.Content.CopyToAsync(stream);
 				}
 
-				var localCopyUri = new Uri("ms-appdata:///temp/" + file.Name);				
+				var localCopyUri = new Uri("ms-appdata:///temp/" + file.Name);
+
+				if (isGif)
+				{
+					var linkIndex = inlines.Count;
+					if (String.IsNullOrWhiteSpace(navigationUri))
+					{
+						//AddGifNavigation(image, localCopyUri.AbsoluteUri);
+
+						AddGifNavigation(image, src);
+					}
+
+					//AddGifHyperlink(inlines, linkIndex, localCopyUri.AbsoluteUri);
+					AddGifHyperlink(inlines, linkIndex, src);
+				}
+
 				image.Source = new BitmapImage(localCopyUri);
 			}
+		}
+
+		private void AddGifNavigation(Image image, string src)
+		{
+			_dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+			{
+				image.IsTapEnabled = true;
+				image.Tapped += (sender, args) =>
+				{
+					args.Handled = true;
+					var ns = ServiceLocator.Current.GetInstance<INavigationService>();
+					ns.Navigate("GifImage", src);
+				};
+			});
+		}
+
+		private void AddGifHyperlink(InlineCollection inlines, int linkIndex, string src)
+		{
+			var hyperlink = new Hyperlink();
+			hyperlink.Click += (sender, args) =>
+			{
+				var ns = ServiceLocator.Current.GetInstance<INavigationService>();
+				ns.Navigate("GifImage", src);
+			};
+
+			hyperlink.Inlines.Add(new Run
+			{
+				Text = "GIF",//Strings.Resources.AnimatedGifTitle,
+				FontSize = _appSettings.FontSize,
+				FontStyle = FontStyle.Italic
+			});
+
+			inlines.Insert(linkIndex, hyperlink);
+			inlines.Insert(linkIndex + 1, new LineBreak());
 		}
 		
 		private void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex, StringParameters strParams)
