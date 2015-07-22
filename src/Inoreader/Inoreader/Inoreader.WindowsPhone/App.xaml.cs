@@ -149,6 +149,7 @@ namespace Inoreader
 
 			// Stream page state
 			SessionStateService.RegisterKnownType(typeof(StreamItem));
+			SessionStateService.RegisterKnownType(typeof(HeaderSpaceStreamItem));
 			SessionStateService.RegisterKnownType(typeof(EmptySpaceStreamItem));
 			SessionStateService.RegisterKnownType(typeof(StreamItemCollectionState));
 		}

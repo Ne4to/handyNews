@@ -391,8 +391,8 @@ namespace Inoreader.ViewModels.Pages
 				SetCurrentItemStarred(false);
 			}
 
-			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
-			CurrentItemStarredEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+			CurrentItemReadEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem) && !(_currentItem is HeaderSpaceStreamItem);
+			CurrentItemStarredEnabled = _currentItem != null && !(_currentItem is EmptySpaceStreamItem) && !(_currentItem is HeaderSpaceStreamItem);
 			RaiseOpenWebCommandCanExecuteChanged();
 			RaiseShareCommandCanExecuteChanged();
 			RaiseSaveCommandCanExecuteChanged();
@@ -427,7 +427,7 @@ namespace Inoreader.ViewModels.Pages
 		{
 			var items = (object[])obj;
 			var firstItem = (StreamItem)items[0];
-			if (firstItem is EmptySpaceStreamItem)
+			if (firstItem is EmptySpaceStreamItem || firstItem is HeaderSpaceStreamItem)
 			{
 				CurrentItemReadEnabled = false;
 				CurrentItemStarredEnabled = false;
@@ -448,7 +448,7 @@ namespace Inoreader.ViewModels.Pages
 			SetCurrentItemRead(!_currentItem.Unread);
 			SetCurrentItemStarred(_currentItem.Starred);
 
-			CurrentItemReadEnabled = _currentItem != null;
+			//CurrentItemReadEnabled = _currentItem != null;
 			CurrentItemStarredEnabled = _currentItem != null;
 			RaiseOpenWebCommandCanExecuteChanged();
 			RaiseShareCommandCanExecuteChanged();
@@ -458,7 +458,7 @@ namespace Inoreader.ViewModels.Pages
 		private void OnSelectItem(object obj)
 		{
 			var item = obj as StreamItem;
-			if (item != null && !(item is EmptySpaceStreamItem))
+			if (item != null && !(item is EmptySpaceStreamItem) && !(item is HeaderSpaceStreamItem))
 			{
 				if (_currentItem != null)
 					_currentItem.IsSelected = false;
@@ -533,7 +533,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private bool CanSave()
 		{
-			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem) && !(_currentItem is HeaderSpaceStreamItem);
 		}
 
 		private void OnShare()
@@ -543,13 +543,13 @@ namespace Inoreader.ViewModels.Pages
 
 		private bool CanShare()
 		{
-			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem);
+			return _currentItem != null && !(_currentItem is EmptySpaceStreamItem) && !(_currentItem is HeaderSpaceStreamItem);
 		}
 
 		private void OnReadItem(object o)
 		{
 			var item = o as StreamItem;
-			if (item == null || item is EmptySpaceStreamItem)
+			if (item == null || item is EmptySpaceStreamItem || item is HeaderSpaceStreamItem)
 				return;
 
 			item.NeedSetReadExplicitly = !item.Unread;
@@ -565,7 +565,7 @@ namespace Inoreader.ViewModels.Pages
 		private void OnStarItem(object o)
 		{
 			var item = o as StreamItem;
-			if (item == null || item is EmptySpaceStreamItem)
+			if (item == null || item is EmptySpaceStreamItem || item is HeaderSpaceStreamItem)
 				return;
 
 			item.Starred = !item.Starred;
@@ -665,7 +665,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private void OnCurrentItemReadChanged(bool newValue)
 		{
-			if (_currentItem == null || _currentItem is EmptySpaceStreamItem)
+			if (_currentItem == null || _currentItem is EmptySpaceStreamItem || _currentItem is HeaderSpaceStreamItem)
 				return;
 
 			if (newValue)
@@ -686,7 +686,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private void OnCurrentItemStarredChanged(bool newValue)
 		{
-			if (_currentItem == null || _currentItem is EmptySpaceStreamItem)
+			if (_currentItem == null || _currentItem is EmptySpaceStreamItem || _currentItem is HeaderSpaceStreamItem)
 				return;
 
 			if (newValue)
@@ -705,7 +705,7 @@ namespace Inoreader.ViewModels.Pages
 
 		void dataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
 		{
-			if (_currentItem == null || _currentItem is EmptySpaceStreamItem)
+			if (_currentItem == null || _currentItem is EmptySpaceStreamItem || _currentItem is HeaderSpaceStreamItem)
 			{
 				args.Request.FailWithDisplayText(Strings.Resources.ErrorShareMessage);
 				return;

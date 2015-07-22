@@ -95,6 +95,7 @@ namespace Inoreader.Domain.Models
 			_continuation = stream.continuation;
 			var itemsQuery = GetItems(stream);
 
+			Add(new HeaderSpaceStreamItem());
 			AddRange(itemsQuery);
 			Add(new EmptySpaceStreamItem());
 			OnPropertyChanged("Count");

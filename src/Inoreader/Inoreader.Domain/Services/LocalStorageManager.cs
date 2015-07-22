@@ -552,7 +552,7 @@ namespace Inoreader.Domain.Services
 			{
 				foreach (var item in collection.Items)
 				{
-					if (item is EmptySpaceStreamItem)
+					if (item is EmptySpaceStreamItem || item is HeaderSpaceStreamItem)
 						continue;
 
 					statement.Bind("@ID", item.Id);
@@ -628,6 +628,7 @@ namespace Inoreader.Domain.Services
 		private StreamItem[] LoadStreamCollectionItems(SQLiteConnection connection, string streamId)
 		{
 			List<StreamItem> items = new List<StreamItem>();
+			items.Add(new HeaderSpaceStreamItem());
 
 			using (var statement = connection.Prepare(@"SELECT ID, PUBLISHED, TITLE, WEB_URI, CONTENT, UNREAD, NEED_SET_READ_EXPLICITLY, IS_SELECTED, STARRED, SAVED FROM STREAM_ITEM WHERE STREAM_ID = @STREAM_ID;"))
 			{

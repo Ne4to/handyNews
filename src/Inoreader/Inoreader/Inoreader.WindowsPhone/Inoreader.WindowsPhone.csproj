@@ -150,6 +150,9 @@
     <Compile Include="Views\Details\EmptySpaceItem.xaml.cs">
       <DependentUpon>EmptySpaceItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Details\HeaderSpaceItem.xaml.cs">
+      <DependentUpon>HeaderSpaceItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Details\OfflineBar.xaml.cs">
       <DependentUpon>OfflineBar.xaml</DependentUpon>
     </Compile>
@@ -262,6 +265,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Details\EmptySpaceItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Details\HeaderSpaceItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

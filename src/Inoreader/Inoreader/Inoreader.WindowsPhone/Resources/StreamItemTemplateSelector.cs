@@ -6,6 +6,7 @@ namespace Inoreader.Resources
 {
 	public class StreamItemTemplateSelector : DataTemplateSelector
 	{
+		public DataTemplate HeaderSpaceTemplate { get; set; }
 		public DataTemplate StreamItemTemplate { get; set; }
 		public DataTemplate EmptySpaceTemplate { get; set; }
 
@@ -17,6 +18,9 @@ namespace Inoreader.Resources
 			var type = item.GetType();
 			if (type == typeof(EmptySpaceStreamItem))
 				return EmptySpaceTemplate;
+
+			if (type == typeof (HeaderSpaceStreamItem))
+				return HeaderSpaceTemplate;
 
 			return StreamItemTemplate;
 		}

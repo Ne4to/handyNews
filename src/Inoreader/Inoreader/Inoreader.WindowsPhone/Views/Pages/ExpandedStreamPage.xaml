@@ -235,6 +235,10 @@
 			</Setter>
 		</Style>
 
+		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="2" />
+
+		<behaviors:DataContextPresenter DataContext="{Binding ElementName=PageHeader}" x:Key="PageHeaderPresenter" />
+
 		<resources:StreamItemTemplateSelector x:Key="StreamItemExpandedViewTemplateSelector">
 			<resources:StreamItemTemplateSelector.StreamItemTemplate>
 				<DataTemplate>
@@ -284,8 +288,8 @@
 
 												<StackPanel Grid.Column="1" 
 															HorizontalAlignment="Right" 
-															VerticalAlignment="Top">											
-													
+															VerticalAlignment="Top">
+
 													<controls:StarControl
 																Visibility="{Binding Starred, Converter={StaticResource BooleanToVisibilityConverter}}"
 																Width="15" 
@@ -340,9 +344,12 @@
 					<details:EmptySpaceItem />
 				</DataTemplate>
 			</resources:StreamItemTemplateSelector.EmptySpaceTemplate>
+			<resources:StreamItemTemplateSelector.HeaderSpaceTemplate>
+				<DataTemplate>
+					<details:HeaderSpaceItem Control="{Binding DataContext, Source={StaticResource PageHeaderPresenter}}" />
+				</DataTemplate>
+			</resources:StreamItemTemplateSelector.HeaderSpaceTemplate>
 		</resources:StreamItemTemplateSelector>
-
-		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="1" />
 	</storeApps:VisualStateAwarePage.Resources>
 
 	<Page.BottomAppBar>
@@ -369,13 +376,14 @@
 								Label="read"
 								Icon="Read" 
 								IsChecked="{Binding CurrentItemRead, Mode=TwoWay}"
-								IsEnabled="{Binding CurrentItemReadEnabled}" />
-
+								 />
+				<!--IsEnabled="{Binding CurrentItemReadEnabled}"-->
 				<AppBarToggleButton x:Uid="SetStarAppBarButton"
 								Label="star"
 								Icon="Favorite"
 								IsChecked="{Binding CurrentItemStarred, Mode=TwoWay}"
-								IsEnabled="{Binding CurrentItemStarredEnabled}"/>
+								/>
+				<!--IsEnabled="{Binding CurrentItemStarredEnabled}"-->
 
 				<AppBarButton x:Uid="AllArticlesAppBarButton"
 							  Label="all articles"
@@ -394,12 +402,7 @@
 		</CommandBar>
 	</Page.BottomAppBar>
 
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
-
+	<Grid>	
 		<TextBlock Text="{Binding Title}" x:Name="PageHeader"
 				   Style="{StaticResource PageHeaderTextStyle}" 
 				   TextWrapping="WrapWholeWords"
@@ -410,8 +413,7 @@
 			</TextBlock.RenderTransform>
 		</TextBlock>
 		
-		<ListView Grid.Row="1" 
-				  x:Name="ItemsListView"
+		<ListView x:Name="ItemsListView"
 				  ItemsSource="{Binding Items}" 
 				  ItemContainerStyle="{StaticResource ListViewItemStyle1}"
 				  ItemTemplateSelector="{StaticResource StreamItemExpandedViewTemplateSelector}" 
@@ -423,7 +425,7 @@
 			
 			<interactivity:Interaction.Behaviors>
 				<behaviors:ItemsScrollBehavior>
-					<behaviors:ScrollBehaviorCustomItem OffsetThreshold="40" 
+					<behaviors:ScrollBehaviorCustomItem OffsetThreshold="10" 
 														LessThresholdStateName="ShowHeaderState"
 														GreateOrEqualThresholdStateName="HideHeaderState"
 														Control="{Binding DataContext, Source={StaticResource PagePresenter}}" />
@@ -436,16 +438,15 @@
 			</interactivity:Interaction.Behaviors>
 		</ListView>
 
-		<details:OfflineBar Grid.Row="0" Grid.RowSpan="2"
+		<details:OfflineBar
 		                    Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
-		<ProgressBar Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+		<ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-		<TextBlock Grid.Row="1" 
-				   x:Uid="EverythingReadBlock"
+		<TextBlock x:Uid="EverythingReadBlock"
 		           Visibility="{Binding Items.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
 				   Style="{StaticResource EverythingReadTextBlockStyle}" />
 
-		<StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+		<StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
 			<AppBarButton Icon="Back" Click="BackButton_OnClick" Margin="0,0,5,0" Style="{StaticResource NextPrevButtonStyle}" />
 			<AppBarButton Icon="Forward" Click="ForwardButton_OnClick" Margin="5,0,0,0" Style="{StaticResource NextPrevButtonStyle}" />
 		</StackPanel>
