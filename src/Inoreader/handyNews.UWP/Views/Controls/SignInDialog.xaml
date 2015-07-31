@@ -1,0 +1,40 @@
+﻿<ContentDialog
+    x:Class="handyNews.UWP.Views.Controls.SignInDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"    
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Uid="SignInDialog"
+    Title="Sign in"
+    PrimaryButtonText="sign in"
+    SecondaryButtonText=""
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    IsPrimaryButtonEnabled="{x:Bind ViewModel.SignInAvailable, Mode=OneWay}">
+
+    <ContentDialog.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///Resources/Styles.aspx" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentDialog.Resources>
+
+    <Grid>
+        <StackPanel>
+            <TextBox x:Uid="SignInEmailBox" Header="user name" PlaceholderText="username" 
+					 Text="{x:Bind ViewModel.Email, Mode=TwoWay}"
+					 Margin="0,10,0,0" />
+            <PasswordBox x:Uid="SignInPasswordBox" Header="password" IsPasswordRevealButtonEnabled="True" Password="{x:Bind ViewModel.Password, Mode=TwoWay}" />
+
+            <!--<Button x:Uid="SignInButton" Content="sign in" Command="{Binding SignInCommand}" />-->
+            
+            <TextBlock x:Uid="SignInOAuthWarning" 
+			            Style="{StaticResource InfoTextStyle}"		   
+					   Text="In case you usually login with your Google of Facebook account: Open the Inoreader profile preferences and set a password. Use this with your username to login." />
+            <HyperlinkButton x:Uid="SignUpButton" Content="sign up" HorizontalAlignment="Left" Foreground="#FF0099EB" FontSize="18.14" NavigateUri="http://www.inoreader.com/" />
+        </StackPanel>
+
+        <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
+    </Grid>
+</ContentDialog>

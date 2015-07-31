@@ -7,7 +7,11 @@ namespace Inoreader.Domain.Services
 	// ReSharper disable once ClassNeverInstantiated.Global
 	public class CredentialService : ICredentialService
 	{
-		private const string AppResourceName = "Inoreader Free";
+#if WINDOWS_UWP
+        private const string AppResourceName = "handy News";
+#else
+        private const string AppResourceName = "Inoreader Free";
+#endif
 
 		public void Save(string userName, string password)
 		{

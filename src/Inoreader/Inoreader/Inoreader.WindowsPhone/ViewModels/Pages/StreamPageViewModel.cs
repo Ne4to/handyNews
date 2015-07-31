@@ -228,9 +228,9 @@ namespace Inoreader.ViewModels.Pages
 			_networkManager.NetworkChanged += _networkManager_NetworkChanged;
 		}
 
-		void _networkManager_NetworkChanged(object sender, NetworkChangedEventArgs e)
+		async void _networkManager_NetworkChanged(object sender, NetworkChangedEventArgs e)
 		{
-			_dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsOffline = !e.Connected);			
+			await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsOffline = !e.Connected);
 		}
 
 		public override void OnNavigatedTo(object navigationParameter, NavigationMode navigationMode, Dictionary<string, object> viewModelState)

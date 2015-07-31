@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{344F7495-2116-43C8-AE71-EBC6C4C00851}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BLL", "BLL", "{3D10D58F-B55D-4F1D-8066-D85136DC0C07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inoreader.Domain", "Inoreader.Domain\Inoreader.Domain.csproj", "{4192BEF7-2C53-4945-A8B0-AAA923C5891D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "handyNews.UWP", "handyNews.UWP\handyNews.UWP.csproj", "{FE435333-C46D-4966-8A39-50C34AF4CDCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,6 +108,32 @@ Global
 		{4192BEF7-2C53-4945-A8B0-AAA923C5891D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4192BEF7-2C53-4945-A8B0-AAA923C5891D}.Release|x64.ActiveCfg = Release|Any CPU
 		{4192BEF7-2C53-4945-A8B0-AAA923C5891D}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|ARM.ActiveCfg = Debug|ARM
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|ARM.Build.0 = Debug|ARM
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|ARM.Deploy.0 = Debug|ARM
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|Mixed Platforms.Deploy.0 = Debug|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|x64.ActiveCfg = Debug|x64
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|x64.Build.0 = Debug|x64
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|x64.Deploy.0 = Debug|x64
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|x86.ActiveCfg = Debug|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|x86.Build.0 = Debug|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Debug|x86.Deploy.0 = Debug|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|Any CPU.ActiveCfg = Release|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|ARM.ActiveCfg = Release|ARM
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|ARM.Build.0 = Release|ARM
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|ARM.Deploy.0 = Release|ARM
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|Mixed Platforms.Build.0 = Release|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|Mixed Platforms.Deploy.0 = Release|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|x64.ActiveCfg = Release|x64
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|x64.Build.0 = Release|x64
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|x64.Deploy.0 = Release|x64
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|x86.ActiveCfg = Release|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|x86.Build.0 = Release|x86
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,5 +143,6 @@ Global
 		{12EC6B39-AC35-4909-B18A-54E427402552} = {3D10D58F-B55D-4F1D-8066-D85136DC0C07}
 		{6B7CA140-A928-4F7C-BDCD-7813EE043D05} = {FA60D082-1956-48EB-809E-FCBC4B0F5E84}
 		{4192BEF7-2C53-4945-A8B0-AAA923C5891D} = {3D10D58F-B55D-4F1D-8066-D85136DC0C07}
+		{FE435333-C46D-4966-8A39-50C34AF4CDCE} = {344F7495-2116-43C8-AE71-EBC6C4C00851}
 	EndGlobalSection
 EndGlobal
