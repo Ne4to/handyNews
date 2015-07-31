@@ -2,6 +2,7 @@
 using Windows.ApplicationModel;
 using Windows.UI.Xaml.Data;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
 
@@ -9,13 +10,13 @@ namespace Inoreader.Converters
 {
 	public class HtmlToShortPlainTextConverter : IValueConverter
 	{
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryClient;
 
 		public HtmlToShortPlainTextConverter()
 		{
 			if (!DesignMode.DesignModeEnabled)
 			{
-				_telemetryClient = ServiceLocator.Current.GetInstance<TelemetryClient>();
+				_telemetryClient = ServiceLocator.Current.GetInstance<ITelemetryManager>();
 			}
 		}
 
@@ -29,7 +30,7 @@ namespace Inoreader.Converters
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryClient.TrackError(e);
 				return String.Empty;
 			}
 		}

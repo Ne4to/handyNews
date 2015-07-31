@@ -12,7 +12,8 @@ using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
-using Microsoft.ApplicationInsights;
+using Inoreader.Domain.Services.Interfaces;
+
 using Microsoft.Practices.ServiceLocation;
 //using Microsoft.Practices.Prism.Mvvm.Interfaces;
 
@@ -20,7 +21,7 @@ namespace Inoreader.Domain.Services
 {
 	public class RichTextBlockBuilder
 	{
-		private readonly TelemetryClient _telemetry;
+		private readonly ITelemetryManager _telemetry;
 		private readonly AppSettingsService _appSettings;
 		private readonly List<Image> _allImages = new List<Image>();
 		private readonly double _maxImageWidth;
@@ -43,7 +44,7 @@ namespace Inoreader.Domain.Services
 				return;
 
 			_appSettings = ServiceLocator.Current.GetInstance<AppSettingsService>();
-			_telemetry = ServiceLocator.Current.GetInstance<TelemetryClient>();
+			_telemetry = ServiceLocator.Current.GetInstance<ITelemetryManager>();
 
 			var displayInformation = DisplayInformation.GetForCurrentView();
 			_maxImageWidth = ImageManager.GetMaxImageWidth(displayInformation);
@@ -115,7 +116,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetry.TrackException(e);
+				_telemetry.TrackError(e);
 				images = _allImages;
 				return new List<Paragraph>();
 			}

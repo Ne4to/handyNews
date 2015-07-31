@@ -6,20 +6,21 @@ using Windows.Storage;
 using Inoreader.Annotations;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Models.States;
-using Microsoft.ApplicationInsights;
+using Inoreader.Domain.Services.Interfaces;
+
 using SQLitePCL;
 
 namespace Inoreader.Domain.Services
 {
 	public class LocalStorageManager
 	{
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 		private const string DatabaseFilename = "data.db";
 
-		public LocalStorageManager(TelemetryClient telemetryClient)
+		public LocalStorageManager(ITelemetryManager telemetryManager)
 		{
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
-			_telemetryClient = telemetryClient;
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
+			_telemetryManager = telemetryManager;
 		}
 
 		public void Init()
@@ -256,7 +257,7 @@ namespace Inoreader.Domain.Services
 				}
 				catch (Exception e)
 				{
-					_telemetryClient.TrackException(e);
+					_telemetryManager.TrackError(e);
 				}
 			});
 		}
@@ -362,7 +363,7 @@ namespace Inoreader.Domain.Services
 		
 		public Task<List<TreeItemBase>> LoadSubscriptionsAsync()
 		{
-			_telemetryClient.TrackEvent(TelemetryEvents.LoadSubscriptionsFromCache);
+			_telemetryManager.TrackEvent(TelemetryEvents.LoadSubscriptionsFromCache);
 
 			return Task.Run(() =>
 			{
@@ -424,7 +425,7 @@ namespace Inoreader.Domain.Services
 				}
 				catch (Exception e)
 				{
-					_telemetryClient.TrackException(e);
+					_telemetryManager.TrackError(e);
 					return null;
 				}
 			});
@@ -527,7 +528,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 			}
 		}
 
@@ -600,7 +601,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 				return null;
 			}
 		}
@@ -681,7 +682,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 				return 0UL;
 			}
 		}
@@ -703,7 +704,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 				return 0UL;
 			}
 		}
@@ -727,7 +728,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 			}
 		}
 
@@ -768,7 +769,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 			}
 		}
 
@@ -794,7 +795,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 			}
 		}
 

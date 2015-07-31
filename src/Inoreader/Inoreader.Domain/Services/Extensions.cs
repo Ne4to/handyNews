@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Windows.Storage;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -26,24 +24,6 @@ namespace Inoreader.Domain.Services
 				return defaultValue;
 
 			return (T)o;
-		}
-
-		public static void TrackExceptionFull(this TelemetryClient telemetryClient, Exception exception)
-		{
-			var exceptionTelemetry = new ExceptionTelemetry(exception);
-			exceptionTelemetry.Properties.Add("Ex.StackTrace", exception.StackTrace);
-			exceptionTelemetry.Properties.Add("Ex.Source", exception.Source);
-			exceptionTelemetry.Properties.Add("Ex.Message", exception.Message);
-			
-			var baseException = exception.GetBaseException();
-			if (baseException != null)
-			{
-				exceptionTelemetry.Properties.Add("Ex.Base.Message", baseException.Message);
-				exceptionTelemetry.Properties.Add("Ex.Base.Source", baseException.Source);
-				exceptionTelemetry.Properties.Add("Ex.Base.StackTrace", baseException.StackTrace);
-			}
-
-			telemetryClient.TrackException(exceptionTelemetry);
 		}
 
 		public static DateTime GetBeginWeekDate(this DateTime date, DayOfWeek startOfWeek = DayOfWeek.Monday)

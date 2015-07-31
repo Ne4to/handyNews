@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Inoreader.Annotations;
 using Inoreader.Api;
-using Microsoft.ApplicationInsights;
+using Inoreader.Domain.Services.Interfaces;
+
 
 namespace Inoreader.Domain.Services
 {
@@ -13,23 +14,23 @@ namespace Inoreader.Domain.Services
 		private const int FalseValue = 0;
 
 		private readonly ApiClient _apiClient;
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 		private readonly LocalStorageManager _localStorageManager;
 
 		private int _currentBusy = FalseValue;
 
 		public TagsManager([NotNull] ApiClient apiClient,
-			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] NetworkManager networkManager,
 			[NotNull] LocalStorageManager localStorageManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 			if (networkManager == null) throw new ArgumentNullException("networkManager");
 			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 
 			_apiClient = apiClient;
-			_telemetryClient = telemetryClient;
+			_telemetryManager = telemetryManager;
 			_localStorageManager = localStorageManager;
 
 			networkManager.NetworkChanged += networkManager_NetworkChanged;
@@ -74,7 +75,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryManager.TrackError(ex);
 			}
 
 			try
@@ -83,7 +84,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryManager.TrackError(ex);
 			}
 		}
 
@@ -96,7 +97,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryManager.TrackError(ex);
 			}
 
 			try
@@ -105,7 +106,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryManager.TrackError(ex);
 			}
 		}
 
@@ -138,7 +139,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackExceptionFull(ex);
+				_telemetryManager.TrackError(ex);
 			}
 			finally
 			{
