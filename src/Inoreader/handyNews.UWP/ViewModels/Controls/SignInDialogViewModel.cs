@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Inoreader;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using ReactiveUI;
 // ReSharper disable ExplicitCallerInfoArgument
 
@@ -19,13 +21,15 @@ namespace handyNews.UWP.ViewModels.Controls
         private string _email;
         private string _password;
         private bool _isBusy;
+        private string _signInError;
 
         #endregion
 
         #region Properties
 
         public ICredentialService CredentialService { get; set; }
-        
+        public ITelemetryManager TelemetryManager { get; set; }
+
         public string Email
         {
             get { return _email; }
@@ -56,6 +60,12 @@ namespace handyNews.UWP.ViewModels.Controls
             }
         }
 
+        public string SignInError
+        {
+            get { return _signInError; }
+            set { SetProperty(ref _signInError, value); }
+        }
+
         public bool SignInAvailable => !string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Password) && !IsBusy;
 
         #endregion
@@ -65,39 +75,30 @@ namespace handyNews.UWP.ViewModels.Controls
             if (!SignInAvailable)
                 return false;
 
+            SignInError = null;
             IsBusy = true;
-
-            Exception error = null;
 
             try
             {
                 await Task.Delay(3000);
+                throw new NotImplementedException("ISignInManager is not implemented");
                 //await _apiClient.SignInAsync(Email, Password);
 
-                //_telemetryClient.TrackEvent(TelemetryEvents.SignIn);
-
+                TelemetryManager.TrackEvent(TelemetryEvents.SignIn);
                 CredentialService.Save(Email, Password);
-
-                //_navigationService.Navigate(PageTokens.Subscriptions, null);
                 return true;
             }
             catch (Exception ex)
             {
-                error = ex;
-                //_telemetryClient.TrackExceptionFull(ex);
+                TelemetryManager.TrackError(ex);
+                SignInError = ex.Message;
 
                 return false;
             }
             finally
             {
                 IsBusy = false;
-            }
-
-            //if (error != null)
-            //{
-            //    MessageDialog msgbox = new MessageDialog(error.Message, Strings.Resources.ErrorDialogTitle);
-            //    await msgbox.ShowAsync();
-            //}
+            }            
         }
     }
 }

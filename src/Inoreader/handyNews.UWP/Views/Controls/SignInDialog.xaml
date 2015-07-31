@@ -33,6 +33,8 @@
 			            Style="{StaticResource InfoTextStyle}"		   
 					   Text="In case you usually login with your Google of Facebook account: Open the Inoreader profile preferences and set a password. Use this with your username to login." />
             <HyperlinkButton x:Uid="SignUpButton" Content="sign up" HorizontalAlignment="Left" Foreground="#FF0099EB" FontSize="18.14" NavigateUri="http://www.inoreader.com/" />
+
+            <TextBlock Text="{x:Bind ViewModel.SignInError, Mode=OneWay}" />
         </StackPanel>
 
         <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />

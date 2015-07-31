@@ -2,6 +2,7 @@
   "dependencies": {
     "Autofac": "3.5.2",
     "Autofac.Extras.CommonServiceLocator": "3.2.0",
+    "Microsoft.ApplicationInsights.WindowsApps": "1.0.0",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
     "reactiveui": "6.5.0",
     "splat": "1.6.2"

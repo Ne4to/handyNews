@@ -19,6 +19,7 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>handyNews.UWP_StoreKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>9DF2DC655063A88E21DFCE6B8534A1EAB8462DBD</PackageCertificateThumbprint>
+    <ApplicationInsightsResourceId />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -93,11 +94,18 @@
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="handyNews.UWP_StoreKey.pfx" />
     <None Include="project.json" />
+    <None Include="Service References\Application Insights\ConnectedService.json" />
     <PRIResource Include="Strings\ru-RU\Resources.resw" />
     <PRIResource Include="Strings\pt-BR\Resources.resw" />
     <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Inoreader\Inoreader.WindowsPhone\ApplicationInsightsTelemetryManager.cs">
+      <Link>Services\ApplicationInsightsTelemetryManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Inoreader\Inoreader.WindowsPhone\TelemetryEvents.cs">
+      <Link>TelemetryEvents.cs</Link>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -154,6 +162,9 @@
       <Project>{4192BEF7-2C53-4945-A8B0-AAA923C5891D}</Project>
       <Name>Inoreader.Domain</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

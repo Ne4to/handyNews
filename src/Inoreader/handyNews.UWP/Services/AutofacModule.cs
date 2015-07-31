@@ -1,7 +1,10 @@
 ﻿using Autofac;
 using Autofac.Extras.CommonServiceLocator;
 using handyNews.UWP.ViewModels.Controls;
+using Inoreader;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
+using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
 
 namespace handyNews.UWP.Services
@@ -14,10 +17,17 @@ namespace handyNews.UWP.Services
 
             builder.RegisterType<CredentialService>()
                 .As<ICredentialService>();
-        
+
+            builder.RegisterInstance(new ApplicationInsightsTelemetryManager(new TelemetryClient()))
+                .As<ITelemetryManager>()
+                .SingleInstance();
+            //builder.RegisterType<ApplicationInsightsTelemetryManager>()
+            //    .As<ITelemetryManager>()
+            //    .SingleInstance();
+
             builder.RegisterType<SignInDialogViewModel>()
-                .As<SignInDialogViewModel>().
-                PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+                .As<SignInDialogViewModel>()
+                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             // Perform registrations and build the container.
             var container = builder.Build();
