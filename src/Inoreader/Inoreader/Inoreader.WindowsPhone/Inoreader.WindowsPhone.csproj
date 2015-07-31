@@ -89,6 +89,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ApplicationInsightsTelemetryManager.cs" />
     <Compile Include="Behaviors\DataContextPresenter.cs" />
     <Compile Include="Behaviors\DependencyPropertyChangedHelper.cs" />
     <Compile Include="Behaviors\ItemsScrollBehavior.cs" />

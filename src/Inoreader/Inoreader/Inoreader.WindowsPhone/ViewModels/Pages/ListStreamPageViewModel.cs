@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Inoreader.Annotations;
 using Inoreader.Api;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 
@@ -15,7 +16,7 @@ namespace Inoreader.ViewModels.Pages
 	{
 		public ListStreamPageViewModel([NotNull] ApiClient apiClient, 
 			[NotNull] INavigationService navigationService, 
-			[NotNull] TelemetryClient telemetryClient, 
+			[NotNull] ITelemetryManager telemetryManager, 
 			[NotNull] TagsManager tagsManager, 
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
@@ -23,7 +24,7 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] NetworkManager networkManager) 
 			: base(apiClient, 
 				navigationService, 
-				telemetryClient, 
+				telemetryManager, 
 				tagsManager, 
 				settingsService,
 				savedStreamManager, 

@@ -7,6 +7,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Api;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -20,7 +21,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly INavigationService _navigationService;
 		private readonly ICredentialService _credentialService;
 		private readonly ApiClient _apiClient;
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 
 		#region Fields
 
@@ -82,17 +83,17 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ApiClient apiClient, TelemetryClient telemetryClient)
+		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ApiClient apiClient, ITelemetryManager telemetryManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (credentialService == null) throw new ArgumentNullException("credentialService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 
 			_navigationService = navigationService;
 			_credentialService = credentialService;
 			_apiClient = apiClient;
-			_telemetryClient = telemetryClient;
+			_telemetryManager = telemetryManager;
 		}
 
 #if DEBUG
@@ -136,8 +137,8 @@ namespace Inoreader.ViewModels.Pages
 				await _apiClient.SignInAsync(Email, Password);
 				
 				stopwatch.Stop();
-				_telemetryClient.TrackMetric(TemetryMetrics.SignInResponseTime, stopwatch.Elapsed.TotalSeconds);
-				_telemetryClient.TrackEvent(TelemetryEvents.SignIn);
+				_telemetryManager.TrackMetric(TemetryMetrics.SignInResponseTime, stopwatch.Elapsed.TotalSeconds);
+				_telemetryManager.TrackEvent(TelemetryEvents.SignIn);
 				
 				if (RememberMe)
 				{
@@ -149,7 +150,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackExceptionFull(ex);				
+				_telemetryManager.TrackError(ex);				
 			}
 			finally
 			{

@@ -8,7 +8,8 @@ using Windows.Data.Html;
 using Inoreader.Api;
 using Inoreader.Api.Models;
 using Inoreader.Domain.Models;
-using Microsoft.ApplicationInsights;
+using Inoreader.Domain.Services.Interfaces;
+
 
 namespace Inoreader.Domain.Services
 {
@@ -18,17 +19,17 @@ namespace Inoreader.Domain.Services
 		private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
 		private readonly ApiClient _apiClient;
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 		private readonly AppSettingsService _settingsService;
 
-		public SubscriptionsManager(ApiClient apiClient, TelemetryClient telemetryClient, AppSettingsService settingsService)
+		public SubscriptionsManager(ApiClient apiClient, ITelemetryManager telemetryManager, AppSettingsService settingsService)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 
 			_apiClient = apiClient;
-			_telemetryClient = telemetryClient;
+			_telemetryManager = telemetryManager;
 			_settingsService = settingsService;
 		}
 
@@ -41,7 +42,7 @@ namespace Inoreader.Domain.Services
 			var unreadCount = await _apiClient.GetUnreadCountAsync();
 
 			stopwatch.Stop();
-			_telemetryClient.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
+			_telemetryManager.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
 
 			var unreadCountDictionary = new Dictionary<string, int>();
 			foreach (var unreadcount in unreadCount.UnreadCounts)

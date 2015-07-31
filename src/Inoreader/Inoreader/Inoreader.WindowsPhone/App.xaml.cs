@@ -12,6 +12,7 @@ using Inoreader.Api;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Models.States;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using Inoreader.ViewModels.Pages;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -67,8 +68,11 @@ namespace Inoreader
 			_container.RegisterType<NetworkManager>(new ContainerControlledLifetimeManager());
 			_container.RegisterType<TileManager>(new ContainerControlledLifetimeManager());
 			_container.RegisterInstance(_appSettingsService);
-			_container.RegisterInstance(_telemetryClient);
-			_container.RegisterType<ImageManager>(new ContainerControlledLifetimeManager());
+
+            var telemetryManager = new ApplicationInsightsTelemetryManager(_telemetryClient);
+            _container.RegisterInstance<ITelemetryManager>(telemetryManager);
+            //_container.RegisterInstance(_telemetryClient);
+            _container.RegisterType<ImageManager>(new ContainerControlledLifetimeManager());
 
 			var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
@@ -80,7 +84,7 @@ namespace Inoreader
 			_apiClient = new ApiClient(appId, appKey);
 			_container.RegisterInstance(_apiClient);
 
-			var localStorageManager = new LocalStorageManager(_telemetryClient);
+			var localStorageManager = new LocalStorageManager(telemetryManager);
 			localStorageManager.Init();
 			_container.RegisterInstance(localStorageManager);
 

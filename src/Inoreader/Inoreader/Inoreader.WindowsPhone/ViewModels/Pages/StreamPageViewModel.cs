@@ -15,6 +15,7 @@ using Inoreader.Api.Exceptions;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Models.States;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -28,7 +29,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private readonly ApiClient _apiClient;
 		private readonly INavigationService _navigationService;
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 		private readonly TagsManager _tagsManager;
 		private readonly SavedStreamManager _savedStreamManager;
 		private readonly LocalStorageManager _localStorageManager;
@@ -192,7 +193,7 @@ namespace Inoreader.ViewModels.Pages
 
 		public StreamPageViewModel([NotNull] ApiClient apiClient,
 			[NotNull] INavigationService navigationService,
-			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TagsManager tagsManager,
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
@@ -201,7 +202,7 @@ namespace Inoreader.ViewModels.Pages
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
 			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
@@ -210,7 +211,7 @@ namespace Inoreader.ViewModels.Pages
 
 			_apiClient = apiClient;
 			_navigationService = navigationService;
-			_telemetryClient = telemetryClient;
+			_telemetryManager = telemetryManager;
 			_tagsManager = tagsManager;
 			_savedStreamManager = savedStreamManager;
 			_localStorageManager = localStorageManager;
@@ -312,7 +313,7 @@ namespace Inoreader.ViewModels.Pages
 				return false;
 
 			_currentItem = itemsState.Items.FirstOrDefault(i => i.IsSelected);
-			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryClient, b => IsBusy = b, _preloadItemCount);
+			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryManager, b => IsBusy = b, _preloadItemCount);
 			Items.LoadMoreItemsError += (sender, args) => IsOffline = true;
 
 			return true;
@@ -337,7 +338,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackExceptionFull(ex);
+				_telemetryManager.TrackError(ex);
 			}
 			finally
 			{
@@ -354,7 +355,7 @@ namespace Inoreader.ViewModels.Pages
 
 			if (cacheData != null)
 			{
-				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryClient, b => IsBusy = b, _preloadItemCount);
+				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryManager, b => IsBusy = b, _preloadItemCount);
 				_currentItem = items.FirstOrDefault(i => i.IsSelected);
 				_currentItemRead = _currentItem != null && !_currentItem.Unread;
 				CurrentItemReadEnabled = _currentItem != null;
@@ -372,7 +373,7 @@ namespace Inoreader.ViewModels.Pages
 		{
 			await _localStorageManager.ClearTempFilesAsync();
 
-			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryClient, AllArticles, b => IsBusy = b, _preloadItemCount);
+			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryManager, AllArticles, b => IsBusy = b, _preloadItemCount);
 			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			await streamItems.InitAsync();
 			
@@ -500,13 +501,13 @@ namespace Inoreader.ViewModels.Pages
 				return;
 
 			var uri = new Uri(_currentItem.WebUri);
-			_telemetryClient.TrackEvent(TelemetryEvents.OpenItemInWeb);
+			_telemetryManager.TrackEvent(TelemetryEvents.OpenItemInWeb);
 			await Launcher.LaunchUriAsync(uri);
 		}
 
 		private void OnRefresh()
 		{
-			_telemetryClient.TrackEvent(TelemetryEvents.ManualRefreshStream);
+			_telemetryManager.TrackEvent(TelemetryEvents.ManualRefreshStream);
 			LoadData();
 		}
 
@@ -527,7 +528,7 @@ namespace Inoreader.ViewModels.Pages
 			}
 			catch (Exception e)
 			{
-				_telemetryClient.TrackException(e);
+				_telemetryManager.TrackError(e);
 			}
 		}
 
@@ -605,7 +606,7 @@ namespace Inoreader.ViewModels.Pages
 			Exception error = null;
 			try
 			{
-				_telemetryClient.TrackEvent(TelemetryEvents.MarkAllAsRead);
+				_telemetryManager.TrackEvent(TelemetryEvents.MarkAllAsRead);
 				await _apiClient.MarkAllAsReadAsync(Items.StreamId, Items.StreamTimestamp);
 
 				foreach (var item in Items)
@@ -618,7 +619,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackException(ex);
+				_telemetryManager.TrackError(ex);
 			}
 
 			if (error == null) return;

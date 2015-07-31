@@ -13,6 +13,7 @@ using Inoreader.Api;
 using Inoreader.Api.Exceptions;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -27,7 +28,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly INavigationService _navigationService;
 		private readonly ApiClient _apiClient;
 		private readonly AppSettingsService _settingsService;
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 		private readonly TileManager _tileManager;
 		private readonly LocalStorageManager _localStorageManager;
 		private readonly SubscriptionsManager _subscriptionsManager;
@@ -128,7 +129,7 @@ namespace Inoreader.ViewModels.Pages
 		public SubscriptionsPageViewModel([NotNull] INavigationService navigationService,
 			[NotNull] ApiClient apiClient,
 			[NotNull] AppSettingsService settingsService,
-			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TileManager tileManager,
 			[NotNull] LocalStorageManager localStorageManager,
 			[NotNull] SubscriptionsManager subscriptionsManager,
@@ -137,7 +138,7 @@ namespace Inoreader.ViewModels.Pages
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (settingsService == null) throw new ArgumentNullException("settingsService");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 			if (tileManager == null) throw new ArgumentNullException("tileManager");
 			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 			if (subscriptionsManager == null) throw new ArgumentNullException("subscriptionsManager");
@@ -146,7 +147,7 @@ namespace Inoreader.ViewModels.Pages
 			_navigationService = navigationService;
 			_apiClient = apiClient;
 			_settingsService = settingsService;
-			_telemetryClient = telemetryClient;
+			_telemetryManager = telemetryManager;
 			_tileManager = tileManager;
 			_localStorageManager = localStorageManager;
 			_subscriptionsManager = subscriptionsManager;
@@ -198,7 +199,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackExceptionFull(ex);
+				_telemetryManager.TrackError(ex);
 			}
 			finally
 			{
@@ -272,7 +273,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private void OnRefresh()
 		{
-			_telemetryClient.TrackEvent(TelemetryEvents.ManualRefreshSubscriptions);
+			_telemetryManager.TrackEvent(TelemetryEvents.ManualRefreshSubscriptions);
 			LoadSubscriptions();
 		}
 
@@ -296,7 +297,7 @@ namespace Inoreader.ViewModels.Pages
 			Exception error = null;
 			try
 			{
-				_telemetryClient.TrackEvent(TelemetryEvents.MarkAllAsRead);
+				_telemetryManager.TrackEvent(TelemetryEvents.MarkAllAsRead);
 
 				var timestamp = GetUnixTimeStamp();
 				await _apiClient.MarkAllAsReadAsync(item.Id, timestamp);
@@ -306,7 +307,7 @@ namespace Inoreader.ViewModels.Pages
 			catch (Exception ex)
 			{
 				error = ex;
-				_telemetryClient.TrackException(ex);
+				_telemetryManager.TrackError(ex);
 			}
 
 			if (error == null) return;

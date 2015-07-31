@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Store;
 using Windows.System;
+using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -11,7 +12,7 @@ namespace Inoreader.ViewModels.Pages
 {
 	public class AboutPageViewModel : ViewModel
 	{
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 
 		#region Fields
 
@@ -49,27 +50,27 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public AboutPageViewModel(TelemetryClient telemetryClient)
+		public AboutPageViewModel(ITelemetryManager telemetryManager)
 		{
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
-			_telemetryClient = telemetryClient;
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
+			_telemetryManager = telemetryManager;
 		}
 
 		private async void OnReview()
 		{
-			_telemetryClient.TrackEvent(TelemetryEvents.Review);
+			_telemetryManager.TrackEvent(TelemetryEvents.Review);
 			await Launcher.LaunchUriAsync(new Uri("ms-windows-store:reviewapp?appid=" + CurrentApp.AppId));
 		}
 
 		private async void OnSubmitBug()
 		{
-			_telemetryClient.TrackEvent(TelemetryEvents.SubmitBug);
+			_telemetryManager.TrackEvent(TelemetryEvents.SubmitBug);
 			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/handyNews/issues/new"));
 		}
 		
 		private async void OnContribute()
 		{			
-			_telemetryClient.TrackEvent(TelemetryEvents.Contribute);
+			_telemetryManager.TrackEvent(TelemetryEvents.Contribute);
 			await Launcher.LaunchUriAsync(new Uri("https://github.com/Ne4to/handyNews"));
 		}
 	}

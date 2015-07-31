@@ -16,7 +16,8 @@ using Inoreader.Api;
 using Inoreader.Api.Models;
 using Inoreader.Domain.Models.States;
 using Inoreader.Domain.Services;
-using Microsoft.ApplicationInsights;
+using Inoreader.Domain.Services.Interfaces;
+
 
 namespace Inoreader.Domain.Models
 {
@@ -25,7 +26,7 @@ namespace Inoreader.Domain.Models
 		private readonly ApiClient _apiClient;
 		private readonly string _streamId;
 		private readonly bool _showNewestFirst;
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 		private readonly Action<bool> _onBusy;
 		private string _continuation;
 		private int _streamTimestamp;
@@ -47,17 +48,17 @@ namespace Inoreader.Domain.Models
 
 		public event EventHandler LoadMoreItemsError;
 
-		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, TelemetryClient telemetryClient, bool allArticles, Action<bool> onBusy, int preloadItemsCount)
+		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, ITelemetryManager telemetryManager, bool allArticles, Action<bool> onBusy, int preloadItemsCount)
 			: base(preloadItemsCount)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (streamId == null) throw new ArgumentNullException("streamId");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 			if (onBusy == null) throw new ArgumentNullException("onBusy");
 
 			_apiClient = apiClient;
 			_streamId = streamId;
-			_telemetryClient = telemetryClient;
+			_telemetryManager = telemetryManager;
 			_onBusy = onBusy;
 			_showNewestFirst = showNewestFirst;
 			_allArticles = allArticles;
@@ -66,18 +67,18 @@ namespace Inoreader.Domain.Models
 
 		public StreamItemCollection([NotNull] StreamItemCollectionState state,
 			[NotNull] ApiClient apiClient,
-			[NotNull] TelemetryClient telemetryClient,
+			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] Action<bool> onBusy,
 			int preloadItemsCount)
 			: base(state.Items.Length)
 		{
 			if (state == null) throw new ArgumentNullException("state");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 			if (onBusy == null) throw new ArgumentNullException("onBusy");
 
 			_apiClient = apiClient;
-			_telemetryClient = telemetryClient;
+			_telemetryManager = telemetryManager;
 			_onBusy = onBusy;
 
 			_streamId = state.StreamId;
@@ -143,7 +144,7 @@ namespace Inoreader.Domain.Models
 				_streamTimestamp = stream.updated;
 
 				stopwatch.Stop();
-				_telemetryClient.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
+				_telemetryManager.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
 			}
 			finally
 			{
@@ -209,7 +210,7 @@ namespace Inoreader.Domain.Models
 			catch (Exception ex)
 			{
 				_fault = true;
-				_telemetryClient.TrackExceptionFull(ex);
+				_telemetryManager.TrackError(ex);
 
 				if (LoadMoreItemsError != null)
 					LoadMoreItemsError(this, EventArgs.Empty);

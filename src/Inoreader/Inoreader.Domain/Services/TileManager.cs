@@ -12,8 +12,9 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Inoreader.Annotations;
+using Inoreader.Domain.Services.Interfaces;
 using Inoreader.Domain.Views.Controls;
-using Microsoft.ApplicationInsights;
+
 using NotificationsExtensions.TileContent;
 
 namespace Inoreader.Domain.Services
@@ -25,12 +26,12 @@ namespace Inoreader.Domain.Services
 		private const string SquareFileName = "SquareTile.png";
 		private const string SquareSmallFileName = "SquareSmallTile.png";
 
-		private readonly TelemetryClient _telemetryClient;
+		private readonly ITelemetryManager _telemetryManager;
 
-		public TileManager([NotNull] TelemetryClient telemetryClient)
+		public TileManager([NotNull] ITelemetryManager telemetryManager)
 		{
-			if (telemetryClient == null) throw new ArgumentNullException("telemetryClient");
-			_telemetryClient = telemetryClient;
+			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
+			_telemetryManager = telemetryManager;
 		}
 
 		public async void UpdateAsync(long count)
@@ -77,7 +78,7 @@ namespace Inoreader.Domain.Services
 			}
 			catch (Exception ex)
 			{
-				_telemetryClient.TrackException(ex);
+				_telemetryManager.TrackError(ex);
 			}
 		}
 
