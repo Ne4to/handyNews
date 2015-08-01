@@ -10,10 +10,9 @@ using Inoreader.Api.Models;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Services.Interfaces;
 
-
 namespace Inoreader.Domain.Services
 {
-	public class SubscriptionsManager
+	public class SubscriptionsManager : ISubscriptionsManager
 	{
 		private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
 		private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -24,16 +23,16 @@ namespace Inoreader.Domain.Services
 
 		public SubscriptionsManager(ApiClient apiClient, ITelemetryManager telemetryManager, ISettingsManager settingsService)
 		{
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (settingsService == null) throw new ArgumentNullException("settingsService");
+			if (apiClient == null) throw new ArgumentNullException(nameof(apiClient));
+			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+			if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
 
 			_apiClient = apiClient;
 			_telemetryManager = telemetryManager;
 			_settingsService = settingsService;
 		}
 
-		public async Task<List<TreeItemBase>> LoadSubscriptionsAsync()
+		public async Task<List<SubscriptionItemBase>> LoadSubscriptionsAsync()
 		{
 			var stopwatch = Stopwatch.StartNew();
 
@@ -66,7 +65,7 @@ namespace Inoreader.Domain.Services
 								where s.Categories != null
 									  && s.Categories.Any(c => String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
 								orderby s.Title// descending 
-								select CreateSubscriptionItem(s, unreadCountDictionary);
+								select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max);
 
 				categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
 				categoryItem.Title = (from s in subscriptions.Subscriptions
@@ -75,15 +74,17 @@ namespace Inoreader.Domain.Services
 									  select HtmlUtilities.ConvertToText(c.Label)).FirstOrDefault();
 
 				categoryItem.UnreadCount = categoryItem.Subscriptions.Sum(t => t.UnreadCount);
+                categoryItem.IsMaxUnread = categoryItem.Subscriptions.Any(t => t.IsMaxUnread);
 
-				var readAllItem = new SubscriptionItem
+                var readAllItem = new SubscriptionItem
 				{
 					Id = categoryItem.Id,
 					SortId = categoryItem.SortId,
 					IconUrl = ReadAllIconUrl,
 					Title = Strings.Resources.ReadAllSubscriptionItem,
 					PageTitle = categoryItem.Title,
-					UnreadCount = categoryItem.UnreadCount
+					UnreadCount = categoryItem.UnreadCount,
+                    IsMaxUnread = categoryItem.IsMaxUnread
 				};
 
 				categoryItem.Subscriptions.Insert(0, readAllItem);
@@ -95,19 +96,21 @@ namespace Inoreader.Domain.Services
 			var singleItems = (from s in subscriptions.Subscriptions
 							   where s.Categories == null || s.Categories.Length == 0
 							   orderby s.Title
-							   select CreateSubscriptionItem(s, unreadCountDictionary)).ToList();
+							   select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max)).ToList();
 
-			var allItems = new List<TreeItemBase>(categories.OrderBy(c => c.Title));
+			var allItems = new List<SubscriptionItemBase>(categories.OrderBy(c => c.Title));
 			allItems.AddRange(singleItems);
 
 			var totalUnreadCount = allItems.Sum(t => t.UnreadCount);
+		    var isTotalMax = allItems.Any(t => t.IsMaxUnread);
 			var readAllRootItem = new SubscriptionItem
 			{
 				Id = SpecialTags.Read,
 				IconUrl = ReadAllIconUrl,
 				Title = Strings.Resources.ReadAllSubscriptionItem,
 				PageTitle = Strings.Resources.ReadAllSubscriptionItem,
-				UnreadCount = totalUnreadCount
+				UnreadCount = totalUnreadCount,
+                IsMaxUnread = isTotalMax
 			};
 			allItems.Insert(0, readAllRootItem);
 
@@ -119,9 +122,10 @@ namespace Inoreader.Domain.Services
 			return allItems;			
 		}
 
-		private static SubscriptionItem CreateSubscriptionItem(Subscription s, Dictionary<string, int> unreadCountDictionary)
+		private static SubscriptionItem CreateSubscriptionItem(Subscription s, Dictionary<string, int> unreadCountDictionary, int maxUnread)
 		{
-			return new SubscriptionItem
+		    var unreadCount = GetUnreadCount(unreadCountDictionary, s.Id);
+		    return new SubscriptionItem
 			{
 				Id = s.Id,
 				SortId = s.SortId,
@@ -131,17 +135,18 @@ namespace Inoreader.Domain.Services
 				Title = HtmlUtilities.ConvertToText(s.Title),
 				PageTitle = HtmlUtilities.ConvertToText(s.Title),
 				FirstItemMsec = s.FirstItemMsec,
-				UnreadCount = GetUnreadCount(unreadCountDictionary, s.Id)
+				UnreadCount = unreadCount,
+                IsMaxUnread = unreadCount == maxUnread
 			};
 		}
 
-		private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)
+	    private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)
 		{
 			int count;
 			return unreadCounts.TryGetValue(id, out count) ? count : 0;
 		}
 
-		private void HideEmpty(List<TreeItemBase> allItems)
+		private void HideEmpty(List<SubscriptionItemBase> allItems)
 		{
 			allItems.RemoveAll(c => c.UnreadCount == 0);
 			foreach (var cat in allItems.OfType<CategoryItem>())
