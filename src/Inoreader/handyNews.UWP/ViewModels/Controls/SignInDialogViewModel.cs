@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
+using Windows.Storage;
 using handyNews.UWP.Model;
 using Inoreader;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
+using Newtonsoft.Json.Linq;
 
 // ReSharper disable ExplicitCallerInfoArgument
 
@@ -23,6 +27,7 @@ namespace handyNews.UWP.ViewModels.Controls
         #region Properties
 
         public ICredentialService CredentialService { get; set; }
+        public ISignInManager SignInManager { get; set; }
         public ITelemetryManager TelemetryManager { get; set; }
 
         public string Email
@@ -75,9 +80,7 @@ namespace handyNews.UWP.ViewModels.Controls
 
             try
             {
-                await Task.Delay(3000);
-                throw new NotImplementedException("ISignInManager is not implemented");
-                //await _apiClient.SignInAsync(Email, Password);
+                await SignInManager.SignInAsync(Email, Password);
 
                 TelemetryManager.TrackEvent(TelemetryEvents.SignIn);
                 CredentialService.Save(Email, Password);
@@ -94,6 +97,24 @@ namespace handyNews.UWP.ViewModels.Controls
             {
                 IsBusy = false;
             }            
+        }
+
+        [Conditional("DEBUG")]
+        public async void SetDebugUser()
+        {
+            try
+            {
+                var uri = new Uri("ms-appx:///Assets/DebugSignInData.json");
+                var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
+                var strData = await FileIO.ReadTextAsync(file);
+                var data = JObject.Parse(strData);
+
+                Email = data["username"].ToString();
+                Password = data["password"].ToString();
+            }
+            catch (FileNotFoundException)
+            {
+            }
         }
     }
 }

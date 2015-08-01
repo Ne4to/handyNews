@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Inoreader.Domain.Services.Interfaces;
+using Microsoft.Practices.ServiceLocation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -30,8 +32,12 @@ namespace handyNews.UWP.Views
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            SignInDialog dialog = new SignInDialog();
-            await dialog.ShowAsync();
+            var signInManager = ServiceLocator.Current.GetInstance<ISignInManager>();
+            if (signInManager.SignInRequired)
+            {
+                SignInDialog dialog = new SignInDialog();
+                await dialog.ShowAsync();
+            }
         }
     }
 }

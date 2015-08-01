@@ -10,7 +10,7 @@
     PrimaryButtonText="sign in"
     SecondaryButtonText=""
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    IsPrimaryButtonEnabled="{x:Bind ViewModel.SignInAvailable, Mode=OneWay}">
+    IsPrimaryButtonEnabled="{x:Bind ViewModel.SignInAvailable, Mode=OneWay}" Loaded="SignInDialog_OnLoaded">
 
     <ContentDialog.Resources>
         <ResourceDictionary>

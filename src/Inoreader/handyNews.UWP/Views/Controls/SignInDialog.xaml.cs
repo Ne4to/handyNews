@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml.Controls;
+﻿using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using handyNews.UWP.ViewModels.Controls;
 using Microsoft.Practices.ServiceLocation;
 
@@ -38,6 +39,11 @@ namespace handyNews.UWP.Views.Controls
             {
                 deferral.Complete();
             }
+        }
+
+        private void SignInDialog_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ViewModel.SetDebugUser();
         }
     }
 }
