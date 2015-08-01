@@ -96,6 +96,9 @@
     <Compile Include="Models\TreeItemBase.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ApiSession.cs" />
+    <Compile Include="Services\Interfaces\ISessionStore.cs" />
+    <Compile Include="Services\SessionStore.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CredentialService.cs" />
     <Compile Include="Services\Extensions.cs" />
@@ -104,6 +107,7 @@
     <Compile Include="Services\ICredentialService.cs" />
     <Compile Include="Services\ILexeme.cs" />
     <Compile Include="Services\ImageManager.cs" />
+    <Compile Include="Services\Interfaces\ISignInManager.cs" />
     <Compile Include="Services\Interfaces\ITelemetryManager.cs" />
     <Compile Include="Services\LiteralLexeme.cs" />
     <Compile Include="Services\LocalStorageManager.cs" />
@@ -112,6 +116,7 @@
     <Compile Include="Services\SavedStreamManager.cs" />
     <Compile Include="Services\ScrollUtils.cs" />
     <Compile Include="Services\ScrollViewerState.cs" />
+    <Compile Include="Services\SignInManager.cs" />
     <Compile Include="Services\SpecialTags.cs" />
     <Compile Include="Services\StringParameters.cs" />
     <Compile Include="Services\SubscriptionsManager.cs" />

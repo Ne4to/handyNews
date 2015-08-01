@@ -12,64 +12,55 @@ namespace Inoreader.Api
 {
 	public class ApiClient
 	{
-		private readonly HttpClient _httpClient;
-		private readonly ApiSessionStore _sessionStore;
-
-		public bool SignInRequired
+	    private readonly IApiSession _apiSession;
+	    private readonly HttpClient _httpClient;
+		
+	    public ApiClient(string appId, string appKey, IApiSession apiSession)
 		{
-			get { return String.IsNullOrEmpty(_sessionStore.Auth); }
-		}
-
-		public ApiClient(string appId, string appKey)
-		{
-			var httpClientHandler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+	        if (apiSession == null) throw new ArgumentNullException(nameof(apiSession));
+            _apiSession = apiSession;
+	        
+            var httpClientHandler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
 			_httpClient = new HttpClient(httpClientHandler);
 			_httpClient.DefaultRequestHeaders.Add("AppId", appId);
 			_httpClient.DefaultRequestHeaders.Add("AppKey", appKey);
 			_httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue()
 			{
 				NoCache = true
-			};
-			_sessionStore = new ApiSessionStore();
+			};			
 		}
+        
+	    public async Task<SignInResponse> SignInAsync(string email, string password)
+	    {
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("Email", email),
+                new KeyValuePair<string, string>("Passwd", password)
+            });
 
-		public void ClearSession()
-		{
-			_sessionStore.Clear();
-			_sessionStore.Save();
-		}
+            var response = await _httpClient.PostAsync(@"https://www.inoreader.com/accounts/ClientLogin", content).ConfigureAwait(false);
 
-		/// <exception cref="AuthenticationApiException"></exception>		
-		public async Task<SignInResponse> SignInAsync(string email, string password)
-		{
-			var content = new FormUrlEncodedContent(new[]
-			{
-				new KeyValuePair<string, string>("Email", email), 
-				new KeyValuePair<string, string>("Passwd", password)
-			});
+	        if (response.StatusCode == HttpStatusCode.Unauthorized)
+	        {
+	            return new SignInResponse
+	            {
+	                Success = false,
+	                ErrorMessage = await response.Content.ReadAsStringAsync().ConfigureAwait(false)
+	            };
+	        }
 
-			var response = await _httpClient.PostAsync(@"https://www.inoreader.com/accounts/ClientLogin", content).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
 
-			if (response.StatusCode == HttpStatusCode.Unauthorized)
-				throw new AuthenticationApiException(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return GetSignInResult(responseString);
+        }
 
-			response.EnsureSuccessStatusCode();
-
-			var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-			var signInResponse = GetSignInResult(responseString);
-
-			_sessionStore.SID = signInResponse.SID;
-			_sessionStore.LSID = signInResponse.LSID;
-			_sessionStore.Auth = signInResponse.Auth;
-			_sessionStore.Save();
-
-			return signInResponse;
-		}
-
-		private static SignInResponse GetSignInResult(string responseString)
-		{
-			SignInResponse response = new SignInResponse();
+	    private static SignInResponse GetSignInResult(string responseString)
+	    {
+	        SignInResponse response = new SignInResponse
+	        {
+	            Success = true
+	        };
 
 			var items = responseString.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (var item in items)
@@ -160,7 +151,7 @@ namespace Inoreader.Api
 		{
 			var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
-			string auth = _sessionStore.Auth;
+			string auth = _apiSession.AuthenticationToken;
 			if (!String.IsNullOrEmpty(auth))
 			{
 				requestMessage.Headers.Authorization = new AuthenticationHeaderValue("GoogleLogin", "auth=" + auth);
@@ -182,7 +173,7 @@ namespace Inoreader.Api
 		{
 			var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
-			string auth = _sessionStore.Auth;
+			string auth = _apiSession.AuthenticationToken;
 			if (!String.IsNullOrEmpty(auth))
 			{
 				requestMessage.Headers.Authorization = new AuthenticationHeaderValue("GoogleLogin", "auth=" + auth);

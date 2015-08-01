@@ -22,8 +22,9 @@ namespace Inoreader.ViewModels.Pages
 		private readonly ICredentialService _credentialService;
 		private readonly ApiClient _apiClient;
 		private readonly ITelemetryManager _telemetryManager;
+	    private readonly ISignInManager _signInManager;
 
-		#region Fields
+	    #region Fields
 
 		private bool _isBusy;
 		private string _email;
@@ -83,17 +84,19 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ApiClient apiClient, ITelemetryManager telemetryManager)
+		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ApiClient apiClient, ITelemetryManager telemetryManager, ISignInManager signInManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (credentialService == null) throw new ArgumentNullException("credentialService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
+		    if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
 
-			_navigationService = navigationService;
+		    _navigationService = navigationService;
 			_credentialService = credentialService;
 			_apiClient = apiClient;
 			_telemetryManager = telemetryManager;
+		    _signInManager = signInManager;
 		}
 
 #if DEBUG
@@ -134,7 +137,7 @@ namespace Inoreader.ViewModels.Pages
 			{
 				var stopwatch = Stopwatch.StartNew();
 				
-				await _apiClient.SignInAsync(Email, Password);
+				await _signInManager.SignInAsync(Email, Password);
 				
 				stopwatch.Stop();
 				_telemetryManager.TrackMetric(TemetryMetrics.SignInResponseTime, stopwatch.Elapsed.TotalSeconds);

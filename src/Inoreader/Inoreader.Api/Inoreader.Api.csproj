@@ -57,9 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiClient.cs" />
-    <Compile Include="ApiSessionStore.cs" />
     <Compile Include="Exceptions\ApiException.cs" />
     <Compile Include="Exceptions\AuthorizationApiException.cs" />
+    <Compile Include="IApiSession.cs" />
     <Compile Include="Models\StreamResponse.cs" />
     <Compile Include="Models\UnreadCountResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
