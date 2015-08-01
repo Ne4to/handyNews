@@ -33,7 +33,8 @@ namespace Inoreader.ViewModels.Pages
 		private readonly LocalStorageManager _localStorageManager;
 		private readonly SubscriptionsManager _subscriptionsManager;
 		private readonly NetworkManager _networkManager;
-		private readonly CoreDispatcher _dispatcher;
+	    private readonly ISignInManager _signInManager;
+	    private readonly CoreDispatcher _dispatcher;
 
 		private bool _isBusy;
 		private bool _isOffline;
@@ -133,7 +134,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] TileManager tileManager,
 			[NotNull] LocalStorageManager localStorageManager,
 			[NotNull] SubscriptionsManager subscriptionsManager,
-			[NotNull] NetworkManager networkManager)
+			[NotNull] NetworkManager networkManager,
+            [NotNull] ISignInManager signInManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
@@ -143,8 +145,9 @@ namespace Inoreader.ViewModels.Pages
 			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 			if (subscriptionsManager == null) throw new ArgumentNullException("subscriptionsManager");
 			if (networkManager == null) throw new ArgumentNullException("networkManager");
+		    if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
 
-			_navigationService = navigationService;
+		    _navigationService = navigationService;
 			_apiClient = apiClient;
 			_settingsService = settingsService;
 			_telemetryManager = telemetryManager;
@@ -152,8 +155,9 @@ namespace Inoreader.ViewModels.Pages
 			_localStorageManager = localStorageManager;
 			_subscriptionsManager = subscriptionsManager;
 			_networkManager = networkManager;
+		    _signInManager = signInManager;
 
-			_dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+		    _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 
 			Application.Current.Resuming += Application_Resuming;
 			_networkManager.NetworkChanged += _networkManager_NetworkChanged;
@@ -192,7 +196,7 @@ namespace Inoreader.ViewModels.Pages
 			}
 			catch (AuthenticationApiException)
 			{
-				_apiClient.ClearSession();
+				_signInManager.SignOut();
 				_navigationService.Navigate(PageTokens.SignIn, null);
 				return;
 			}
@@ -394,7 +398,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private void OnSignOut()
 		{
-			_apiClient.ClearSession();
+			_signInManager.SignOut();
 			_navigationService.Navigate(PageTokens.SignIn, null);			
 		}
 

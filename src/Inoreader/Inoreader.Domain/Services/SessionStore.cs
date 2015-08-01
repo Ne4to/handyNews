@@ -1,9 +1,10 @@
 using Windows.Storage;
+using Inoreader.Domain.Services.Interfaces;
 
-namespace Inoreader.Api
+namespace Inoreader.Domain.Services 
 {
-	internal class ApiSessionStore
-	{
+	public class SessionStore : ISessionStore
+    {
 		private const string SettingsContainerName = "API.Session";
 
 		private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.RoamingSettings;
@@ -14,7 +15,7 @@ namespace Inoreader.Api
 		public string LSID { get; set; }
 		public string Auth { get; set; }
 
-		public ApiSessionStore()
+		public SessionStore()
 		{
 			Load();
 		}

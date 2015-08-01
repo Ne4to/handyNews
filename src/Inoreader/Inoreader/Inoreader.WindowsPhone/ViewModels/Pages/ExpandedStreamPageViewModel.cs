@@ -21,7 +21,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
-			[NotNull] NetworkManager networkManager)
+			[NotNull] NetworkManager networkManager,
+            [NotNull] ISignInManager signInManager)
 			: base(apiClient,
 				navigationService,
 				telemetryManager,
@@ -29,7 +30,8 @@ namespace Inoreader.ViewModels.Pages
 				settingsService,
 				savedStreamManager,
 				localStorageManager,
-				networkManager)
+				networkManager, 
+                signInManager)
 		{
 		}
 	}

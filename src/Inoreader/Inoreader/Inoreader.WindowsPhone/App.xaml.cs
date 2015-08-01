@@ -32,7 +32,8 @@ namespace Inoreader
 
 		// New up the singleton container that will be used for type resolution in the app
 		readonly IUnityContainer _container = new UnityContainer();
-		private ApiClient _apiClient;
+        private ApiClient _apiClient;
+	    private ISignInManager _signInManager;
 		readonly AppSettingsService _appSettingsService = new AppSettingsService();
 		private TagsManager _tagsManager;
 		
@@ -43,7 +44,7 @@ namespace Inoreader
 
 		protected override Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
 		{
-			var pageToken = _apiClient.SignInRequired ? PageTokens.SignIn : PageTokens.Subscriptions;
+			var pageToken = _signInManager.SignInRequired ? PageTokens.SignIn : PageTokens.Subscriptions;
 			NavigationService.Navigate(pageToken, null);
 			return Task.FromResult(0);
 		}
@@ -74,17 +75,25 @@ namespace Inoreader
             //_container.RegisterInstance(_telemetryClient);
             _container.RegisterType<ImageManager>(new ContainerControlledLifetimeManager());
 
-			var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
+            _container.RegisterType<ISessionStore, SessionStore>(new ContainerControlledLifetimeManager());
+            _container.RegisterType<IApiSession, ApiSession>(new ContainerControlledLifetimeManager());
+
+            var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
 			var strData = await FileIO.ReadTextAsync(file);
 			var data = JObject.Parse(strData);
 
 			var appId = data["AppId"].ToString();
 			var appKey = data["AppKey"].ToString();
-			_apiClient = new ApiClient(appId, appKey);
+		    var apiSession = _container.Resolve<IApiSession>();
+			_apiClient = new ApiClient(appId, appKey, apiSession);
 			_container.RegisterInstance(_apiClient);
+            
+		    _container.RegisterType<ISignInManager, SignInManager>(new ContainerControlledLifetimeManager());
 
-			var localStorageManager = new LocalStorageManager(telemetryManager);
+		    _signInManager = _container.Resolve<ISignInManager>();
+            
+            var localStorageManager = new LocalStorageManager(telemetryManager);
 			localStorageManager.Init();
 			_container.RegisterInstance(localStorageManager);
 

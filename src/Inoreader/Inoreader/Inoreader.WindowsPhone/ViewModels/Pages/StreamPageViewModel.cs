@@ -34,7 +34,8 @@ namespace Inoreader.ViewModels.Pages
 		private readonly SavedStreamManager _savedStreamManager;
 		private readonly LocalStorageManager _localStorageManager;
 		private readonly NetworkManager _networkManager;
-		private readonly CoreDispatcher _dispatcher;
+	    private readonly ISignInManager _signInManager;
+	    private readonly CoreDispatcher _dispatcher;
 		private readonly bool _showNewestFirst;
 		private readonly bool _autoMarkAsRead;
 		private string _streamId;
@@ -198,7 +199,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] AppSettingsService settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
-			[NotNull] NetworkManager networkManager)
+			[NotNull] NetworkManager networkManager,
+            [NotNull] ISignInManager signInManager)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
@@ -208,16 +210,18 @@ namespace Inoreader.ViewModels.Pages
 			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
 			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
 			if (networkManager == null) throw new ArgumentNullException("networkManager");
+		    if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
 
-			_apiClient = apiClient;
+		    _apiClient = apiClient;
 			_navigationService = navigationService;
 			_telemetryManager = telemetryManager;
 			_tagsManager = tagsManager;
 			_savedStreamManager = savedStreamManager;
 			_localStorageManager = localStorageManager;
 			_networkManager = networkManager;
+		    _signInManager = signInManager;
 
-			_showNewestFirst = settingsService.ShowNewestFirst;
+		    _showNewestFirst = settingsService.ShowNewestFirst;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
 			_preloadItemCount = settingsService.PreloadItemCount;
 
@@ -331,7 +335,7 @@ namespace Inoreader.ViewModels.Pages
 			}
 			catch (AuthenticationApiException)
 			{
-				_apiClient.ClearSession();
+				_signInManager.SignOut();
 				_navigationService.Navigate(PageTokens.SignIn, null);
 				return;
 			}
