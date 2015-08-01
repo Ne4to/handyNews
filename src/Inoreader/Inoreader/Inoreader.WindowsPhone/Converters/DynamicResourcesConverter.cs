@@ -2,20 +2,21 @@
 using Windows.ApplicationModel;
 using Windows.UI.Xaml.Data;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Services.Interfaces;
 using Microsoft.Practices.ServiceLocation;
 
 namespace Inoreader.Converters
 {
 	public class DynamicResourcesConverter : IValueConverter
 	{
-		private readonly AppSettingsService _appSettings;
+		private readonly ISettingsManager _appSettings;
 
 		public DynamicResourcesConverter()
 		{
 			if (DesignMode.DesignModeEnabled)
 				return;
 
-			_appSettings = ServiceLocator.Current.GetInstance<AppSettingsService>();
+			_appSettings = ServiceLocator.Current.GetInstance<ISettingsManager>();
 		}
 
 		public object Convert(object value, Type targetType, object parameter, string language)

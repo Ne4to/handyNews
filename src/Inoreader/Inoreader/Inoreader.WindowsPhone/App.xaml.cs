@@ -75,6 +75,7 @@ namespace Inoreader
             //_container.RegisterInstance(_telemetryClient);
             _container.RegisterType<ImageManager>(new ContainerControlledLifetimeManager());
 
+            _container.RegisterType<ISettingsManager, AppSettingsService>(new ContainerControlledLifetimeManager());
             _container.RegisterType<ISessionStore, SessionStore>(new ContainerControlledLifetimeManager());
             _container.RegisterType<IApiSession, ApiSession>(new ContainerControlledLifetimeManager());
 

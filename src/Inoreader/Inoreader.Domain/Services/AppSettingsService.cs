@@ -1,11 +1,12 @@
 ﻿using System;
 using Windows.Storage;
 using Windows.UI.Xaml;
+using Inoreader.Domain.Services.Interfaces;
 
 namespace Inoreader.Domain.Services
 {
-	public class AppSettingsService
-	{
+    public class AppSettingsService : ISettingsManager
+    {
 		private const double DefaultFontSize = 11D;
 		private const double StreamTitleFontSizeMult = 14D / DefaultFontSize;
 		private const double StreamDateFontSizeMult = 11D / DefaultFontSize;

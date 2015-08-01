@@ -27,7 +27,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private readonly INavigationService _navigationService;
 		private readonly ApiClient _apiClient;
-		private readonly AppSettingsService _settingsService;
+		private readonly ISettingsManager _settingsService;
 		private readonly ITelemetryManager _telemetryManager;
 		private readonly TileManager _tileManager;
 		private readonly LocalStorageManager _localStorageManager;
@@ -129,7 +129,7 @@ namespace Inoreader.ViewModels.Pages
 		
 		public SubscriptionsPageViewModel([NotNull] INavigationService navigationService,
 			[NotNull] ApiClient apiClient,
-			[NotNull] AppSettingsService settingsService,
+			[NotNull] ISettingsManager settingsService,
 			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TileManager tileManager,
 			[NotNull] LocalStorageManager localStorageManager,
