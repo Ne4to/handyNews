@@ -1,15 +1,10 @@
-﻿using handyNews.UWP.Model;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using handyNews.UWP.Model;
 using Inoreader;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
-using ReactiveUI;
+
 // ReSharper disable ExplicitCallerInfoArgument
 
 namespace handyNews.UWP.ViewModels.Controls
