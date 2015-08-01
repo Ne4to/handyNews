@@ -31,15 +31,15 @@ namespace Inoreader.ViewModels.Pages
 		private readonly ITelemetryManager _telemetryManager;
 		private readonly TileManager _tileManager;
 		private readonly LocalStorageManager _localStorageManager;
-		private readonly SubscriptionsManager _subscriptionsManager;
+		private readonly ISubscriptionsManager _subscriptionsManager;
 		private readonly NetworkManager _networkManager;
 	    private readonly ISignInManager _signInManager;
 	    private readonly CoreDispatcher _dispatcher;
 
 		private bool _isBusy;
 		private bool _isOffline;
-		private List<TreeItemBase> _treeItems;
-		private List<TreeItemBase> _rootItems;
+		private List<SubscriptionItemBase> _treeItems;
+		private List<SubscriptionItemBase> _rootItems;
 		private bool _isRoot = true;
 		private string _categoryId;
 		private string _subscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
@@ -63,7 +63,7 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _subscriptionsHeader, value); }
 		}
 
-		public List<TreeItemBase> TreeItems
+		public List<SubscriptionItemBase> TreeItems
 		{
 			get { return _treeItems; }
 			private set { SetProperty(ref _treeItems, value); }
@@ -133,7 +133,7 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TileManager tileManager,
 			[NotNull] LocalStorageManager localStorageManager,
-			[NotNull] SubscriptionsManager subscriptionsManager,
+			[NotNull] ISubscriptionsManager subscriptionsManager,
 			[NotNull] NetworkManager networkManager,
             [NotNull] ISignInManager signInManager)
 		{
@@ -175,7 +175,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private async void LoadSubscriptions()
 		{
-			List<TreeItemBase> subscriptionItems = null;
+			List<SubscriptionItemBase> subscriptionItems = null;
 
 			IsBusy = true;
 
@@ -230,7 +230,7 @@ namespace Inoreader.ViewModels.Pages
 				{
 					SubscriptionsHeader = cat.Title;
 					_isRoot = false;
-					TreeItems = new List<TreeItemBase>(cat.Subscriptions);
+					TreeItems = new List<SubscriptionItemBase>(cat.Subscriptions);
 				}
 				else
 				{
@@ -255,7 +255,7 @@ namespace Inoreader.ViewModels.Pages
 			if (categoryItem != null)
 			{
 				SubscriptionsHeader = categoryItem.Title;
-				TreeItems = new List<TreeItemBase>(categoryItem.Subscriptions);
+				TreeItems = new List<SubscriptionItemBase>(categoryItem.Subscriptions);
 				_isRoot = false;
 				_categoryId = categoryItem.Id;
 			}
@@ -365,9 +365,9 @@ namespace Inoreader.ViewModels.Pages
 				return false;
 
 			SubscriptionsHeader = viewModelState.GetValue<string>("SubscriptionsHeader");
-			_rootItems = viewModelState.GetValue<List<TreeItemBase>>("RootItems");
+			_rootItems = viewModelState.GetValue<List<SubscriptionItemBase>>("RootItems");
 			_isRoot = viewModelState.GetValue<bool>("IsRoot");
-			TreeItems = viewModelState.GetValue<List<TreeItemBase>>("TreeItems");
+			TreeItems = viewModelState.GetValue<List<SubscriptionItemBase>>("TreeItems");
 			_categoryId = viewModelState.GetValue<string>("CategoryId");
 
 			return _rootItems != null && TreeItems != null;

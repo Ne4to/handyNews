@@ -17,7 +17,9 @@ namespace Inoreader.Domain.Services
 		private readonly ITelemetryManager _telemetryManager;
 		private const string DatabaseFilename = "data.db";
 
-		public LocalStorageManager(ITelemetryManager telemetryManager)
+	    private const long AddMaxCountColumnSchemaVersion = 10L;
+
+        public LocalStorageManager(ITelemetryManager telemetryManager)
 		{
 			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 			_telemetryManager = telemetryManager;
@@ -74,8 +76,23 @@ namespace Inoreader.Domain.Services
 				{
 					statement.Step();
 				}
-			}
-		}
+
+			    if (GetSchemaVersion(connection) < AddMaxCountColumnSchemaVersion)
+			    {
+                    using (var statement = connection.Prepare(@"ALTER TABLE SUB_CAT ADD COLUMN IS_MAX_COUNT INTEGER NOT NULL DEFAULT 0;"))
+                    {
+                        statement.Step();
+                    }
+
+                    using (var statement = connection.Prepare(@"ALTER TABLE SUB_ITEM ADD COLUMN IS_MAX_COUNT INTEGER NOT NULL DEFAULT 0;"))
+                    {
+                        statement.Step();
+                    }
+
+                    SetSchemaVersion(connection, AddMaxCountColumnSchemaVersion);
+			    }
+            }
+        }
 
 		private void EnableForeignKeys(SQLiteConnection connection)
 		{
@@ -100,6 +117,23 @@ namespace Inoreader.Domain.Services
 				statement.Step();
 			}
 		}
+
+	    private long GetSchemaVersion(SQLiteConnection connection)
+	    {            
+            using (var statement = connection.Prepare(@"PRAGMA main.user_version;"))
+            {
+                statement.Step();
+                return (long)statement[0];                
+            }
+        }
+
+	    private void SetSchemaVersion(SQLiteConnection connection, long version)
+	    {
+            using (var statement = connection.Prepare($@"PRAGMA main.user_version = {version};"))
+            {
+                statement.Step();                
+            }
+        }
 
 		#region Saved stream item
 
@@ -231,7 +265,7 @@ namespace Inoreader.Domain.Services
 
 		#region Subscriptions
 
-		public Task SaveSubscriptionsAsync(List<TreeItemBase> items)
+		public Task SaveSubscriptionsAsync(List<SubscriptionItemBase> items)
 		{
 			var cats = items.OfType<CategoryItem>().ToArray();
 			var subItems = items.OfType<SubscriptionItem>().Union(cats.SelectMany(c => c.Subscriptions)).ToArray();
@@ -284,8 +318,8 @@ namespace Inoreader.Domain.Services
 		{
 			if (cats.Length == 0) return;
 
-			using (var statement = connection.Prepare(@"INSERT INTO SUB_CAT(ID, SORT_ID, TITLE, UNREAD_COUNT) 
-																			VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT);"))
+			using (var statement = connection.Prepare(@"INSERT INTO SUB_CAT(ID, SORT_ID, TITLE, UNREAD_COUNT, IS_MAX_COUNT) 
+																			VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @IS_MAX_COUNT);"))
 			{
 				foreach (var categoryItem in cats)
 				{
@@ -293,6 +327,7 @@ namespace Inoreader.Domain.Services
 					statement.Bind("@SORT_ID", categoryItem.SortId);
 					statement.Bind("@TITLE", categoryItem.Title);
 					statement.Bind("@UNREAD_COUNT", categoryItem.UnreadCount);
+					statement.Bind("@IS_MAX_COUNT", categoryItem.IsMaxUnread ? 1 : 0);
 
 					statement.Step();
 
@@ -312,8 +347,8 @@ namespace Inoreader.Domain.Services
 			using (
 				var statement =
 					connection.Prepare(
-						@"INSERT INTO SUB_ITEM(ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC) 
-																			VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @URL, @HTML_URL, @ICON_URL, @FIRST_ITEM_MSEC);"))
+                        @"INSERT INTO SUB_ITEM(ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC, IS_MAX_COUNT) 
+																			VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @URL, @HTML_URL, @ICON_URL, @FIRST_ITEM_MSEC, @IS_MAX_COUNT);"))
 			{
 				foreach (var item in subItems)
 				{
@@ -328,6 +363,7 @@ namespace Inoreader.Domain.Services
 					statement.Bind("@HTML_URL", item.HtmlUrl);
 					statement.Bind("@ICON_URL", item.IconUrl);
 					statement.Bind("@FIRST_ITEM_MSEC", item.FirstItemMsec);
+					statement.Bind("@IS_MAX_COUNT", item.IsMaxUnread ? 1 : 0);
 
 					statement.Step();
 
@@ -361,7 +397,7 @@ namespace Inoreader.Domain.Services
 			}
 		}
 		
-		public Task<List<TreeItemBase>> LoadSubscriptionsAsync()
+		public Task<List<SubscriptionItemBase>> LoadSubscriptionsAsync()
 		{
 			_telemetryManager.TrackEvent(TelemetryEvents.LoadSubscriptionsFromCache);
 
@@ -380,7 +416,7 @@ namespace Inoreader.Domain.Services
 						links = LoadSubscriptionLinks(connection);
 					}
 
-					var result = new List<TreeItemBase>();
+					var result = new List<SubscriptionItemBase>();
 
 					foreach (var categoryItem in cats)
 					{
@@ -435,7 +471,7 @@ namespace Inoreader.Domain.Services
 		{
 			var result = new List<CategoryItem>();
 
-			using (var statement = connection.Prepare(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT FROM SUB_CAT;"))
+			using (var statement = connection.Prepare(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT, IS_MAX_COUNT FROM SUB_CAT;"))
 			{
 				while (statement.Step() == SQLiteResult.ROW)
 				{
@@ -445,8 +481,9 @@ namespace Inoreader.Domain.Services
 						SortId = statement.GetText(1),
 						Title = statement.GetText(2),
 						PageTitle = statement.GetText(2),
-						UnreadCount = statement.GetInteger(3)
-					};
+						UnreadCount = statement.GetInteger(3),
+                        IsMaxUnread = statement.GetInteger(4) == 1
+                    };
 
 					result.Add(item);
 				}
@@ -459,7 +496,7 @@ namespace Inoreader.Domain.Services
 		{
 			var result = new List<SubscriptionItem>();
 
-			using (var statement = connection.Prepare(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC FROM SUB_ITEM;"))
+			using (var statement = connection.Prepare(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC, IS_MAX_COUNT FROM SUB_ITEM;"))
 			{
 				while (statement.Step() == SQLiteResult.ROW)
 				{
@@ -473,8 +510,9 @@ namespace Inoreader.Domain.Services
 						Url = (string)statement[4],
 						HtmlUrl = (string)statement[5],
 						IconUrl = (string)statement[6],
-						FirstItemMsec = (long)statement[7]
-					};
+						FirstItemMsec = (long)statement[7],
+                        IsMaxUnread = statement.GetInteger(8) == 1
+                    };
 
 					result.Add(item);
 				}

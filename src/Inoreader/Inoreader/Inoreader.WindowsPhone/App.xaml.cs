@@ -78,6 +78,7 @@ namespace Inoreader
             _container.RegisterType<ISettingsManager, AppSettingsService>(new ContainerControlledLifetimeManager());
             _container.RegisterType<ISessionStore, SessionStore>(new ContainerControlledLifetimeManager());
             _container.RegisterType<IApiSession, ApiSession>(new ContainerControlledLifetimeManager());
+            _container.RegisterType<ISubscriptionsManager, SubscriptionsManager>(new ContainerControlledLifetimeManager());
 
             var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
@@ -156,10 +157,10 @@ namespace Inoreader
 			base.OnRegisterKnownTypesForSerialization();
 
 			// Subscriptions page state
-			SessionStateService.RegisterKnownType(typeof(TreeItemBase));
+			SessionStateService.RegisterKnownType(typeof(SubscriptionItemBase));
 			SessionStateService.RegisterKnownType(typeof(SubscriptionItem));
 			SessionStateService.RegisterKnownType(typeof(CategoryItem));
-			SessionStateService.RegisterKnownType(typeof(List<TreeItemBase>));
+			SessionStateService.RegisterKnownType(typeof(List<SubscriptionItemBase>));
 
 			// Stream page state
 			SessionStateService.RegisterKnownType(typeof(StreamItem));

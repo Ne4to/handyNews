@@ -16,115 +16,125 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
 	mvvm:ViewModelLocator.AutoWireViewModel="true">
 
-	<Page.Resources>
-		<converters:UnreadCountStringConverter x:Key="UnreadCountStringConverter" />
+    <Page.Resources>
+        <converters:UnreadCountStringConverter x:Key="UnreadCountStringConverter" />
 
-		<Style x:Key="TreeItemTextStyle" TargetType="TextBlock">
-			<Setter Property="FontSize" Value="18" />
-			<Setter Property="FontWeight" Value="SemiLight" />
-		</Style>
+        <Style x:Key="TreeItemTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiLight" />
+        </Style>
 
-		<Style x:Key="TreeItemUnreadCountTextStyle" TargetType="TextBlock" BasedOn="{StaticResource TreeItemTextStyle}">
-			<Setter Property="Margin" Value="5,0,0,0" />
-		</Style>
+        <resources:SubscriptionItemTemplateSelector x:Key="SubscriptionItemTemplateSelector">
+            <resources:SubscriptionItemTemplateSelector.CategoryTemplate>
+                <DataTemplate>
+                    <Grid Margin="5,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-		<resources:SubscriptionItemTemplateSelector x:Key="SubscriptionItemTemplateSelector">
-			<resources:SubscriptionItemTemplateSelector.CategoryTemplate>
-				<DataTemplate>
-					<Grid Margin="5,0">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-
-						<TextBlock Text="&#xE09B;" FontFamily="Segoe UI Symbol" Style="{StaticResource TreeItemTextStyle}" Margin="0,0,5,0"
+                        <TextBlock Text="&#xE09B;" FontFamily="Segoe UI Symbol" Style="{StaticResource TreeItemTextStyle}" Margin="0,0,5,0"
 								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
-						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
+                        <TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
 								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
-						<TextBlock Grid.Column="2" Text="{Binding UnreadCount}" Style="{StaticResource TreeItemUnreadCountTextStyle}"
+
+                        <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="5,0,0,0">
+                            <TextBlock Text="{Binding UnreadCount}" Style="{StaticResource TreeItemTextStyle}"
 								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
-					</Grid>
-				</DataTemplate>
-			</resources:SubscriptionItemTemplateSelector.CategoryTemplate>
 
-			<resources:SubscriptionItemTemplateSelector.ItemTemplate>
-				<DataTemplate>
-					<Grid Margin="5,0">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
+                            <TextBlock Text="+" Style="{StaticResource TreeItemTextStyle}"
+								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"
+                                   Visibility="{Binding IsMaxUnread, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </resources:SubscriptionItemTemplateSelector.CategoryTemplate>
 
-						<Image Width="16" Height="16" Source="{Binding IconUrl}" Margin="0,0,5,0" />
-						<TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
+            <resources:SubscriptionItemTemplateSelector.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image Width="16" Height="16" Source="{Binding IconUrl}" Margin="0,0,5,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
 								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
-						<TextBlock Grid.Column="2" Text="{Binding UnreadCount}" Style="{StaticResource TreeItemUnreadCountTextStyle}"
+
+                        <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="5,0,0,0">
+                            <TextBlock Text="{Binding UnreadCount}" Style="{StaticResource TreeItemTextStyle}"
 								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}" />
-					</Grid>
-				</DataTemplate>
-			</resources:SubscriptionItemTemplateSelector.ItemTemplate>
-		</resources:SubscriptionItemTemplateSelector>
 
-		<converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="0" />
-	</Page.Resources>
+                            <TextBlock Text="+" Style="{StaticResource TreeItemTextStyle}"
+								   FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"
+                                   Visibility="{Binding IsMaxUnread, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </resources:SubscriptionItemTemplateSelector.ItemTemplate>
+        </resources:SubscriptionItemTemplateSelector>
 
-	<Page.BottomAppBar>
-		<!--ClosedDisplayMode="Minimal"-->
-		<CommandBar>
-			<CommandBar.PrimaryCommands>
-				<AppBarButton Icon="Download" x:Uid="SavedAppBarButton" Label="saved" Command="{Binding SavedCommand}" />
-				<AppBarButton Icon="Favorite" x:Uid="StarsAppBarButton" Label="stars" Command="{Binding StarsCommand}" />
-				<AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding RefreshCommand}" />
-			</CommandBar.PrimaryCommands>
-			<CommandBar.SecondaryCommands>
-				<AppBarButton x:Uid="MarkAllAsReadAppBarButton" 
+        <converters:ZeroCountToVisibilityConverter x:Key="ZeroCountToVisibilityConverter" VisibleCount="0" />
+    </Page.Resources>
+
+    <Page.BottomAppBar>
+        <!--ClosedDisplayMode="Minimal"-->
+        <CommandBar>
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Icon="Download" x:Uid="SavedAppBarButton" Label="saved" Command="{Binding SavedCommand}" />
+                <AppBarButton Icon="Favorite" x:Uid="StarsAppBarButton" Label="stars" Command="{Binding StarsCommand}" />
+                <AppBarButton Icon="Refresh" x:Uid="RefreshAppBarButton" Label="refresh" Command="{Binding RefreshCommand}" />
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Uid="MarkAllAsReadAppBarButton" 
 							  Label="mark all as read"
 							  Command="{Binding MarkAllAsReadCommand}"/>
 
-				<AppBarButton x:Uid="SettingsAppBarButton" Label="settings" Command="{Binding SettingsPageCommand}" />
-				<AppBarButton x:Uid="AboutAppBarButton" Label="about" Command="{Binding AboutPageCommand}" />
-				<AppBarButton x:Uid="SignOutAppBarButton" Label="sign out" Command="{Binding SignOutCommand}" />
-			</CommandBar.SecondaryCommands>
-		</CommandBar>
-	</Page.BottomAppBar>
+                <AppBarButton x:Uid="SettingsAppBarButton" Label="settings" Command="{Binding SettingsPageCommand}" />
+                <AppBarButton x:Uid="AboutAppBarButton" Label="about" Command="{Binding AboutPageCommand}" />
+                <AppBarButton x:Uid="SignOutAppBarButton" Label="sign out" Command="{Binding SignOutCommand}" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
 
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-		<Grid>
-			<TextBlock x:Uid="PageHeaderTitle" Text="handy News" Style="{StaticResource PageHeaderTextStyle}" />
-			<details:OfflineBar Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Grid>
+            <TextBlock x:Uid="PageHeaderTitle" Text="handy News" Style="{StaticResource PageHeaderTextStyle}" />
+            <details:OfflineBar Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-			<ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
-		</Grid>
+            <ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </Grid>
 
-		<ListView Grid.Row="1" 
+        <ListView Grid.Row="1" 
 				  x:Name="TreeItemsListView"				  
 				  ItemsSource="{Binding TreeItems}"
 				  ItemTemplateSelector="{StaticResource SubscriptionItemTemplateSelector}"
 				  IsItemClickEnabled="True"
 				  ContinuumNavigationTransitionInfo.ExitElementContainer="True">
-			<ListView.ItemContainerStyle>
-				<Style TargetType="ListViewItem">
-					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
-				</Style>
-			</ListView.ItemContainerStyle>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
 
-			<interactivity:Interaction.Behaviors>
-				<core:EventTriggerBehavior EventName="ItemClick">
-					<core:InvokeCommandAction Command="{Binding ItemClickCommand}" />
-				</core:EventTriggerBehavior>
-			</interactivity:Interaction.Behaviors>
-		</ListView>
+            <interactivity:Interaction.Behaviors>
+                <core:EventTriggerBehavior EventName="ItemClick">
+                    <core:InvokeCommandAction Command="{Binding ItemClickCommand}" />
+                </core:EventTriggerBehavior>
+            </interactivity:Interaction.Behaviors>
+        </ListView>
 
-		<TextBlock Grid.Row="1" 
+        <TextBlock Grid.Row="1" 
 				   x:Uid="EverythingReadBlock"
 		           Visibility="{Binding TreeItems.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 
-				   Style="{StaticResource EverythingReadTextBlockStyle}" />		
-	</Grid>
+				   Style="{StaticResource EverythingReadTextBlockStyle}" />
+    </Grid>
 </storeApps:VisualStateAwarePage>
