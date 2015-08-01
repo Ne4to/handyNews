@@ -20,9 +20,9 @@ namespace Inoreader.Domain.Services
 
 		private readonly ApiClient _apiClient;
 		private readonly ITelemetryManager _telemetryManager;
-		private readonly AppSettingsService _settingsService;
+		private readonly ISettingsManager _settingsService;
 
-		public SubscriptionsManager(ApiClient apiClient, ITelemetryManager telemetryManager, AppSettingsService settingsService)
+		public SubscriptionsManager(ApiClient apiClient, ITelemetryManager telemetryManager, ISettingsManager settingsService)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");

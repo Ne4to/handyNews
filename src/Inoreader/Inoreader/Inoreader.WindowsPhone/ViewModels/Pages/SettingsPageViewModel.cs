@@ -19,7 +19,7 @@ namespace Inoreader.ViewModels.Pages
     {
         #region Fields
 
-        private readonly AppSettingsService _settingsService;
+        private readonly ISettingsManager _settingsService;
         private readonly ITelemetryManager _telemetryManager;
         private readonly LocalStorageManager _localStorageManager;
         private readonly string _initialDisplayCulture;
@@ -148,7 +148,7 @@ namespace Inoreader.ViewModels.Pages
 
         #endregion
 
-        public SettingsPageViewModel([NotNull] AppSettingsService settingsService,
+        public SettingsPageViewModel([NotNull] ISettingsManager settingsService,
             [NotNull] ITelemetryManager telemetryManager,
             [NotNull] LocalStorageManager localStorageManager)
         {

@@ -22,7 +22,7 @@ namespace Inoreader.Domain.Services
 	public class RichTextBlockBuilder
 	{
 		private readonly ITelemetryManager _telemetry;
-		private readonly AppSettingsService _appSettings;
+		private readonly ISettingsManager _appSettings;
 		private readonly List<Image> _allImages = new List<Image>();
 		private readonly double _maxImageWidth;
 		private readonly HttpClient _httpClient;
@@ -43,7 +43,7 @@ namespace Inoreader.Domain.Services
 			if (DesignMode.DesignModeEnabled)
 				return;
 
-			_appSettings = ServiceLocator.Current.GetInstance<AppSettingsService>();
+			_appSettings = ServiceLocator.Current.GetInstance<ISettingsManager>();
 			_telemetry = ServiceLocator.Current.GetInstance<ITelemetryManager>();
 
 			var displayInformation = DisplayInformation.GetForCurrentView();

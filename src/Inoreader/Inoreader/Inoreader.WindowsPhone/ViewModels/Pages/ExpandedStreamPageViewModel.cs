@@ -18,7 +18,7 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] INavigationService navigationService,
 			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TagsManager tagsManager,
-			[NotNull] AppSettingsService settingsService,
+			[NotNull] ISettingsManager settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
 			[NotNull] NetworkManager networkManager,
