@@ -5,10 +5,8 @@ using System.Windows.Input;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
-using Inoreader.Api;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
-using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 using Newtonsoft.Json.Linq;
@@ -20,7 +18,6 @@ namespace Inoreader.ViewModels.Pages
 	{
 		private readonly INavigationService _navigationService;
 		private readonly ICredentialService _credentialService;
-		private readonly ApiClient _apiClient;
 		private readonly ITelemetryManager _telemetryManager;
 	    private readonly ISignInManager _signInManager;
 
@@ -84,17 +81,15 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ApiClient apiClient, ITelemetryManager telemetryManager, ISignInManager signInManager)
+		public SignInPageViewModel(INavigationService navigationService, ICredentialService credentialService, ITelemetryManager telemetryManager, ISignInManager signInManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException("navigationService");
 			if (credentialService == null) throw new ArgumentNullException("credentialService");
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
 		    if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
 
 		    _navigationService = navigationService;
 			_credentialService = credentialService;
-			_apiClient = apiClient;
 			_telemetryManager = telemetryManager;
 		    _signInManager = signInManager;
 		}

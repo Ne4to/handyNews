@@ -6,6 +6,7 @@ namespace Inoreader.Domain.Services.Interfaces
     public interface IStreamManager
     {
         Task<GetItemsResult> GetItemsAsync(GetItemsOptions options);
+        Task MarkAllAsReadAsync(string streamId, int streamTimestamp);
     }
 
     public class GetItemsOptions

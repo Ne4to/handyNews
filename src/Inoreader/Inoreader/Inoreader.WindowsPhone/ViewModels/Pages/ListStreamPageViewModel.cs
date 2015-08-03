@@ -14,8 +14,7 @@ namespace Inoreader.ViewModels.Pages
 {
 	public class ListStreamPageViewModel : StreamPageViewModel
 	{
-		public ListStreamPageViewModel([NotNull] ApiClient apiClient, 
-			[NotNull] INavigationService navigationService, 
+		public ListStreamPageViewModel([NotNull] INavigationService navigationService, 
 			[NotNull] ITelemetryManager telemetryManager, 
 			[NotNull] TagsManager tagsManager, 
 			[NotNull] ISettingsManager settingsService,
@@ -24,8 +23,7 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] NetworkManager networkManager,
             [NotNull] ISignInManager signInManager,
             [NotNull] IStreamManager streamManager) 
-			: base(apiClient, 
-				navigationService, 
+			: base(navigationService, 
 				telemetryManager, 
 				tagsManager, 
 				settingsService,

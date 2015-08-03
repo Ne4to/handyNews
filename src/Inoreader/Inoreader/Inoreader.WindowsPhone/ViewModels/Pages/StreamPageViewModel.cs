@@ -9,7 +9,6 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
-using Inoreader.Api;
 using Inoreader.Api.Exceptions;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Models.States;
@@ -25,7 +24,6 @@ namespace Inoreader.ViewModels.Pages
 	{
 		#region Fields
 
-		private readonly ApiClient _apiClient;
 		private readonly INavigationService _navigationService;
 		private readonly ITelemetryManager _telemetryManager;
 		private readonly TagsManager _tagsManager;
@@ -191,8 +189,7 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public StreamPageViewModel([NotNull] ApiClient apiClient,
-			[NotNull] INavigationService navigationService,
+		public StreamPageViewModel([NotNull] INavigationService navigationService,
 			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TagsManager tagsManager,
 			[NotNull] ISettingsManager settingsService,
@@ -202,18 +199,16 @@ namespace Inoreader.ViewModels.Pages
             [NotNull] ISignInManager signInManager,
             [NotNull] IStreamManager streamManager)
 		{
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (navigationService == null) throw new ArgumentNullException("navigationService");
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
-			if (settingsService == null) throw new ArgumentNullException("settingsService");
-			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
-			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
-			if (networkManager == null) throw new ArgumentNullException("networkManager");
+			if (navigationService == null) throw new ArgumentNullException(nameof(navigationService));
+			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+			if (tagsManager == null) throw new ArgumentNullException(nameof(tagsManager));
+			if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
+			if (savedStreamManager == null) throw new ArgumentNullException(nameof(savedStreamManager));
+			if (localStorageManager == null) throw new ArgumentNullException(nameof(localStorageManager));
+			if (networkManager == null) throw new ArgumentNullException(nameof(networkManager));
 		    if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
 		    if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
-
-		    _apiClient = apiClient;
+		    
 			_navigationService = navigationService;
 			_telemetryManager = telemetryManager;
 			_tagsManager = tagsManager;
@@ -613,7 +608,7 @@ namespace Inoreader.ViewModels.Pages
 			try
 			{
 				_telemetryManager.TrackEvent(TelemetryEvents.MarkAllAsRead);
-				await _apiClient.MarkAllAsReadAsync(Items.StreamId, Items.StreamTimestamp);
+				await _streamManager.MarkAllAsReadAsync(Items.StreamId, Items.StreamTimestamp);
 
 				foreach (var item in Items)
 				{

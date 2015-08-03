@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -14,7 +13,6 @@ using Inoreader.Api.Exceptions;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
-using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -26,7 +24,7 @@ namespace Inoreader.ViewModels.Pages
 		#region Fields
 
 		private readonly INavigationService _navigationService;
-		private readonly ApiClient _apiClient;
+		private readonly IStreamManager _streamManager;
 		private readonly ISettingsManager _settingsService;
 		private readonly ITelemetryManager _telemetryManager;
 		private readonly TileManager _tileManager;
@@ -128,7 +126,7 @@ namespace Inoreader.ViewModels.Pages
 		#endregion
 		
 		public SubscriptionsPageViewModel([NotNull] INavigationService navigationService,
-			[NotNull] ApiClient apiClient,
+			[NotNull] IStreamManager streamManager,
 			[NotNull] ISettingsManager settingsService,
 			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TileManager tileManager,
@@ -137,18 +135,18 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] NetworkManager networkManager,
             [NotNull] ISignInManager signInManager)
 		{
-			if (navigationService == null) throw new ArgumentNullException("navigationService");
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (settingsService == null) throw new ArgumentNullException("settingsService");
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (tileManager == null) throw new ArgumentNullException("tileManager");
-			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
-			if (subscriptionsManager == null) throw new ArgumentNullException("subscriptionsManager");
-			if (networkManager == null) throw new ArgumentNullException("networkManager");
+			if (navigationService == null) throw new ArgumentNullException(nameof(navigationService));
+			if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
+			if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
+			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+			if (tileManager == null) throw new ArgumentNullException(nameof(tileManager));
+			if (localStorageManager == null) throw new ArgumentNullException(nameof(localStorageManager));
+			if (subscriptionsManager == null) throw new ArgumentNullException(nameof(subscriptionsManager));
+			if (networkManager == null) throw new ArgumentNullException(nameof(networkManager));
 		    if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
 
 		    _navigationService = navigationService;
-			_apiClient = apiClient;
+			_streamManager = streamManager;
 			_settingsService = settingsService;
 			_telemetryManager = telemetryManager;
 			_tileManager = tileManager;
@@ -304,7 +302,7 @@ namespace Inoreader.ViewModels.Pages
 				_telemetryManager.TrackEvent(TelemetryEvents.MarkAllAsRead);
 
 				var timestamp = GetUnixTimeStamp();
-				await _apiClient.MarkAllAsReadAsync(item.Id, timestamp);
+				await _streamManager.MarkAllAsReadAsync(item.Id, timestamp);
 
 				LoadSubscriptions();
 			}

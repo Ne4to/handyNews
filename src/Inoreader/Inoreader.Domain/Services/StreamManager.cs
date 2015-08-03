@@ -32,6 +32,11 @@ namespace Inoreader.Domain.Services
             };
         }
 
+        public Task MarkAllAsReadAsync(string streamId, int streamTimestamp)
+        {
+            return _apiClient.MarkAllAsReadAsync(streamId, streamTimestamp);
+        }
+
         private IEnumerable<StreamItem> GetItems(StreamResponse stream)
         {
             var itemsQuery = from it in stream.items
