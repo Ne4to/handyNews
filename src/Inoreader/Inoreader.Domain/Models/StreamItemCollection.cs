@@ -27,7 +27,6 @@ namespace Inoreader.Domain.Models
 		private readonly string _streamId;
 		private readonly bool _showNewestFirst;
 		private readonly ITelemetryManager _telemetryManager;
-		private readonly Action<bool> _onBusy;
 		private string _continuation;
 		private int _streamTimestamp;
 		private bool _fault;
@@ -42,24 +41,33 @@ namespace Inoreader.Domain.Models
 			get { return _streamTimestamp; }
 		}
 
-		bool _busy;
+		bool _isBusy;
 		private bool _allArticles;
 		private readonly int _preloadItemsCount;
+	    private bool _initCompleted;
+
+	    public bool IsBusy
+	    {
+	        get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                OnPropertyChanged();
+            }
+	    }
 
 		public event EventHandler LoadMoreItemsError;
 
-		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, ITelemetryManager telemetryManager, bool allArticles, Action<bool> onBusy, int preloadItemsCount)
+		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
 			: base(preloadItemsCount)
 		{
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (streamId == null) throw new ArgumentNullException("streamId");
 			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (onBusy == null) throw new ArgumentNullException("onBusy");
-
+			
 			_apiClient = apiClient;
 			_streamId = streamId;
 			_telemetryManager = telemetryManager;
-			_onBusy = onBusy;
 			_showNewestFirst = showNewestFirst;
 			_allArticles = allArticles;
 			_preloadItemsCount = preloadItemsCount;
@@ -68,19 +76,16 @@ namespace Inoreader.Domain.Models
 		public StreamItemCollection([NotNull] StreamItemCollectionState state,
 			[NotNull] ApiClient apiClient,
 			[NotNull] ITelemetryManager telemetryManager,
-			[NotNull] Action<bool> onBusy,
 			int preloadItemsCount)
 			: base(state.Items.Length)
 		{
 			if (state == null) throw new ArgumentNullException("state");
 			if (apiClient == null) throw new ArgumentNullException("apiClient");
 			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (onBusy == null) throw new ArgumentNullException("onBusy");
-
+			
 			_apiClient = apiClient;
 			_telemetryManager = telemetryManager;
-			_onBusy = onBusy;
-
+			
 			_streamId = state.StreamId;
 			_showNewestFirst = state.ShowNewestFirst;
 			_continuation = state.Continuation;
@@ -135,7 +140,7 @@ namespace Inoreader.Domain.Models
 		{
 			StreamResponse stream;
 
-			_onBusy(true);
+		    IsBusy = true;
 			try
 			{
 				var stopwatch = Stopwatch.StartNew();
@@ -148,7 +153,8 @@ namespace Inoreader.Domain.Models
 			}
 			finally
 			{
-				_onBusy(false);
+                IsBusy = false;
+			    _initCompleted = true;
 			}
 
 			return stream;
@@ -164,17 +170,18 @@ namespace Inoreader.Domain.Models
 
 		public bool HasMoreItems
 		{
-			get { return !String.IsNullOrEmpty(_continuation) && !_fault; }
+			get { return /*!_initCompleted ||*/ (!String.IsNullOrEmpty(_continuation) && !_fault); }
 		}
 
 		public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
 		{
-			if (_busy)
+			if (IsBusy)
 			{
-				throw new InvalidOperationException("Only one operation in flight at a time");
-			}
+                //return AsyncInfo.Run(c => Task.FromResult(new LoadMoreItemsResult()));
+                throw new InvalidOperationException("Only one operation in flight at a time");
+            }
 
-			_busy = true;
+            IsBusy = true;
 
 			var loadCount = Math.Max(count, (uint)_preloadItemsCount);
 
@@ -219,7 +226,7 @@ namespace Inoreader.Domain.Models
 			}
 			finally
 			{
-				_busy = false;
+                IsBusy = false;
 			}
 		}
 

@@ -43,7 +43,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private string _title;
 		private StreamItemCollection _items;
-		private bool _isBusy;
+		//private bool _isBusy;
 		private bool _currentItemRead;
 		private bool _currentItemReadEnabled;
 		private bool _currentItemStarred;
@@ -81,11 +81,11 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _items, value); }
 		}
 
-		public bool IsBusy
-		{
-			get { return _isBusy; }
-			private set { SetProperty(ref _isBusy, value); }
-		}
+		//public bool IsBusy
+		//{
+		//	get { return _isBusy; }
+		//	private set { SetProperty(ref _isBusy, value); }
+		//}
 
 		public bool CurrentItemRead
 		{
@@ -317,7 +317,7 @@ namespace Inoreader.ViewModels.Pages
 				return false;
 
 			_currentItem = itemsState.Items.FirstOrDefault(i => i.IsSelected);
-			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryManager, b => IsBusy = b, _preloadItemCount);
+			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryManager, _preloadItemCount);
 			Items.LoadMoreItemsError += (sender, args) => IsOffline = true;
 
 			return true;
@@ -325,7 +325,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private async void LoadData()
 		{
-			IsBusy = true;
+			//IsBusy = true;
 
 			Exception error = null;
 			try
@@ -346,20 +346,20 @@ namespace Inoreader.ViewModels.Pages
 			}
 			finally
 			{
-				IsBusy = false;
+				//IsBusy = false;
 			}
 
 			if (error == null) return;
 
 			IsOffline = true;
 
-			IsBusy = true;
+			//IsBusy = true;
 			var cacheData = await _localStorageManager.LoadStreamCollectionAsync(_streamId);
-			IsBusy = false;
+			//IsBusy = false;
 
 			if (cacheData != null)
 			{
-				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryManager, b => IsBusy = b, _preloadItemCount);
+				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryManager, _preloadItemCount);
 				_currentItem = items.FirstOrDefault(i => i.IsSelected);
 				_currentItemRead = _currentItem != null && !_currentItem.Unread;
 				CurrentItemReadEnabled = _currentItem != null;
@@ -377,12 +377,12 @@ namespace Inoreader.ViewModels.Pages
 		{
 			await _localStorageManager.ClearTempFilesAsync();
 
-			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryManager, AllArticles, b => IsBusy = b, _preloadItemCount);
-			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
+			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryManager, AllArticles, _preloadItemCount);
+            streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			await streamItems.InitAsync();
-			
-			Items = streamItems;
-			_currentItem = Items.FirstOrDefault();
+            Items = streamItems;
+
+            _currentItem = Items.FirstOrDefault();
 
 			if (_currentItem != null)
 			{
