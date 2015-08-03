@@ -79,6 +79,7 @@ namespace Inoreader
             _container.RegisterType<ISessionStore, SessionStore>(new ContainerControlledLifetimeManager());
             _container.RegisterType<IApiSession, ApiSession>(new ContainerControlledLifetimeManager());
             _container.RegisterType<ISubscriptionsManager, SubscriptionsManager>(new ContainerControlledLifetimeManager());
+            _container.RegisterType<IStreamManager, StreamManager>(new ContainerControlledLifetimeManager());
 
             var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
 			var file = await StorageFile.GetFileFromApplicationUriAsync(uri);

@@ -26,3 +26,7 @@
 /src/Inoreader/Inoreader.Domain/bin
 /src/Inoreader/Inoreader.Domain/obj
 /src/Inoreader/Inoreader.Tests/obj/ARM/Debug
+/src/Inoreader/handyNews.UWP/bin/x86/Debug
+/src/Inoreader/handyNews.UWP/obj/x86/Debug
+/src/Inoreader/handyNews.UWP/project.lock.json
+/src/Inoreader/.vs/config

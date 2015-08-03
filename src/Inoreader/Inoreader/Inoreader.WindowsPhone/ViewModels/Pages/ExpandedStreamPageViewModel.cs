@@ -22,7 +22,8 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
 			[NotNull] NetworkManager networkManager,
-            [NotNull] ISignInManager signInManager)
+            [NotNull] ISignInManager signInManager,
+            [NotNull] IStreamManager streamManager)
 			: base(apiClient,
 				navigationService,
 				telemetryManager,
@@ -31,7 +32,8 @@ namespace Inoreader.ViewModels.Pages
 				savedStreamManager,
 				localStorageManager,
 				networkManager, 
-                signInManager)
+                signInManager, 
+                streamManager)
 		{
 		}
 	}
