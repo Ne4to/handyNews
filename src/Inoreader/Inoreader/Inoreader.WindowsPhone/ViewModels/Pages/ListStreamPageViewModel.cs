@@ -14,24 +14,24 @@ namespace Inoreader.ViewModels.Pages
 {
 	public class ListStreamPageViewModel : StreamPageViewModel
 	{
-		public ListStreamPageViewModel([NotNull] ApiClient apiClient, 
-			[NotNull] INavigationService navigationService, 
+		public ListStreamPageViewModel([NotNull] INavigationService navigationService, 
 			[NotNull] ITelemetryManager telemetryManager, 
 			[NotNull] TagsManager tagsManager, 
 			[NotNull] ISettingsManager settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
 			[NotNull] NetworkManager networkManager,
-            [NotNull] ISignInManager signInManager) 
-			: base(apiClient, 
-				navigationService, 
+            [NotNull] ISignInManager signInManager,
+            [NotNull] IStreamManager streamManager) 
+			: base(navigationService, 
 				telemetryManager, 
 				tagsManager, 
 				settingsService,
 				savedStreamManager, 
 				localStorageManager, 
 				networkManager,
-                signInManager)
+                signInManager,
+                streamManager)
 		{
 		}
 	}

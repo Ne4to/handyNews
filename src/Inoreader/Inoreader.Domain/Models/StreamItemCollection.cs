@@ -23,64 +23,69 @@ namespace Inoreader.Domain.Models
 {
 	public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
 	{
-		private readonly ApiClient _apiClient;
-		private readonly string _streamId;
-		private readonly bool _showNewestFirst;
-		private readonly ITelemetryManager _telemetryManager;
-		private readonly Action<bool> _onBusy;
-		private string _continuation;
-		private int _streamTimestamp;
-		private bool _fault;
+	    private readonly ITelemetryManager _telemetryManager;
+	    private readonly IStreamManager _streamManager;
 
-		public string StreamId
+	    private readonly string _streamId;
+	    private readonly bool _showNewestFirst;
+	    private string _continuation;
+	    private int _streamTimestamp;
+	    private bool _fault;
+
+	    public string StreamId
 		{
 			get { return _streamId; }
 		}
 
-		public int StreamTimestamp
+	    public int StreamTimestamp
 		{
 			get { return _streamTimestamp; }
 		}
 
-		bool _busy;
-		private bool _allArticles;
-		private readonly int _preloadItemsCount;
+	    bool _isBusy;
+	    private bool _allArticles;
+	    private readonly int _preloadItemsCount;
+
+	    public bool IsBusy
+	    {
+	        get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                OnPropertyChanged();
+            }
+	    }
 
 		public event EventHandler LoadMoreItemsError;
 
-		public StreamItemCollection(ApiClient apiClient, string streamId, bool showNewestFirst, ITelemetryManager telemetryManager, bool allArticles, Action<bool> onBusy, int preloadItemsCount)
+		public StreamItemCollection(IStreamManager streamManager, string streamId, bool showNewestFirst, ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
 			: base(preloadItemsCount)
 		{
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (streamId == null) throw new ArgumentNullException("streamId");
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (onBusy == null) throw new ArgumentNullException("onBusy");
+		    if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
+		    if (streamId == null) throw new ArgumentNullException(nameof(streamId));
+		    if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
 
-			_apiClient = apiClient;
-			_streamId = streamId;
+		    _streamManager = streamManager;
+		    _streamId = streamId;
 			_telemetryManager = telemetryManager;
-			_onBusy = onBusy;
 			_showNewestFirst = showNewestFirst;
 			_allArticles = allArticles;
 			_preloadItemsCount = preloadItemsCount;
 		}
 
 		public StreamItemCollection([NotNull] StreamItemCollectionState state,
-			[NotNull] ApiClient apiClient,
+			[NotNull] IStreamManager streamManager,
 			[NotNull] ITelemetryManager telemetryManager,
-			[NotNull] Action<bool> onBusy,
 			int preloadItemsCount)
 			: base(state.Items.Length)
 		{
-			if (state == null) throw new ArgumentNullException("state");
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (onBusy == null) throw new ArgumentNullException("onBusy");
+		    if (state == null) throw new ArgumentNullException(nameof(state));
+		    if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
+		    if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
 
-			_apiClient = apiClient;
-			_telemetryManager = telemetryManager;
-			_onBusy = onBusy;
-
+		    _streamManager = streamManager;
+		    _telemetryManager = telemetryManager;
+			
 			_streamId = state.StreamId;
 			_showNewestFirst = state.ShowNewestFirst;
 			_continuation = state.Continuation;
@@ -92,89 +97,53 @@ namespace Inoreader.Domain.Models
 
 		public async Task InitAsync()
 		{
-			var stream = await LoadAsync(_preloadItemsCount, null);
-			_continuation = stream.continuation;
-			var itemsQuery = GetItems(stream);
+            StreamItem[] items;
 
+            IsBusy = true;
+
+            try
+            {
+                var options = new GetItemsOptions
+                {
+                    Count = _preloadItemsCount,
+                    Continuation = null,
+                    ShowNewestFirst = _showNewestFirst,
+                    StreamId = _streamId,
+                    IncludeRead = _allArticles
+                };
+
+		        var result = await _streamManager.GetItemsAsync(options);
+		        items = result.Items;
+		        _continuation = result.Continuation;
+                _streamTimestamp = result.Timestamp;
+            }
+		    finally
+		    {
+		        IsBusy = false;
+		    }
+            
 			Add(new HeaderSpaceStreamItem());
-			AddRange(itemsQuery);
+			AddRange(items);
 			Add(new EmptySpaceStreamItem());
 			OnPropertyChanged("Count");
 		}
 
-		private static IEnumerable<StreamItem> GetItems(StreamResponse stream)
-		{
-			var itemsQuery = from it in stream.items
-							 select new StreamItem
-							 {
-								 Id = it.id,
-								 Published = UnixTimeStampToDateTime(it.published),
-								 Title = HtmlUtilities.ConvertToText(it.title),
-								 Content = it.summary.content,
-								 WebUri = GetWebUri(it),
-								 Starred = it.categories != null
-										   && it.categories.Any(c => c.EndsWith("/state/com.google/starred", StringComparison.OrdinalIgnoreCase)),
-								 Unread = it.categories != null && !it.categories.Any(c => c.EndsWith("/state/com.google/read"))
-							 };
-			return itemsQuery;
-		}
-
-		private static string GetWebUri(Item item)
-		{
-			if (item.alternate == null)
-				return null;
-
-			var q = from a in item.alternate
-					where String.Equals(a.type, "text/html", StringComparison.OrdinalIgnoreCase)
-					select a.href;
-
-			return q.FirstOrDefault();
-		}
-
-		private async Task<StreamResponse> LoadAsync(int count, string continuation)
-		{
-			StreamResponse stream;
-
-			_onBusy(true);
-			try
-			{
-				var stopwatch = Stopwatch.StartNew();
-
-				stream = await _apiClient.GetStreamAsync(_streamId, _showNewestFirst, count, continuation, _allArticles);
-				_streamTimestamp = stream.updated;
-
-				stopwatch.Stop();
-				_telemetryManager.TrackMetric(TemetryMetrics.GetStreamResponseTime, stopwatch.Elapsed.TotalSeconds);
-			}
-			finally
-			{
-				_onBusy(false);
-			}
-
-			return stream;
-		}
-
-		public static DateTimeOffset UnixTimeStampToDateTime(int unixTimeStamp)
-		{
-			var epochDate = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-			return epochDate.AddSeconds(unixTimeStamp);
-		}
-
-		#region ISupportIncrementalLoading
+	    #region ISupportIncrementalLoading
 
 		public bool HasMoreItems
 		{
-			get { return !String.IsNullOrEmpty(_continuation) && !_fault; }
+			get { return /*!_initCompleted ||*/ (!String.IsNullOrEmpty(_continuation) && !_fault); }
 		}
 
 		public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
 		{
-			if (_busy)
+			if (IsBusy)
 			{
-				throw new InvalidOperationException("Only one operation in flight at a time");
-			}
+                //return AsyncInfo.Run(c => Task.FromResult(new LoadMoreItemsResult()));
+                throw new InvalidOperationException("Only one operation in flight at a time");
+            }
 
-			_busy = true;
+            IsBusy = true;
 
 			var loadCount = Math.Max(count, (uint)_preloadItemsCount);
 
@@ -193,11 +162,31 @@ namespace Inoreader.Domain.Models
 		{
 			try
 			{
-				var stream = await LoadAsync((int)count, _continuation);
-				_continuation = stream.continuation;
+                StreamItem[] items;
+                IsBusy = true;
 
-				var items = GetItems(stream).ToArray();
-				var baseIndex = Count - 1;
+                try
+                {
+                    var options = new GetItemsOptions
+                    {
+                        Count = (int) count,
+                        Continuation = _continuation,
+                        IncludeRead = _allArticles,
+                        ShowNewestFirst = _showNewestFirst,
+                        StreamId = _streamId
+                    };
+
+			        var result = await _streamManager.GetItemsAsync(options);
+			        items = result.Items;
+			        _continuation = result.Continuation;
+			        _streamTimestamp = result.Timestamp;
+			    }
+			    finally
+			    {
+			        IsBusy = false;
+			    }
+
+                var baseIndex = Count - 1;
 
 				InsertRange(Count - 1, items);
 				OnPropertyChanged("Count");
@@ -219,11 +208,11 @@ namespace Inoreader.Domain.Models
 			}
 			finally
 			{
-				_busy = false;
+                IsBusy = false;
 			}
 		}
 
-		void NotifyOfInsertedItems(int baseIndex, int count)
+	    void NotifyOfInsertedItems(int baseIndex, int count)
 		{
 			if (CollectionChanged == null)
 			{

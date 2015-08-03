@@ -440,7 +440,7 @@
 
 		<details:OfflineBar
 		                    Visibility="{Binding IsOffline, Converter={StaticResource BooleanToVisibilityConverter}}" />
-		<ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <ProgressBar Visibility="{Binding Items.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}" />
 
 		<TextBlock x:Uid="EverythingReadBlock"
 		           Visibility="{Binding Items.Count, Converter={StaticResource ZeroCountToVisibilityConverter}}" 

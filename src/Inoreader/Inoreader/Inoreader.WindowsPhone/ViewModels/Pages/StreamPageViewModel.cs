@@ -7,16 +7,13 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Popups;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
 using Inoreader.Annotations;
-using Inoreader.Api;
 using Inoreader.Api.Exceptions;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Models.States;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
-using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -27,7 +24,6 @@ namespace Inoreader.ViewModels.Pages
 	{
 		#region Fields
 
-		private readonly ApiClient _apiClient;
 		private readonly INavigationService _navigationService;
 		private readonly ITelemetryManager _telemetryManager;
 		private readonly TagsManager _tagsManager;
@@ -35,6 +31,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly LocalStorageManager _localStorageManager;
 		private readonly NetworkManager _networkManager;
 	    private readonly ISignInManager _signInManager;
+	    private readonly IStreamManager _streamManager;
 	    private readonly CoreDispatcher _dispatcher;
 		private readonly bool _showNewestFirst;
 		private readonly bool _autoMarkAsRead;
@@ -43,7 +40,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private string _title;
 		private StreamItemCollection _items;
-		private bool _isBusy;
+		//private bool _isBusy;
 		private bool _currentItemRead;
 		private bool _currentItemReadEnabled;
 		private bool _currentItemStarred;
@@ -81,11 +78,11 @@ namespace Inoreader.ViewModels.Pages
 			private set { SetProperty(ref _items, value); }
 		}
 
-		public bool IsBusy
-		{
-			get { return _isBusy; }
-			private set { SetProperty(ref _isBusy, value); }
-		}
+		//public bool IsBusy
+		//{
+		//	get { return _isBusy; }
+		//	private set { SetProperty(ref _isBusy, value); }
+		//}
 
 		public bool CurrentItemRead
 		{
@@ -192,27 +189,26 @@ namespace Inoreader.ViewModels.Pages
 
 		#endregion
 
-		public StreamPageViewModel([NotNull] ApiClient apiClient,
-			[NotNull] INavigationService navigationService,
+		public StreamPageViewModel([NotNull] INavigationService navigationService,
 			[NotNull] ITelemetryManager telemetryManager,
 			[NotNull] TagsManager tagsManager,
 			[NotNull] ISettingsManager settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
 			[NotNull] NetworkManager networkManager,
-            [NotNull] ISignInManager signInManager)
+            [NotNull] ISignInManager signInManager,
+            [NotNull] IStreamManager streamManager)
 		{
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (navigationService == null) throw new ArgumentNullException("navigationService");
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (tagsManager == null) throw new ArgumentNullException("tagsManager");
-			if (settingsService == null) throw new ArgumentNullException("settingsService");
-			if (savedStreamManager == null) throw new ArgumentNullException("savedStreamManager");
-			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
-			if (networkManager == null) throw new ArgumentNullException("networkManager");
+			if (navigationService == null) throw new ArgumentNullException(nameof(navigationService));
+			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+			if (tagsManager == null) throw new ArgumentNullException(nameof(tagsManager));
+			if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
+			if (savedStreamManager == null) throw new ArgumentNullException(nameof(savedStreamManager));
+			if (localStorageManager == null) throw new ArgumentNullException(nameof(localStorageManager));
+			if (networkManager == null) throw new ArgumentNullException(nameof(networkManager));
 		    if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
-
-		    _apiClient = apiClient;
+		    if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
+		    
 			_navigationService = navigationService;
 			_telemetryManager = telemetryManager;
 			_tagsManager = tagsManager;
@@ -220,6 +216,7 @@ namespace Inoreader.ViewModels.Pages
 			_localStorageManager = localStorageManager;
 			_networkManager = networkManager;
 		    _signInManager = signInManager;
+		    _streamManager = streamManager;
 
 		    _showNewestFirst = settingsService.ShowNewestFirst;
 			_autoMarkAsRead = settingsService.AutoMarkAsRead;
@@ -317,7 +314,7 @@ namespace Inoreader.ViewModels.Pages
 				return false;
 
 			_currentItem = itemsState.Items.FirstOrDefault(i => i.IsSelected);
-			Items = new StreamItemCollection(itemsState, _apiClient, _telemetryManager, b => IsBusy = b, _preloadItemCount);
+			Items = new StreamItemCollection(itemsState, _streamManager, _telemetryManager, _preloadItemCount);
 			Items.LoadMoreItemsError += (sender, args) => IsOffline = true;
 
 			return true;
@@ -325,7 +322,7 @@ namespace Inoreader.ViewModels.Pages
 
 		private async void LoadData()
 		{
-			IsBusy = true;
+			//IsBusy = true;
 
 			Exception error = null;
 			try
@@ -346,20 +343,20 @@ namespace Inoreader.ViewModels.Pages
 			}
 			finally
 			{
-				IsBusy = false;
+				//IsBusy = false;
 			}
 
 			if (error == null) return;
 
 			IsOffline = true;
 
-			IsBusy = true;
+			//IsBusy = true;
 			var cacheData = await _localStorageManager.LoadStreamCollectionAsync(_streamId);
-			IsBusy = false;
+			//IsBusy = false;
 
 			if (cacheData != null)
 			{
-				var items = new StreamItemCollection(cacheData, _apiClient, _telemetryManager, b => IsBusy = b, _preloadItemCount);
+				var items = new StreamItemCollection(cacheData, _streamManager, _telemetryManager, _preloadItemCount);
 				_currentItem = items.FirstOrDefault(i => i.IsSelected);
 				_currentItemRead = _currentItem != null && !_currentItem.Unread;
 				CurrentItemReadEnabled = _currentItem != null;
@@ -377,12 +374,12 @@ namespace Inoreader.ViewModels.Pages
 		{
 			await _localStorageManager.ClearTempFilesAsync();
 
-			var streamItems = new StreamItemCollection(_apiClient, _streamId, _showNewestFirst, _telemetryManager, AllArticles, b => IsBusy = b, _preloadItemCount);
-			streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
+			var streamItems = new StreamItemCollection(_streamManager, _streamId, _showNewestFirst, _telemetryManager, AllArticles, _preloadItemCount);
+            streamItems.LoadMoreItemsError += (sender, args) => IsOffline = true;
 			await streamItems.InitAsync();
-			
-			Items = streamItems;
-			_currentItem = Items.FirstOrDefault();
+            Items = streamItems;
+
+            _currentItem = Items.FirstOrDefault();
 
 			if (_currentItem != null)
 			{
@@ -611,7 +608,7 @@ namespace Inoreader.ViewModels.Pages
 			try
 			{
 				_telemetryManager.TrackEvent(TelemetryEvents.MarkAllAsRead);
-				await _apiClient.MarkAllAsReadAsync(Items.StreamId, Items.StreamTimestamp);
+				await _streamManager.MarkAllAsReadAsync(Items.StreamId, Items.StreamTimestamp);
 
 				foreach (var item in Items)
 				{

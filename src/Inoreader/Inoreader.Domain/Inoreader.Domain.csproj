@@ -89,9 +89,11 @@
     <Compile Include="Models\CategoryItem.cs" />
     <Compile Include="Models\EmptySpaceStreamItem.cs" />
     <Compile Include="Models\HeaderSpaceStreamItem.cs" />
+    <Compile Include="Services\Interfaces\IStreamManager.cs" />
     <Compile Include="Models\States\StreamItemCollectionState.cs" />
     <Compile Include="Models\StreamItem.cs" />
     <Compile Include="Models\StreamItemCollection.cs" />
+    <Compile Include="Services\StreamManager.cs" />
     <Compile Include="Models\SubscriptionItem.cs" />
     <Compile Include="Models\SubscriptionItemBase.cs" />
     <Compile Include="Properties\Annotations.cs" />
