@@ -1,0 +1,81 @@
+﻿<UserControl
+    x:Class="handyNews.UWP.Views.Controls.SubscriptionsTree"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:handyNews.UWP.Views.Controls"
+    xmlns:data="using:Inoreader.Domain.Models"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:Inoreader.Converters"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    Loaded="SubscriptionsTree_OnLoaded">
+
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <Style x:Key="TreeItemTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiLight" />
+        </Style>
+
+        <DataTemplate x:Key="ItemDataTemplate" x:DataType="data:SubscriptionItemBase">
+            <Grid Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Image Width="16" Height="16" Source="{x:Bind IconUrl}" Margin="0,0,5,0" />
+                <TextBlock Grid.Column="1" Text="{x:Bind Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
+								    />
+
+                <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
+
+                <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="5,0,0,0">
+                    <TextBlock Text="{x:Bind UnreadCount}" Style="{StaticResource TreeItemTextStyle}"
+								    />
+
+                    <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
+
+                    <TextBlock Text="+" Style="{StaticResource TreeItemTextStyle}"
+								   Visibility="{x:Bind IsMaxUnread, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                    <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
+                </StackPanel>
+
+
+
+
+                <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
+                <!--<TextBlock Text="+" Style="{StaticResource TreeItemTextStyle}"
+							Visibility="{x:Bind IsMaxUnread, Converter={StaticResource BooleanToVisibilityConverter}}" />-->
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <ListView 
+				  x:Name="TreeItemsListView"				  
+				  ItemsSource="{x:Bind ViewModel.TreeItems, Mode=OneWay}"
+				  ItemTemplate="{StaticResource ItemDataTemplate}"
+				  IsItemClickEnabled="True"
+				  ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <interactivity:Interaction.Behaviors>
+                <core:EventTriggerBehavior EventName="ItemClick">
+                    <core:InvokeCommandAction Command="{x:Bind ViewModel.ItemClickCommand}" />
+                </core:EventTriggerBehavior>
+            </interactivity:Interaction.Behaviors>
+        </ListView>
+    </Grid>
+</UserControl>

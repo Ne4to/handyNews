@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 using handyNews.UWP.Model;
+using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Inoreader;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
@@ -13,7 +14,7 @@ using Newtonsoft.Json.Linq;
 
 namespace handyNews.UWP.ViewModels.Controls
 {
-    public class SignInDialogViewModel : BindableBase
+    public class SignInDialogViewModel : BindableBase, ISignInDialogViewModel
     {
         #region Fields
 
@@ -99,7 +100,7 @@ namespace handyNews.UWP.ViewModels.Controls
             }            
         }
 
-        [Conditional("DEBUG")]
+#if DEBUG
         public async void SetDebugUser()
         {
             try
@@ -116,5 +117,6 @@ namespace handyNews.UWP.ViewModels.Controls
             {
             }
         }
+#endif
     }
 }

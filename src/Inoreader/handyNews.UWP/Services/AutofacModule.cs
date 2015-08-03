@@ -3,6 +3,7 @@ using Windows.Storage;
 using Autofac;
 using Autofac.Extras.CommonServiceLocator;
 using handyNews.UWP.ViewModels.Controls;
+using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Inoreader;
 using Inoreader.Api;
 using Inoreader.Domain.Services;
@@ -51,8 +52,18 @@ namespace handyNews.UWP.Services
                 .As<ISignInManager>()
                 .SingleInstance();
 
+            builder.RegisterType<AppSettingsService>()
+                .As<ISettingsManager>();
+
+            builder.RegisterType<SubscriptionsManager>()
+                .As<ISubscriptionsManager>();
+
             builder.RegisterType<SignInDialogViewModel>()
-                .As<SignInDialogViewModel>()
+                .As<ISignInDialogViewModel>()
+                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+
+            builder.RegisterType<SubscriptionsTreeViewModel>()
+                .As<ISubscriptionsTreeViewModel>()
                 .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             // Perform registrations and build the container.

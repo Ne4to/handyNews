@@ -8,5 +8,6 @@ namespace Inoreader.Domain.Models
 		public string PageTitle { get; set; }
 		public long UnreadCount { get; set; }
 	    public bool IsMaxUnread { get; set; }
+	    public string IconUrl { get; set; }
 	}
 }

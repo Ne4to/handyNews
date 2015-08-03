@@ -15,7 +15,8 @@ namespace Inoreader.Domain.Services
 	public class SubscriptionsManager : ISubscriptionsManager
 	{
 		private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
-		private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        private const string CategoryAllIconUrl = "ms-appx:///Assets/CategoryIcon.png";
+        private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
 		private readonly ApiClient _apiClient;
 		private readonly ITelemetryManager _telemetryManager;
@@ -55,6 +56,7 @@ namespace Inoreader.Domain.Services
 							{
 								Id = tag.Id,
 								SortId = tag.SortId,
+                                IconUrl = CategoryAllIconUrl
 							};
 
 			var categories = catsQuery.ToList();

@@ -93,6 +93,7 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <Content Include="Assets\ApiAuth.json" />
+    <Content Include="Assets\CategoryIcon.png" />
     <Content Include="Assets\DebugSignInData.json" />
     <None Include="handyNews.UWP_StoreKey.pfx" />
     <None Include="project.json" />
@@ -111,13 +112,21 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Model\BindableBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AutofacModule.cs" />
+    <Compile Include="Services\DelegateCommand.cs" />
+    <Compile Include="ViewModels\Controls\Interfaces\ISignInDialogViewModel.cs" />
+    <Compile Include="ViewModels\Controls\Interfaces\ISubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\Controls\SignInDialogViewModel.cs" />
+    <Compile Include="ViewModels\Controls\SubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="Views\Controls\SignInDialog.xaml.cs">
       <DependentUpon>SignInDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\SubscriptionsTree.xaml.cs">
+      <DependentUpon>SubscriptionsTree.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -131,6 +140,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Assets\Offline.png" />
+    <Content Include="Assets\ReadAll.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -154,6 +165,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Controls\SubscriptionsTree.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -171,6 +186,14 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ViewModels\Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
+      <Name>Behaviors SDK %28XAML%29</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

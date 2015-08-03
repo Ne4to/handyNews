@@ -482,7 +482,7 @@ namespace Inoreader.Domain.Services
 						Title = statement.GetText(2),
 						PageTitle = statement.GetText(2),
 						UnreadCount = statement.GetInteger(3),
-                        IsMaxUnread = statement.GetInteger(4) == 1
+                        IsMaxUnread = statement.GetInteger(4) == 1                        
                     };
 
 					result.Add(item);

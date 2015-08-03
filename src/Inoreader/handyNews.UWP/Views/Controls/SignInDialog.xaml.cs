@@ -1,21 +1,21 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using handyNews.UWP.ViewModels.Controls;
+using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Microsoft.Practices.ServiceLocation;
 
 namespace handyNews.UWP.Views.Controls
 {
     public sealed partial class SignInDialog : ContentDialog
     {
-        SignInDialogViewModel _viewModel;
+        ISignInDialogViewModel _viewModel;
 
-        public SignInDialogViewModel ViewModel
+        public ISignInDialogViewModel ViewModel
         {
             get
             {
                 if (_viewModel == null)
                 {
-                    _viewModel = ServiceLocator.Current.GetInstance<SignInDialogViewModel>();
+                    _viewModel = ServiceLocator.Current.GetInstance<ISignInDialogViewModel>();
                 }
 
                 return _viewModel;
@@ -43,7 +43,9 @@ namespace handyNews.UWP.Views.Controls
 
         private void SignInDialog_OnLoaded(object sender, RoutedEventArgs e)
         {
+#if DEBUG
             ViewModel.SetDebugUser();
+#endif
         }
     }
 }
