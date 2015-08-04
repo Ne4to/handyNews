@@ -9,6 +9,19 @@
     mc:Ignorable="d" Loaded="Page_Loaded">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <controls:SubscriptionsTree />
+        <RelativePanel>
+            <controls:SubscriptionsTree x:Name="Tree" VerticalAlignment="Stretch" Width="320" />
+            <controls:StreamView x:Name="ItemsView" 
+            RelativePanel.RightOf="Tree" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        </RelativePanel>
+
+        <!--<Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>-->
+
+        <!--<controls:SubscriptionsTree x:Name="Tree" VerticalAlignment="Stretch" Grid.Column="0" />
+        <controls:StreamView x:Name="ItemsView" VerticalAlignment="Stretch" Background="Aqua" Grid.Column="1" HorizontalAlignment="Stretch" />-->
+
     </Grid>
 </Page>

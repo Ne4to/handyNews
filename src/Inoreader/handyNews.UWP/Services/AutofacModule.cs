@@ -58,6 +58,9 @@ namespace handyNews.UWP.Services
             builder.RegisterType<SubscriptionsManager>()
                 .As<ISubscriptionsManager>();
 
+            builder.RegisterType<StreamManager>()
+                .As<IStreamManager>();
+
             builder.RegisterType<SignInDialogViewModel>()
                 .As<ISignInDialogViewModel>()
                 .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
@@ -65,6 +68,10 @@ namespace handyNews.UWP.Services
             builder.RegisterType<SubscriptionsTreeViewModel>()
                 .As<ISubscriptionsTreeViewModel>()
                 .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+
+            builder.RegisterType<StreamViewViewModel>()
+                .As<IStreamViewViewModel>()
+                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);               
 
             // Perform registrations and build the container.
             var container = builder.Build();
