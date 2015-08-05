@@ -61,6 +61,9 @@ namespace handyNews.UWP.Services
             builder.RegisterType<StreamManager>()
                 .As<IStreamManager>();
 
+            builder.RegisterType<ImageManager>()
+                .As<ImageManager>();
+
             builder.RegisterType<SignInDialogViewModel>()
                 .As<ISignInDialogViewModel>()
                 .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
