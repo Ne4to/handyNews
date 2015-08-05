@@ -4,7 +4,7 @@ using Windows.Storage;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Inoreader.Domain.Services
+namespace Inoreader.Domain.Utils
 {
 	public static class Extensions
 	{

@@ -2,10 +2,11 @@
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Inoreader.Domain.Services.Interfaces;
+using Inoreader.Domain.Utils;
 
 namespace Inoreader.Domain.Services
 {
-    public class AppSettingsService : ISettingsManager
+    public class SettingsManager : ISettingsManager
     {
 		private const double DefaultFontSize = 11D;
 		private const double StreamTitleFontSizeMult = 14D / DefaultFontSize;
@@ -82,7 +83,7 @@ namespace Inoreader.Domain.Services
 			get { return FontSize * SubscriptionTreeItemFontSizeMult; }
 		}
 
-		public AppSettingsService()
+		public SettingsManager()
 		{
 			DisplayCulture = String.Empty;
 			HideEmptySubscriptions = true;

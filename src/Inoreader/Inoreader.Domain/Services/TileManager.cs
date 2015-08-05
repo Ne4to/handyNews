@@ -19,7 +19,7 @@ using NotificationsExtensions.TileContent;
 
 namespace Inoreader.Domain.Services
 {
-	public class TileManager
+	public class TileManager : ITileManager
 	{
 		private const string DrawCanvasName = "DrawCanvas";
 		private const string WideFileName = "WideTile.png";
@@ -30,11 +30,11 @@ namespace Inoreader.Domain.Services
 
 		public TileManager([NotNull] ITelemetryManager telemetryManager)
 		{
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
+			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
 			_telemetryManager = telemetryManager;
 		}
 
-		public async void UpdateAsync(long count)
+		public async void UpdatePrimaryTile(long count)
 		{
 			try
 			{

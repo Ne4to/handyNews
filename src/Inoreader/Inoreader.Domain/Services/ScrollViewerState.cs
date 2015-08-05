@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Inoreader.Annotations;
+using Inoreader.Domain.Utils;
 
 namespace Inoreader.Domain.Services
 {

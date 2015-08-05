@@ -1,4 +1,4 @@
-﻿namespace Inoreader.Domain.Services
+﻿namespace Inoreader.Domain.Models
 {
 	public static class SpecialTags
 	{

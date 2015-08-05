@@ -3,12 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Inoreader.Annotations;
 using Inoreader.Api;
+using Inoreader.Domain.Models;
 using Inoreader.Domain.Services.Interfaces;
 
 
 namespace Inoreader.Domain.Services
 {
-	public class TagsManager
+	public class TagsManager : ITagsManager
 	{
 		private const int TrueValue = 1;
 		private const int FalseValue = 0;
@@ -21,13 +22,13 @@ namespace Inoreader.Domain.Services
 
 		public TagsManager([NotNull] ApiClient apiClient,
 			[NotNull] ITelemetryManager telemetryManager,
-			[NotNull] NetworkManager networkManager,
+			[NotNull] INetworkManager networkManager,
 			[NotNull] LocalStorageManager localStorageManager)
 		{
-			if (apiClient == null) throw new ArgumentNullException("apiClient");
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
-			if (networkManager == null) throw new ArgumentNullException("networkManager");
-			if (localStorageManager == null) throw new ArgumentNullException("localStorageManager");
+			if (apiClient == null) throw new ArgumentNullException(nameof(apiClient));
+			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+			if (networkManager == null) throw new ArgumentNullException(nameof(networkManager));
+			if (localStorageManager == null) throw new ArgumentNullException(nameof(localStorageManager));
 
 			_apiClient = apiClient;
 			_telemetryManager = telemetryManager;
@@ -42,25 +43,63 @@ namespace Inoreader.Domain.Services
 				ProcessQueue();
 		}
 
-		public async void MarkAsRead(string id)
+	    public void AddTag(string itemId, string tag)
+	    {
+	        if (itemId == null) throw new ArgumentNullException(nameof(itemId));
+
+	        switch (tag)
+	        {
+	            case SpecialTags.Read:
+	                MarkAsRead(itemId);
+	                return;
+
+	            case SpecialTags.Starred:
+	                AddToStarred(itemId);
+	                return;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(tag));
+            }
+	    }
+
+	    public void RemoveTag(string itemId, string tag)
+	    {
+            if (itemId == null) throw new ArgumentNullException(nameof(itemId));
+
+            switch (tag)
+            {
+                case SpecialTags.Read:
+                    MarkAsUnreadTagAction(itemId);
+                    return;
+                
+                    case SpecialTags.Starred:
+                    RemoveFromStarred(itemId);
+                    return;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(tag));
+            }
+        }
+
+        private async void MarkAsRead(string id)
 		{
 			await _localStorageManager.SetCachedItemAsReadAsync(id, true).ConfigureAwait(false);
 			await AddTagInternalAsync(id, SpecialTags.Read).ConfigureAwait(false);
 		}
 
-		public async void MarkAsUnreadTagAction(string id)
+		private async void MarkAsUnreadTagAction(string id)
 		{
 			await _localStorageManager.SetCachedItemAsReadAsync(id, false).ConfigureAwait(false);
 			await RemoveTagInternalAsync(id, SpecialTags.Read).ConfigureAwait(false);
 		}
 
-		public async void AddToStarred(string id)
+        private async void AddToStarred(string id)
 		{
 			await _localStorageManager.SetCachedItemAsStarredAsync(id, true).ConfigureAwait(false);
 			await AddTagInternalAsync(id, SpecialTags.Starred).ConfigureAwait(false);
 		}
 
-		public async void RemoveFromStarred(string id)
+        private async void RemoveFromStarred(string id)
 		{
 			await _localStorageManager.SetCachedItemAsStarredAsync(id, false).ConfigureAwait(false);
 			await RemoveTagInternalAsync(id, SpecialTags.Starred).ConfigureAwait(false);

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Inoreader.Annotations;
 using Inoreader.Domain.Models;
+using Inoreader.Domain.Models.Parser;
 
 namespace Inoreader.Domain.Services
 {

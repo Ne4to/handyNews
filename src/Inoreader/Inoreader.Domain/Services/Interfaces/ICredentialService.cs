@@ -1,6 +1,6 @@
 using Windows.Security.Credentials;
 
-namespace Inoreader.Domain.Services
+namespace Inoreader.Domain.Services.Interfaces
 {
 	public interface ICredentialService
 	{

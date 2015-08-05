@@ -3,8 +3,9 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Inoreader.Domain.Services;
 
-namespace Inoreader.Domain.Services
+namespace Inoreader.Domain.Utils
 {
 	public static class ScrollUtils
 	{
