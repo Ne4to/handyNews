@@ -129,6 +129,17 @@ namespace handyNews.UWP.ViewModels.Controls
             //}
         }
 
+        public void ShowRoot()
+        {
+            if (!_isRoot)
+            {
+                //SubscriptionsHeader = Strings.Resources.SubscriptionsSectionHeader;
+                TreeItems = _rootItems;
+                _isRoot = true;
+                //return false;
+            }
+        }
+
         private void OnItemClick(object args)
         {
             var clickEventArgs = (ItemClickEventArgs)args;

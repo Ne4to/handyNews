@@ -13,6 +13,7 @@ namespace handyNews.UWP.ViewModels.Controls.Interfaces
         event EventHandler<SubscriptionSelectedEventArgs> SubscriptionSelected;
         List<SubscriptionItemBase> TreeItems { get; }
         void LoadSubscriptionsAsync();
+        void ShowRoot();
     }
 
     public class SubscriptionSelectedEventArgs : EventArgs
