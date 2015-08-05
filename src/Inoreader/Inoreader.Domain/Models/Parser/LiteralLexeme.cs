@@ -1,6 +1,6 @@
 using Windows.Data.Html;
 
-namespace Inoreader.Domain.Services
+namespace Inoreader.Domain.Models.Parser
 {
 	public class LiteralLexeme : ILexeme
 	{

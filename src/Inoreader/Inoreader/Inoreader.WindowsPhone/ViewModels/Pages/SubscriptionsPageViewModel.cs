@@ -13,6 +13,7 @@ using Inoreader.Api.Exceptions;
 using Inoreader.Domain.Models;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
+using Inoreader.Domain.Utils;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -30,7 +31,7 @@ namespace Inoreader.ViewModels.Pages
 		private readonly TileManager _tileManager;
 		private readonly LocalStorageManager _localStorageManager;
 		private readonly ISubscriptionsManager _subscriptionsManager;
-		private readonly NetworkManager _networkManager;
+		private readonly INetworkManager _networkManager;
 	    private readonly ISignInManager _signInManager;
 	    private readonly CoreDispatcher _dispatcher;
 
@@ -132,7 +133,7 @@ namespace Inoreader.ViewModels.Pages
 			[NotNull] TileManager tileManager,
 			[NotNull] LocalStorageManager localStorageManager,
 			[NotNull] ISubscriptionsManager subscriptionsManager,
-			[NotNull] NetworkManager networkManager,
+			[NotNull] INetworkManager networkManager,
             [NotNull] ISignInManager signInManager)
 		{
 			if (navigationService == null) throw new ArgumentNullException(nameof(navigationService));
@@ -187,7 +188,7 @@ namespace Inoreader.ViewModels.Pages
 				var readAllItem = subscriptionItems.FirstOrDefault(t => t.Id == SpecialTags.Read);
 				if (readAllItem != null)
 				{
-					_tileManager.UpdateAsync(readAllItem.UnreadCount);
+					_tileManager.UpdatePrimaryTile(readAllItem.UnreadCount);
 				}
 
 				await _localStorageManager.SaveSubscriptionsAsync(subscriptionItems);

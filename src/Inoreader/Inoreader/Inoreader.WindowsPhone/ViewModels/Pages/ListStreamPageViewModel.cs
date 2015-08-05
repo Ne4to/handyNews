@@ -16,11 +16,11 @@ namespace Inoreader.ViewModels.Pages
 	{
 		public ListStreamPageViewModel([NotNull] INavigationService navigationService, 
 			[NotNull] ITelemetryManager telemetryManager, 
-			[NotNull] TagsManager tagsManager, 
+			[NotNull] ITagsManager tagsManager, 
 			[NotNull] ISettingsManager settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
-			[NotNull] NetworkManager networkManager,
+			[NotNull] INetworkManager networkManager,
             [NotNull] ISignInManager signInManager,
             [NotNull] IStreamManager streamManager) 
 			: base(navigationService, 

@@ -14,6 +14,7 @@ using Inoreader.Domain.Models;
 using Inoreader.Domain.Models.States;
 using Inoreader.Domain.Services;
 using Inoreader.Domain.Services.Interfaces;
+using Inoreader.Domain.Utils;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -26,10 +27,10 @@ namespace Inoreader.ViewModels.Pages
 
 		private readonly INavigationService _navigationService;
 		private readonly ITelemetryManager _telemetryManager;
-		private readonly TagsManager _tagsManager;
+		private readonly ITagsManager _tagsManager;
 		private readonly SavedStreamManager _savedStreamManager;
 		private readonly LocalStorageManager _localStorageManager;
-		private readonly NetworkManager _networkManager;
+		private readonly INetworkManager _networkManager;
 	    private readonly ISignInManager _signInManager;
 	    private readonly IStreamManager _streamManager;
 	    private readonly CoreDispatcher _dispatcher;
@@ -191,11 +192,11 @@ namespace Inoreader.ViewModels.Pages
 
 		public StreamPageViewModel([NotNull] INavigationService navigationService,
 			[NotNull] ITelemetryManager telemetryManager,
-			[NotNull] TagsManager tagsManager,
+			[NotNull] ITagsManager tagsManager,
 			[NotNull] ISettingsManager settingsService,
 			[NotNull] SavedStreamManager savedStreamManager,
 			[NotNull] LocalStorageManager localStorageManager,
-			[NotNull] NetworkManager networkManager,
+			[NotNull] INetworkManager networkManager,
             [NotNull] ISignInManager signInManager,
             [NotNull] IStreamManager streamManager)
 		{
@@ -633,11 +634,11 @@ namespace Inoreader.ViewModels.Pages
 		{
 			if (newValue)
 			{
-				_tagsManager.MarkAsRead(id);
+				_tagsManager.AddTag(id, SpecialTags.Read);
 			}
 			else
 			{
-				_tagsManager.MarkAsUnreadTagAction(id);
+				_tagsManager.RemoveTag(id, SpecialTags.Read);
 			}
 		}
 
@@ -645,11 +646,11 @@ namespace Inoreader.ViewModels.Pages
 		{
 			if (newValue)
 			{
-				_tagsManager.AddToStarred(id);
+				_tagsManager.AddTag(id, SpecialTags.Starred);
 			}
 			else
 			{
-				_tagsManager.RemoveFromStarred(id);
+				_tagsManager.RemoveTag(id, SpecialTags.Starred);
 			}
 		}
 

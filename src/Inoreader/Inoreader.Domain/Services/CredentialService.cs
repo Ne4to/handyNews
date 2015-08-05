@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Windows.Security.Credentials;
+using Inoreader.Domain.Services.Interfaces;
 
 namespace Inoreader.Domain.Services
 {

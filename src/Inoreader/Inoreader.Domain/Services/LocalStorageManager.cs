@@ -21,7 +21,7 @@ namespace Inoreader.Domain.Services
 
         public LocalStorageManager(ITelemetryManager telemetryManager)
 		{
-			if (telemetryManager == null) throw new ArgumentNullException("telemetryManager");
+			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
 			_telemetryManager = telemetryManager;
 		}
 

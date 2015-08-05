@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Inoreader.Domain.Services;
+using Inoreader.Domain.Utils;
 using Microsoft.Practices.Prism.Mvvm;
 
 namespace Inoreader.Views.Pages

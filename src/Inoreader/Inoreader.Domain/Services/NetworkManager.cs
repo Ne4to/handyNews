@@ -1,9 +1,10 @@
 ﻿using System;
 using Windows.Networking.Connectivity;
+using Inoreader.Domain.Services.Interfaces;
 
 namespace Inoreader.Domain.Services
 {
-	public class NetworkManager
+	public class NetworkManager : INetworkManager
 	{
 		public event EventHandler<NetworkChangedEventArgs> NetworkChanged;
 
@@ -25,16 +26,6 @@ namespace Inoreader.Domain.Services
 			}
 			// ReSharper disable once EmptyGeneralCatchClause
 			catch (Exception) { }
-		}
-	}
-
-	public class NetworkChangedEventArgs : EventArgs
-	{
-		public bool Connected { get; private set; }
-
-		public NetworkChangedEventArgs(bool connected)
-		{
-			Connected = connected;
 		}
 	}
 }

@@ -12,6 +12,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
+using Inoreader.Domain.Models.Parser;
 using Inoreader.Domain.Services.Interfaces;
 
 using Microsoft.Practices.ServiceLocation;
