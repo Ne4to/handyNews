@@ -52,7 +52,7 @@ namespace handyNews.UWP.Services
                 .As<ISignInManager>()
                 .SingleInstance();
 
-            builder.RegisterType<AppSettingsService>()
+            builder.RegisterType<SettingsManager>()
                 .As<ISettingsManager>();
 
             builder.RegisterType<SubscriptionsManager>()
