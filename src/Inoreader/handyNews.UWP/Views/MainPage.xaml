@@ -10,9 +10,11 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <RelativePanel>
-            <controls:SubscriptionsTree x:Name="Tree" VerticalAlignment="Stretch" Width="320" />
+            <controls:SubscriptionsTree x:Name="Tree" Width="320" 
+                RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignBottomWithPanel="True" />
             <controls:StreamView x:Name="ItemsView" 
-            RelativePanel.RightOf="Tree" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+                RelativePanel.RightOf="Tree" 
+                RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignBottomWithPanel="True" />
         </RelativePanel>
 
         <!--<Grid.ColumnDefinitions>

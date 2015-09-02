@@ -5,9 +5,13 @@ namespace Inoreader.Domain.Services
 {
 	public class SessionStore : ISessionStore
     {
-		private const string SettingsContainerName = "API.Session";
+#if WINDOWS_UWP
+        private const string SettingsContainerName = "handyNews.Session";
+#else
+        private const string SettingsContainerName = "API.Session";
+#endif
 
-		private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.RoamingSettings;
+        private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.RoamingSettings;
 
 		// ReSharper disable once InconsistentNaming
 		public string SID { get; set; }
