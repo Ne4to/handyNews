@@ -1,4 +1,4 @@
-namespace Inoreader.Domain.Models
+namespace handyNews.Domain.Models
 {
 	public class EmptySpaceStreamItem : StreamItem
 	{

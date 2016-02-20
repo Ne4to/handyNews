@@ -2,24 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Html;
 using Windows.Foundation;
 using Windows.UI.Xaml.Data;
+using handyNews.Domain.Models.States;
+using handyNews.Domain.Services.Interfaces;
 using Inoreader.Annotations;
-using Inoreader.Api;
-using Inoreader.Api.Models;
-using Inoreader.Domain.Models.States;
-using Inoreader.Domain.Services;
-using Inoreader.Domain.Services.Interfaces;
 
-
-namespace Inoreader.Domain.Models
+namespace handyNews.Domain.Models
 {
 	public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
 	{

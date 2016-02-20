@@ -1,6 +1,6 @@
 using System;
 
-namespace Inoreader.Api.Exceptions
+namespace handyNews.API.Exceptions
 {
 	public class AuthenticationApiException : ApiException
 	{

@@ -1,6 +1,6 @@
 ﻿using Windows.UI.Xaml;
 
-namespace Inoreader.Domain.Services.Interfaces
+namespace handyNews.Domain.Services.Interfaces
 {
     public interface ISettingsManager
     {

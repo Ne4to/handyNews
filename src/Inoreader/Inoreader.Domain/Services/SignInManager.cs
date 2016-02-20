@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Inoreader.Api;
-using Inoreader.Api.Exceptions;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.API;
+using handyNews.API.Exceptions;
+using handyNews.Domain.Services.Interfaces;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
     public class SignInManager : ISignInManager
     {

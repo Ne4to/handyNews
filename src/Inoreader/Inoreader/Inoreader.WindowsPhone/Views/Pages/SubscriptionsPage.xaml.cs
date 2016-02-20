@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Inoreader.Domain.Services;
+using handyNews.Domain.Services;
 using Microsoft.Practices.Prism.Mvvm;
 
 namespace Inoreader.Views.Pages

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Windows.UI.Xaml.Navigation;
+using handyNews.Domain.Services;
 using Inoreader.Annotations;
-using Inoreader.Domain.Services;
 using Microsoft.Practices.Prism.Mvvm;
 
 namespace Inoreader.ViewModels.Pages

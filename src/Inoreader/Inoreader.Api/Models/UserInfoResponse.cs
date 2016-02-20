@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Inoreader.Api.Models
+namespace handyNews.API.Models
 {
 	public class UserInfoResponse
 	{

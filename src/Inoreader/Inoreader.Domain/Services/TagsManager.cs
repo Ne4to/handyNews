@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using handyNews.API;
+using handyNews.Domain.Models;
+using handyNews.Domain.Services.Interfaces;
 using Inoreader.Annotations;
-using Inoreader.Api;
-using Inoreader.Domain.Models;
-using Inoreader.Domain.Services.Interfaces;
 
-
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class TagsManager : ITagsManager
 	{

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using handyNews.Domain.Services;
+using handyNews.Domain.Services.Interfaces;
 using Inoreader.Annotations;
-using Inoreader.Api;
-using Inoreader.Domain.Services;
-using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Mvvm.Interfaces;
 

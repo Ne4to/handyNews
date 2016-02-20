@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Inoreader.Domain.Models
+namespace handyNews.Domain.Models
 {	
 	public class CategoryItem : SubscriptionItemBase
 	{

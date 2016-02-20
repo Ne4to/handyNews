@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace Inoreader.Domain.Models.States
+namespace handyNews.Domain.Models.States
 {
 	[DataContract]
 	public class StreamItemCollectionState

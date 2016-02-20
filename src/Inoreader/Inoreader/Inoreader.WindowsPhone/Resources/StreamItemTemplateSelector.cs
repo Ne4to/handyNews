@@ -1,6 +1,6 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Inoreader.Domain.Models;
+using handyNews.Domain.Models;
 
 namespace Inoreader.Resources
 {

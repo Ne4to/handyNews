@@ -1,4 +1,4 @@
-namespace Inoreader.Domain.Services.Interfaces
+namespace handyNews.Domain.Services.Interfaces
 {
     public interface ITagsManager
     {

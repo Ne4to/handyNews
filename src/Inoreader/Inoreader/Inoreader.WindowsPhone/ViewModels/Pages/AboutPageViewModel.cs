@@ -3,7 +3,7 @@ using System.Windows.Input;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Store;
 using Windows.System;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;

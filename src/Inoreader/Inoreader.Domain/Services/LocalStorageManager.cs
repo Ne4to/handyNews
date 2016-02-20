@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
+using handyNews.Domain.Models;
+using handyNews.Domain.Models.States;
+using handyNews.Domain.Services.Interfaces;
 using Inoreader.Annotations;
-using Inoreader.Domain.Models;
-using Inoreader.Domain.Models.States;
-using Inoreader.Domain.Services.Interfaces;
-
 using SQLitePCL;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class LocalStorageManager
 	{

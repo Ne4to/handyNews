@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Inoreader.Domain.Models
+namespace handyNews.Domain.Models
 {
 	[DataContract]
 	public class StreamItem : BindableBaseEx

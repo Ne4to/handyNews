@@ -1,10 +1,10 @@
 ﻿using System;
 using Windows.Storage;
 using Windows.UI.Xaml;
-using Inoreader.Domain.Services.Interfaces;
-using Inoreader.Domain.Utils;
+using handyNews.Domain.Services.Interfaces;
+using handyNews.Domain.Utils;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
     public class SettingsManager : ISettingsManager
     {

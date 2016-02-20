@@ -1,7 +1,7 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public static class VisualTreeUtilities
 	{

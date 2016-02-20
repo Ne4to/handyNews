@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 

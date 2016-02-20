@@ -1,8 +1,8 @@
 ﻿using System;
-using Inoreader.Api;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.API;
+using handyNews.Domain.Services.Interfaces;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
     public class ApiSession : IApiSession
     {

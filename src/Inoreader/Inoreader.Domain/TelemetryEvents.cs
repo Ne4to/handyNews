@@ -1,4 +1,4 @@
-﻿namespace Inoreader.Domain
+﻿namespace handyNews.Domain
 {
 	internal static class TelemetryEvents
 	{

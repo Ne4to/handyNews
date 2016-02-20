@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using handyNews.Domain.Utils;
 using Inoreader.Annotations;
-using Inoreader.Domain.Utils;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class ScrollViewerState
 	{

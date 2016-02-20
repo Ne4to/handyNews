@@ -4,11 +4,11 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Inoreader.Api.Exceptions;
-using Inoreader.Api.Models;
+using handyNews.API.Exceptions;
+using handyNews.API.Models;
 using Newtonsoft.Json.Linq;
 
-namespace Inoreader.Api
+namespace handyNews.API
 {
 	public class ApiClient
 	{

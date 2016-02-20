@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Data.Html;
-using Inoreader.Api;
-using Inoreader.Api.Models;
-using Inoreader.Domain.Models;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.API;
+using handyNews.API.Models;
+using handyNews.Domain.Models;
+using handyNews.Domain.Services.Interfaces;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class SubscriptionsManager : ISubscriptionsManager
 	{

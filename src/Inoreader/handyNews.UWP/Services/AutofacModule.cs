@@ -2,12 +2,12 @@
 using Windows.Storage;
 using Autofac;
 using Autofac.Extras.CommonServiceLocator;
+using handyNews.API;
+using handyNews.Domain.Services;
+using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.ViewModels.Controls;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Inoreader;
-using Inoreader.Api;
-using Inoreader.Domain.Services;
-using Inoreader.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
 using Newtonsoft.Json.Linq;

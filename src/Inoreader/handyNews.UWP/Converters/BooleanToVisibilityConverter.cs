@@ -2,7 +2,7 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-namespace Inoreader.Converters
+namespace handyNews.UWP.Converters
 {
 	public class BooleanToVisibilityConverter : IValueConverter
 	{

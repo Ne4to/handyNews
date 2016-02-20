@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
-namespace Inoreader.Domain.Models
+namespace handyNews.Domain.Models
 {
 	/// <summary>
 	/// Implementation of <see cref="INotifyPropertyChanged"/> to simplify models.

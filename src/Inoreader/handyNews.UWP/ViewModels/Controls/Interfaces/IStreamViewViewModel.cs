@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using Inoreader.Domain.Models;
+using handyNews.Domain.Models;
 
 namespace handyNews.UWP.ViewModels.Controls.Interfaces
 {

@@ -2,9 +2,9 @@
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using handyNews.UWP.Views.Controls;
-using Inoreader.Domain.Services.Interfaces;
 using Microsoft.Practices.ServiceLocation;
 
 namespace handyNews.UWP.Views

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Inoreader.Domain.Services.Interfaces
+namespace handyNews.Domain.Services.Interfaces
 {
     public interface ISignInManager
     {

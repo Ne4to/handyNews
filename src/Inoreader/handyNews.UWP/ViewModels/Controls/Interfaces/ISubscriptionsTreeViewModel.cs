@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
-using Inoreader.Domain.Models;
+using handyNews.Domain.Models;
 
 namespace handyNews.UWP.ViewModels.Controls.Interfaces
 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using Windows.UI.Xaml.Data;
-using Inoreader.Domain.Services;
-using Inoreader.Domain.Utils;
+using handyNews.Domain.Utils;
 
 namespace Inoreader.Converters
 {

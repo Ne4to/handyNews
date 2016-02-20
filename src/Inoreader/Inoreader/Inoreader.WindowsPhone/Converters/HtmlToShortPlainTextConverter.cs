@@ -1,8 +1,8 @@
 ﻿using System;
 using Windows.ApplicationModel;
 using Windows.UI.Xaml.Data;
-using Inoreader.Domain.Services;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.Domain.Services;
+using handyNews.Domain.Services.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
 

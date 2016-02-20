@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Inoreader.Domain.Services.Interfaces
+namespace handyNews.Domain.Services.Interfaces
 {
     public interface ITelemetryManager
     {

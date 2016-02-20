@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Inoreader.Domain.Services;
+using handyNews.Domain.Services;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Xaml.Interactivity;
 

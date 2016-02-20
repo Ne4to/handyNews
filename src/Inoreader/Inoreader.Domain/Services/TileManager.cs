@@ -11,13 +11,12 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
+using handyNews.Domain.Services.Interfaces;
+using handyNews.Domain.Views.Controls;
 using Inoreader.Annotations;
-using Inoreader.Domain.Services.Interfaces;
-using Inoreader.Domain.Views.Controls;
-
 using NotificationsExtensions.TileContent;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class TileManager : ITileManager
 	{

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using Windows.UI.Xaml.Controls;
+using handyNews.API.Exceptions;
+using handyNews.Domain.Models;
+using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.Model;
 using handyNews.UWP.Services;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
-using Inoreader.Api.Exceptions;
-using Inoreader.Domain.Models;
-using Inoreader.Domain.Services.Interfaces;
 
 namespace handyNews.UWP.ViewModels.Controls
 {

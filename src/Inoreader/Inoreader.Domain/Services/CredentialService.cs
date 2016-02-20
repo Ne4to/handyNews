@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Windows.Security.Credentials;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.Domain.Services.Interfaces;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	// ReSharper disable once ClassNeverInstantiated.Global
 	public class CredentialService : ICredentialService

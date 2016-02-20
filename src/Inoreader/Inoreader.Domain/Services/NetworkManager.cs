@@ -1,8 +1,8 @@
 ﻿using System;
 using Windows.Networking.Connectivity;
-using Inoreader.Domain.Services.Interfaces;
+using handyNews.Domain.Services.Interfaces;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class NetworkManager : INetworkManager
 	{

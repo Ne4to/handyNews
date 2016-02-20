@@ -8,7 +8,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
-using Inoreader.Domain.Services;
+using handyNews.Domain.Services;
 using Microsoft.Xaml.Interactivity;
 
 namespace Inoreader.Behaviors

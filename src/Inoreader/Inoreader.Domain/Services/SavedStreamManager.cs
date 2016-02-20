@@ -7,11 +7,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using handyNews.Domain.Models;
+using handyNews.Domain.Models.Parser;
 using Inoreader.Annotations;
-using Inoreader.Domain.Models;
-using Inoreader.Domain.Models.Parser;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class SavedStreamManager
 	{

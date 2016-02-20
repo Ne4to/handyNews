@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Inoreader.Api.Models
+namespace handyNews.API.Models
 {
 	public class TagsResponse
 	{

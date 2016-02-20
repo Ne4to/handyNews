@@ -1,8 +1,8 @@
 ﻿using System;
+using handyNews.Domain.Models;
+using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.Model;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
-using Inoreader.Domain.Models;
-using Inoreader.Domain.Services.Interfaces;
 
 namespace handyNews.UWP.ViewModels.Controls
 {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Inoreader.Domain.Models;
+using handyNews.Domain.Models;
 
-namespace Inoreader.Domain.Services.Interfaces
+namespace handyNews.Domain.Services.Interfaces
 {
     public interface ISubscriptionsManager
     {

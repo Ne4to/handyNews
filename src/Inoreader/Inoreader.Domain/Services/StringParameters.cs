@@ -1,4 +1,4 @@
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	class StringParameters
 	{

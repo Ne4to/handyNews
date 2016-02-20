@@ -4,8 +4,8 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using Inoreader.Domain.Services;
-using Inoreader.Domain.Utils;
+using handyNews.Domain.Services;
+using handyNews.Domain.Utils;
 using Microsoft.Practices.Prism.Mvvm;
 
 namespace Inoreader.Views.Pages

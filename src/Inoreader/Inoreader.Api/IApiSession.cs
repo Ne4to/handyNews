@@ -1,4 +1,4 @@
-﻿namespace Inoreader.Api
+﻿namespace handyNews.API
 {
     public interface IApiSession
     {

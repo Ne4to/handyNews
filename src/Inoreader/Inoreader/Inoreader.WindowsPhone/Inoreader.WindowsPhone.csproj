@@ -403,13 +403,13 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Inoreader.Api\Inoreader.Api.csproj">
+    <ProjectReference Include="..\..\Inoreader.Api\handyNews.API.csproj">
       <Project>{12ec6b39-ac35-4909-b18a-54e427402552}</Project>
-      <Name>Inoreader.Api</Name>
+      <Name>handyNews.API</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Inoreader.Domain\Inoreader.Domain.csproj">
+    <ProjectReference Include="..\..\Inoreader.Domain\handyNews.Domain.csproj">
       <Project>{4192bef7-2c53-4945-a8b0-aaa923c5891d}</Project>
-      <Name>Inoreader.Domain</Name>
+      <Name>handyNews.Domain</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">

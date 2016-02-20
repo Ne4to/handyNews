@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Windows.Data.Html;
-using Inoreader.Domain.Models.Parser;
+using handyNews.Domain.Models.Parser;
 
-namespace Inoreader.Domain.Services
+namespace handyNews.Domain.Services
 {
 	public class HtmlParser
 	{

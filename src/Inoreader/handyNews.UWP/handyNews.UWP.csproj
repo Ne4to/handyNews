@@ -11,8 +11,8 @@
     <AssemblyName>handyNews.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
@@ -187,13 +187,13 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Inoreader.Api\Inoreader.Api.csproj">
+    <ProjectReference Include="..\Inoreader.Api\handyNews.API.csproj">
       <Project>{12EC6B39-AC35-4909-B18A-54E427402552}</Project>
-      <Name>Inoreader.Api</Name>
+      <Name>handyNews.API</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Inoreader.Domain\Inoreader.Domain.csproj">
+    <ProjectReference Include="..\Inoreader.Domain\handyNews.Domain.csproj">
       <Project>{4192BEF7-2C53-4945-A8B0-AAA923C5891D}</Project>
-      <Name>Inoreader.Domain</Name>
+      <Name>handyNews.Domain</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

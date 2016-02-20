@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Inoreader.Domain.Models.Parser
+namespace handyNews.Domain.Models.Parser
 {
 	public class HtmlTagLexeme : ILexeme
 	{
