@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Windows.Storage;
 using handyNews.Domain.Models;
@@ -17,7 +16,7 @@ namespace handyNews.Domain.Services
     public class LocalStorageManager
     {
         private readonly ITelemetryManager _telemetryManager;
-        private const string DatabaseFilename = "data.db";
+        private const string DatabaseFilename = "localdata.db";
 
         private const long AddMaxCountColumnSchemaVersion = 10L;
 
@@ -25,15 +24,17 @@ namespace handyNews.Domain.Services
         {
             if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
             _telemetryManager = telemetryManager;
+
+            Init();
         }
 
         private SQLiteConnection GetConnection()
         {
-            var fullPath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, DatabaseFilename);
+            var fullPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, DatabaseFilename);
             return new SQLiteConnection(new SQLitePlatformWinRT(), fullPath);
         }
 
-        public void Init()
+        private void Init()
         {
             using (var connection = GetConnection())
             {

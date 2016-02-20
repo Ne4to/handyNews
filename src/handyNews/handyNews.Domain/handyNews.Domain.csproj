@@ -118,6 +118,12 @@
     <Compile Include="Models\Parser\ILexeme.cs" />
     <Compile Include="Models\Parser\LiteralLexeme.cs" />
     <Compile Include="Models\SpecialTags.cs" />
+    <Compile Include="Models\SQLiteStorage\StreamCollectionTableRow.cs" />
+    <Compile Include="Models\SQLiteStorage\StreamItemTableRow.cs" />
+    <Compile Include="Models\SQLiteStorage\SubCatSubItemTableRow.cs" />
+    <Compile Include="Models\SQLiteStorage\SubCatTableRow.cs" />
+    <Compile Include="Models\SQLiteStorage\SubItemTableRow.cs" />
+    <Compile Include="Models\SQLiteStorage\TagActionTableRow.cs" />
     <Compile Include="Models\States\StreamItemCollectionState.cs" />
     <Compile Include="Models\StreamItem.cs" />
     <Compile Include="Models\StreamItemCollection.cs" />
@@ -141,6 +147,7 @@
     <Compile Include="Services\LocalStorageManager.cs" />
     <Compile Include="Services\NetworkManager.cs" />
     <Compile Include="Services\RichTextBlockBuilder.cs" />
+    <Compile Include="Models\SQLiteStorage\SavedStreamItemTableRow.cs" />
     <Compile Include="Services\SavedStreamManager.cs" />
     <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Services\SessionStore.cs" />
@@ -195,6 +202,7 @@
       <Name>SQLite for Universal App Platform</Name>
     </SDKReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
