@@ -44,7 +44,7 @@ namespace handyNews.UWP
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            var localStorageManager = new LocalStorageManager(new ApplicationInsightsTelemetryManager(new TelemetryClient()));            
+            var localStorageManager = new LocalStorageManager();            
             var rows = localStorageManager.LoadSubscriptionsAsync().Result;
 
             rows.Add(new SubscriptionItem()

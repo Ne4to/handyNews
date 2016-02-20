@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 using handyNews.Domain.Models;
+using handyNews.Domain.Models.SQLiteStorage;
 using handyNews.Domain.Models.States;
-using handyNews.Domain.Services.Interfaces;
 using JetBrains.Annotations;
 using SQLite.Net;
 using SQLite.Net.Platform.WinRT;
@@ -15,16 +15,11 @@ namespace handyNews.Domain.Services
 {
     public class LocalStorageManager
     {
-        private readonly ITelemetryManager _telemetryManager;
         private const string DatabaseFilename = "localdata.db";
-
         private const long AddMaxCountColumnSchemaVersion = 10L;
 
-        public LocalStorageManager(ITelemetryManager telemetryManager)
+        public LocalStorageManager()
         {
-            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
-            _telemetryManager = telemetryManager;
-
             Init();
         }
 
@@ -234,23 +229,16 @@ namespace handyNews.Domain.Services
 
             return Task.Run(() =>
             {
-                try
+                using (var connection = GetConnection())
                 {
-                    using (var connection = GetConnection())
-                    {
-                        connection.BeginTransaction();
+                    connection.BeginTransaction();
 
-                        ClearSubscriptions(connection);
-                        //SaveSubscriptionCategories(cats, connection);
-                        SaveSubscriptionItems(subItems, connection);
-                        //SaveSubscriptionLinks(catItemsLinks, connection);
+                    ClearSubscriptions(connection);
+                    //SaveSubscriptionCategories(cats, connection);
+                    SaveSubscriptionItems(subItems, connection);
+                    //SaveSubscriptionLinks(catItemsLinks, connection);
 
-                        connection.Commit();
-                    }
-                }
-                catch (Exception e)
-                {
-                    _telemetryManager.TrackError(e);
+                    connection.Commit();
                 }
             });
         }
@@ -267,7 +255,7 @@ namespace handyNews.Domain.Services
             if (cats.Length == 0) return;
             throw new NotImplementedException();
             //using (var statement = connection.Prepare(@"INSERT INTO SUB_CAT(ID, SORT_ID, TITLE, UNREAD_COUNT, IS_MAX_COUNT) 
-												//							VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @IS_MAX_COUNT);"))
+            //							VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @IS_MAX_COUNT);"))
             //{
             //    foreach (var categoryItem in cats)
             //    {
@@ -293,7 +281,7 @@ namespace handyNews.Domain.Services
             var skipIdList = new List<string>(subItems.Length);
 
             var statement = connection.CreateCommand("INSERT INTO SUB_ITEM(ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC, IS_MAX_COUNT) VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @URL, @HTML_URL, @ICON_URL, @FIRST_ITEM_MSEC, @IS_MAX_COUNT);");
-            
+
             foreach (var item in subItems)
             {
                 if (skipIdList.Contains(item.Id))
@@ -325,7 +313,7 @@ namespace handyNews.Domain.Services
             if (catItemsLinks.Length == 0) return;
             throw new NotImplementedException();
             //using (var statement = connection.Prepare(@"INSERT INTO SUB_CAT_SUB_ITEM(CAT_ID, ITEM_ID) 
-												//							VALUES(@CAT_ID, @ITEM_ID);"))
+            //							VALUES(@CAT_ID, @ITEM_ID);"))
             //{
             //    foreach (var lnk in catItemsLinks)
             //    {
@@ -343,156 +331,86 @@ namespace handyNews.Domain.Services
 
         public Task<List<SubscriptionItemBase>> LoadSubscriptionsAsync()
         {
-            _telemetryManager.TrackEvent(TelemetryEvents.LoadSubscriptionsFromCache);
-
             return Task.Run(() =>
             {
-                try
+
+                List<CategoryItem> cats;
+                List<SubscriptionItem> items;
+                List<SubCatSubItemTableRow> links;
+
+                using (var connection = GetConnection())
                 {
-                    List<CategoryItem> cats;
-                    List<SubscriptionItem> items;
-                    List<SUB_CAT_SUB_ITEM> links;
+                    cats = LoadSubscriptionCategories(connection);
+                    items = LoadSubscriptionItems(connection);
+                    links = LoadSubscriptionLinks(connection);
+                }
 
-                    using (var connection = GetConnection())
+                var result = new List<SubscriptionItemBase>();
+
+                foreach (var categoryItem in cats)
+                {
+                    categoryItem.Subscriptions = new List<SubscriptionItem>();
+                }
+                result.AddRange(cats.OrderBy(c => c.Title));
+
+                var linkDict = links.GroupBy(l => l.ItemId, l => l.CatId).ToDictionary(g => g.Key, g => g.ToArray());
+
+                foreach (var subscriptionItem in items.OrderBy(s => s.Title))
+                {
+                    string[] l;
+
+                    if (!linkDict.TryGetValue(subscriptionItem.Id, out l) || l.Length == 0)
                     {
-                        cats = LoadSubscriptionCategories(connection);
-                        items = LoadSubscriptionItems(connection);
-                        links = LoadSubscriptionLinks(connection);
-                    }
-
-                    var result = new List<SubscriptionItemBase>();
-
-                    foreach (var categoryItem in cats)
-                    {
-                        categoryItem.Subscriptions = new List<SubscriptionItem>();
-                    }
-                    result.AddRange(cats.OrderBy(c => c.Title));
-
-                    var linkDict = links.GroupBy(l => l.ITEM_ID, l => l.CAT_ID).ToDictionary(g => g.Key, g => g.ToArray());
-
-                    foreach (var subscriptionItem in items.OrderBy(s => s.Title))
-                    {
-                        string[] l;
-
-                        if (!linkDict.TryGetValue(subscriptionItem.Id, out l) || l.Length == 0)
+                        if (subscriptionItem.Id == SpecialTags.Read)
                         {
-                            if (subscriptionItem.Id == SpecialTags.Read)
-                            {
-                                result.Insert(0, subscriptionItem);
-                            }
-                            else
-                            {
-                                result.Add(subscriptionItem);
-                            }
-
-                            continue;
+                            result.Insert(0, subscriptionItem);
+                        }
+                        else
+                        {
+                            result.Add(subscriptionItem);
                         }
 
-                        foreach (var c in cats.Where(c => l.Contains(c.Id)))
-                        {
-                            if (subscriptionItem.Id == c.Id)
-                            {
-                                c.Subscriptions.Insert(0, subscriptionItem);
-                            }
-                            else
-                            {
-                                c.Subscriptions.Add(subscriptionItem);
-                            }
-                        }
+                        continue;
                     }
 
-                    return result;
+                    foreach (var c in cats.Where(c => l.Contains(c.Id)))
+                    {
+                        if (subscriptionItem.Id == c.Id)
+                        {
+                            c.Subscriptions.Insert(0, subscriptionItem);
+                        }
+                        else
+                        {
+                            c.Subscriptions.Add(subscriptionItem);
+                        }
+                    }
                 }
-                catch (Exception e)
-                {
-                    _telemetryManager.TrackError(e);
-                    return null;
-                }
+
+                return result;
             });
         }
 
         private List<CategoryItem> LoadSubscriptionCategories(SQLiteConnection connection)
         {
-            return connection.
-                Query<CategoryItem>(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT, IS_MAX_COUNT FROM SUB_CAT")
+            return connection
+                .Table<SubCatTableRow>()
+                .Select(t => t.ToModel())
                 .ToList();
-
-            //using (var statement = connection.Prepare(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT, IS_MAX_COUNT FROM SUB_CAT;"))
-            //{
-            //    while (statement.Step() == SQLiteResult.ROW)
-            //    {
-            //        var item = new CategoryItem
-            //        {
-            //            Id = statement.GetText(0),
-            //            SortId = statement.GetText(1),
-            //            Title = statement.GetText(2),
-            //            PageTitle = statement.GetText(2),
-            //            UnreadCount = statement.GetInteger(3),
-            //            IsMaxUnread = statement.GetInteger(4) == 1
-            //        };
-
-            //        result.Add(item);
-            //    }
-            //}
         }
 
         private List<SubscriptionItem> LoadSubscriptionItems(SQLiteConnection connection)
         {
             return connection
-                .Query<SubscriptionItem>(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC, IS_MAX_COUNT FROM SUB_ITEM;")
+                .Table<SubItemTableRow>()
+                .Select(t => t.ToModel())
                 .ToList();
-
-            var result = new List<SubscriptionItem>();
-            throw new NotImplementedException();
-            //using (var statement = connection.Prepare(@"SELECT ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC, IS_MAX_COUNT FROM SUB_ITEM;"))
-            //{
-            //    while (statement.Step() == SQLiteResult.ROW)
-            //    {
-            //        var item = new SubscriptionItem
-            //        {
-            //            Id = (string)statement[0],
-            //            SortId = (string)statement[1],
-            //            Title = (string)statement[2],
-            //            PageTitle = (string)statement[2],
-            //            UnreadCount = (long)statement[3],
-            //            Url = (string)statement[4],
-            //            HtmlUrl = (string)statement[5],
-            //            IconUrl = (string)statement[6],
-            //            FirstItemMsec = (long)statement[7],
-            //            IsMaxUnread = statement.GetInteger(8) == 1
-            //        };
-
-            //        result.Add(item);
-            //    }
-            //}
-
-            return result;
         }
 
-        class SUB_CAT_SUB_ITEM
-        {
-            public string CAT_ID { get; set; }
-            public string ITEM_ID { get; set; }
-        }
-
-        private List<SUB_CAT_SUB_ITEM> LoadSubscriptionLinks(SQLiteConnection connection)
+        private List<SubCatSubItemTableRow> LoadSubscriptionLinks(SQLiteConnection connection)
         {
             return connection
-                .Query<SUB_CAT_SUB_ITEM>(@"SELECT CAT_ID, ITEM_ID FROM SUB_CAT_SUB_ITEM;")
+                .Table<SubCatSubItemTableRow>()
                 .ToList();
-
-            //var result = new List<Tuple<string, string>>();
-            //throw new NotImplementedException();
-            ////using (var statement = connection.Prepare(@"SELECT CAT_ID, ITEM_ID FROM SUB_CAT_SUB_ITEM;"))
-            ////{
-            ////    while (statement.Step() == SQLiteResult.ROW)
-            ////    {
-            ////        var item = new Tuple<string, string>(statement.GetText(0), statement.GetText(1));
-            ////        result.Add(item);
-            ////    }
-            ////}
-
-            //return result;
         }
 
         #endregion
@@ -508,23 +426,16 @@ namespace handyNews.Domain.Services
 
         private void SaveStreamCollectionInternal(StreamItemCollectionState collection)
         {
-            try
+            using (var connection = GetConnection())
             {
-                using (var connection = GetConnection())
-                {
-                    EnableForeignKeys(connection);
+                EnableForeignKeys(connection);
 
-                    connection.BeginTransaction();
-                    
-                    SaveStreamCollection(connection, collection);
-                    SaveStreamCollectionItems(connection, collection);
+                connection.BeginTransaction();
 
-                    connection.Commit();
-                }
-            }
-            catch (Exception e)
-            {
-                _telemetryManager.TrackError(e);
+                SaveStreamCollection(connection, collection);
+                SaveStreamCollectionItems(connection, collection);
+
+                connection.Commit();
             }
         }
 
@@ -532,7 +443,7 @@ namespace handyNews.Domain.Services
         {
             throw new NotImplementedException();
             //using (var statement = connection.Prepare(@"INSERT OR REPLACE INTO STREAM_COLLECTION(STREAM_ID, CONTINUATION, SHOW_NEWEST_FIRST, STREAM_TIMESTAMP, FAULT) 
-												//							VALUES(@STREAM_ID, @CONTINUATION, @SHOW_NEWEST_FIRST, @STREAM_TIMESTAMP, @FAULT);"))
+            //							VALUES(@STREAM_ID, @CONTINUATION, @SHOW_NEWEST_FIRST, @STREAM_TIMESTAMP, @FAULT);"))
             //{
             //    statement.Bind("@STREAM_ID", collection.StreamId);
             //    statement.Bind("@CONTINUATION", collection.Continuation);
@@ -582,25 +493,17 @@ namespace handyNews.Domain.Services
 
         private StreamItemCollectionState LoadStreamCollectionInternal(string streamId)
         {
-            try
+            using (var connection = GetConnection())
             {
-                using (var connection = GetConnection())
-                {
-                    EnableForeignKeys(connection);
+                EnableForeignKeys(connection);
 
-                    var result = LoadStreamCollection(connection, streamId);
+                var result = LoadStreamCollection(connection, streamId);
 
-                    if (result == null)
-                        return null;
+                if (result == null)
+                    return null;
 
-                    result.Items = LoadStreamCollectionItems(connection, streamId);
-                    return result;
-                }
-            }
-            catch (Exception e)
-            {
-                _telemetryManager.TrackError(e);
-                return null;
+                result.Items = LoadStreamCollectionItems(connection, streamId);
+                return result;
             }
         }
 
@@ -668,48 +571,32 @@ namespace handyNews.Domain.Services
 
         private ulong GetTotalCacheSizeInternal()
         {
-            try
+            using (var connection = GetConnection())
             {
-                using (var connection = GetConnection())
-                {
-                    throw new NotImplementedException();
+                throw new NotImplementedException();
 
-                    //using (var statement = connection.Prepare(@"SELECT SUM(LENGTH(CAST(CONTENT AS BLOB))) FROM STREAM_ITEM;"))
-                    //{
-                    //    if (statement.Step() != SQLiteResult.ROW)
-                    //        return 0UL;
+                //using (var statement = connection.Prepare(@"SELECT SUM(LENGTH(CAST(CONTENT AS BLOB))) FROM STREAM_ITEM;"))
+                //{
+                //    if (statement.Step() != SQLiteResult.ROW)
+                //        return 0UL;
 
-                    //    return (ulong)statement.GetInteger(0);
-                    //}
-                }
-            }
-            catch (Exception e)
-            {
-                _telemetryManager.TrackError(e);
-                return 0UL;
+                //    return (ulong)statement.GetInteger(0);
+                //}
             }
         }
 
         private async Task<ulong> GetTempFilesSizeAsync()
         {
-            try
-            {
-                var tempSize = 0UL;
+            var tempSize = 0UL;
 
-                var folder = ApplicationData.Current.TemporaryFolder;
-                var files = await folder.GetFilesAsync().AsTask().ConfigureAwait(false);
-                foreach (var storageFile in files)
-                {
-                    tempSize += (await storageFile.GetBasicPropertiesAsync().AsTask().ConfigureAwait(false)).Size;
-                }
-
-                return tempSize;
-            }
-            catch (Exception e)
+            var folder = ApplicationData.Current.TemporaryFolder;
+            var files = await folder.GetFilesAsync().AsTask().ConfigureAwait(false);
+            foreach (var storageFile in files)
             {
-                _telemetryManager.TrackError(e);
-                return 0UL;
+                tempSize += (await storageFile.GetBasicPropertiesAsync().AsTask().ConfigureAwait(false)).Size;
             }
+
+            return tempSize;
         }
 
         public Task ClearCacheAsync()
@@ -719,32 +606,20 @@ namespace handyNews.Domain.Services
 
         private void ClearCacheInternal()
         {
-            try
+            using (var connection = GetConnection())
             {
-                using (var connection = GetConnection())
-                {
-                    connection.Execute(@"DELETE FROM STREAM_ITEM;");
-                }
-            }
-            catch (Exception e)
-            {
-                _telemetryManager.TrackError(e);
+                connection.Execute(@"DELETE FROM STREAM_ITEM;");
             }
         }
 
         public async Task ClearTempFilesAsync()
         {
-            try
+            var folder = ApplicationData.Current.TemporaryFolder;
+            var files = await folder.GetFilesAsync().AsTask().ConfigureAwait(false);
+            foreach (var storageFile in files)
             {
-                var folder = ApplicationData.Current.TemporaryFolder;
-                var files = await folder.GetFilesAsync().AsTask().ConfigureAwait(false);
-                foreach (var storageFile in files)
-                {
-                    await storageFile.DeleteAsync().AsTask().ConfigureAwait(false);
-                }
+                await storageFile.DeleteAsync().AsTask().ConfigureAwait(false);
             }
-            // ReSharper disable once EmptyGeneralCatchClause
-            catch (Exception) { }
         }
 
         public Task SetCachedItemAsReadAsync(string id, bool newValue)
@@ -754,23 +629,16 @@ namespace handyNews.Domain.Services
 
         private void SetCachedItemAsReadInternal(string id, bool newValue)
         {
-            try
+            using (var connection = GetConnection())
             {
-                using (var connection = GetConnection())
-                {
-                    throw new NotImplementedException();
-                    //using (var statement = connection.Prepare(@"UPDATE STREAM_ITEM SET UNREAD = @UNREAD WHERE ID = @ID;"))
-                    //{
-                    //    statement.Bind("@ID", id);
-                    //    statement.Bind("@UNREAD", newValue ? 0 : 1);
+                throw new NotImplementedException();
+                //using (var statement = connection.Prepare(@"UPDATE STREAM_ITEM SET UNREAD = @UNREAD WHERE ID = @ID;"))
+                //{
+                //    statement.Bind("@ID", id);
+                //    statement.Bind("@UNREAD", newValue ? 0 : 1);
 
-                    //    statement.Step();
-                    //}
-                }
-            }
-            catch (Exception e)
-            {
-                _telemetryManager.TrackError(e);
+                //    statement.Step();
+                //}
             }
         }
 
@@ -781,23 +649,17 @@ namespace handyNews.Domain.Services
 
         private void SetCachedItemAsStarredInternal(string id, bool newValue)
         {
-            try
-            {
-                using (var connection = GetConnection())
-                {
-                    throw new NotImplementedException();
-                    //using (var statement = connection.Prepare(@"UPDATE STREAM_ITEM SET STARRED = @STARRED WHERE ID = @ID;"))
-                    //{
-                    //    statement.Bind("@ID", id);
-                    //    statement.Bind("@STARRED", newValue ? 1 : 0);
 
-                    //    statement.Step();
-                    //}
-                }
-            }
-            catch (Exception e)
+            using (var connection = GetConnection())
             {
-                _telemetryManager.TrackError(e);
+                throw new NotImplementedException();
+                //using (var statement = connection.Prepare(@"UPDATE STREAM_ITEM SET STARRED = @STARRED WHERE ID = @ID;"))
+                //{
+                //    statement.Bind("@ID", id);
+                //    statement.Bind("@STARRED", newValue ? 1 : 0);
+
+                //    statement.Step();
+                //}
             }
         }
 

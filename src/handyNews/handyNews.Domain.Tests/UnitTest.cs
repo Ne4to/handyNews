@@ -12,7 +12,7 @@ namespace handyNews.Domain.Tests
         [TestMethod]
         public void TestMethod1()
         {
-            var localStorageManager = new LocalStorageManager(new ApplicationInsightsTelemetryManager(new TelemetryClient()));
+            var localStorageManager = new LocalStorageManager();
             var t = localStorageManager.LoadSubscriptionsAsync().Result;
         }
     }

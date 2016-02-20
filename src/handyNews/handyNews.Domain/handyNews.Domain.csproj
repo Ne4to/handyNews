@@ -118,6 +118,7 @@
     <Compile Include="Models\Parser\ILexeme.cs" />
     <Compile Include="Models\Parser\LiteralLexeme.cs" />
     <Compile Include="Models\SpecialTags.cs" />
+    <Compile Include="Models\SQLiteStorage\StorageExtensions.cs" />
     <Compile Include="Models\SQLiteStorage\StreamCollectionTableRow.cs" />
     <Compile Include="Models\SQLiteStorage\StreamItemTableRow.cs" />
     <Compile Include="Models\SQLiteStorage\SubCatSubItemTableRow.cs" />
