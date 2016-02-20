@@ -53,3 +53,5 @@
 /src/backup/Inoreader.Domain/bin/x86
 /src/backup/Inoreader.Domain/obj
 /src/backup/Inoreader/Inoreader.WindowsPhone/Assets/DebugSignInData.json
+bin/
+obj/
