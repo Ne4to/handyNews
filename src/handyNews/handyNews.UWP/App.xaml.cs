@@ -16,6 +16,9 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using handyNews.Domain.Models;
+using handyNews.Domain.Services;
+using Microsoft.ApplicationInsights;
 
 namespace handyNews.UWP
 {
@@ -41,6 +44,18 @@ namespace handyNews.UWP
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            var localStorageManager = new LocalStorageManager(new ApplicationInsightsTelemetryManager(new TelemetryClient()));
+            localStorageManager.Init();
+            var rows = localStorageManager.LoadSubscriptionsAsync().Result;
+
+            rows.Add(new SubscriptionItem()
+            {
+                Id = "ID0",
+                Title = "aaa"
+            });
+
+            localStorageManager.SaveSubscriptionsAsync(rows).Wait();
+
             AutofacModule module = new AutofacModule();
             module.Register();
 
