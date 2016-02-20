@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using handyNews.Domain.Utils;
-using Inoreader.Annotations;
+using JetBrains.Annotations;
 
 namespace handyNews.Domain.Services
 {

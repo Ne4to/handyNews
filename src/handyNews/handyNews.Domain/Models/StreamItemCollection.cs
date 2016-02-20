@@ -10,7 +10,7 @@ using Windows.Foundation;
 using Windows.UI.Xaml.Data;
 using handyNews.Domain.Models.States;
 using handyNews.Domain.Services.Interfaces;
-using Inoreader.Annotations;
+using JetBrains.Annotations;
 
 namespace handyNews.Domain.Models
 {

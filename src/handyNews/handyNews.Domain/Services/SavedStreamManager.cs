@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using handyNews.Domain.Models;
 using handyNews.Domain.Models.Parser;
-using Inoreader.Annotations;
+using JetBrains.Annotations;
 
 namespace handyNews.Domain.Services
 {

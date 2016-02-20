@@ -39,3 +39,9 @@
 /src/handyNews/handyNews.UWP/bin
 /src/handyNews/handyNews.UWP/obj
 
+/src/handyNews/handyNews.API/bin
+/src/handyNews/handyNews.API/obj
+/src/handyNews/handyNews.Domain/bin
+/src/handyNews/handyNews.Domain/obj
+/src/handyNews/handyNews.API/project.lock.json
+/src/handyNews/handyNews.Domain/project.lock.json

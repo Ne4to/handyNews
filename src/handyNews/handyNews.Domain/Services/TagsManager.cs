@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using handyNews.API;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
-using Inoreader.Annotations;
+using JetBrains.Annotations;
 
 namespace handyNews.Domain.Services
 {

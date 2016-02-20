@@ -13,8 +13,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using handyNews.Domain.Services.Interfaces;
 using handyNews.Domain.Views.Controls;
-using Inoreader.Annotations;
-using NotificationsExtensions.TileContent;
+using JetBrains.Annotations;
+using NotificationsExtensions.Tiles;
 
 namespace handyNews.Domain.Services
 {
@@ -52,23 +52,49 @@ namespace handyNews.Domain.Services
 					return;
 				var squareSmallName = await SaveFileAsync(squareSmallImage, SquareSmallFileName, 71U, 71U);
 
-				var tileWide = TileContentFactory.CreateTileWide310x150Image();
-				tileWide.StrictValidation = true;
-			
-				tileWide.Branding = TileBranding.Name;
-				tileWide.Image.Src = "ms-appdata:///local/" + wideName;
-			
-				var tileSquare = TileContentFactory.CreateTileSquare150x150Image();
-				tileSquare.Branding = TileBranding.Name;
-				tileSquare.Image.Src = "ms-appdata:///local/" + squareName;
-				tileWide.Square150x150Content = tileSquare;
 
-				var tileSquareSmall = TileContentFactory.CreateTileSquare71x71Image();
-				tileSquareSmall.Branding = TileBranding.None;
-				tileSquareSmall.Image.Src = "ms-appdata:///local/" + squareSmallName;
-				tileSquare.Square71x71Content = tileSquareSmall;
+                var tile = new TileContent
+                {
+			        Visual = new TileVisual
+			        {
+                        TileWide = new TileBinding
+                        {
+                            Branding = TileBranding.Name,
+                            Content = new TileBindingContentAdaptive
+                            {
+                                BackgroundImage = new TileBackgroundImage
+                                {
+                                    Source = new TileImageSource("ms-appdata:///local/" + wideName)
+                                }
+                            }
+                        },
+                        TileMedium = new TileBinding
+                        {
+                            Branding = TileBranding.Name,
+                            Content = new TileBindingContentAdaptive
+                            {
+                                BackgroundImage = new TileBackgroundImage
+                                {
+                                    Source = new TileImageSource("ms-appdata:///local/" + squareName)
+                                }
+                            }
+                        },
+                        TileSmall = new TileBinding
+                        {
+                            Branding = TileBranding.None,
+                            Content = new TileBindingContentAdaptive
+                            {
+                                BackgroundImage = new TileBackgroundImage
+                                {
+                                    Source = new TileImageSource("ms-appdata:///local/" + squareSmallName)
+                                }
+                            }
+                        }
+                    }
+			    };
 
-				var tileNotification = tileWide.CreateNotification();
+                var doc = tile.GetXml();
+                var tileNotification = new TileNotification(doc);
 				tileNotification.ExpirationTime = DateTimeOffset.Now.AddDays(1D);
 
 				var tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();			

@@ -187,16 +187,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Inoreader.Api\handyNews.API.csproj">
-      <Project>{12EC6B39-AC35-4909-B18A-54E427402552}</Project>
-      <Name>handyNews.API</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inoreader.Domain\handyNews.Domain.csproj">
-      <Project>{4192BEF7-2C53-4945-A8B0-AAA923C5891D}</Project>
-      <Name>handyNews.Domain</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
@@ -206,6 +196,16 @@
     <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
       <Name>Behaviors SDK %28XAML%29</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\handyNews.API\handyNews.API.csproj">
+      <Project>{8c1035de-bc2d-4704-afbe-23df0c739fe6}</Project>
+      <Name>handyNews.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\handyNews.Domain\handyNews.Domain.csproj">
+      <Project>{4689b57e-be03-4104-874e-2ee5c0d58a6f}</Project>
+      <Name>handyNews.Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

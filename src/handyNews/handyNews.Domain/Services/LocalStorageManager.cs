@@ -6,7 +6,7 @@ using Windows.Storage;
 using handyNews.Domain.Models;
 using handyNews.Domain.Models.States;
 using handyNews.Domain.Services.Interfaces;
-using Inoreader.Annotations;
+using JetBrains.Annotations;
 using SQLitePCL;
 
 namespace handyNews.Domain.Services
