@@ -45,3 +45,11 @@
 /src/handyNews/handyNews.Domain/obj
 /src/handyNews/handyNews.API/project.lock.json
 /src/handyNews/handyNews.Domain/project.lock.json
+/src/backup/Inoreader/Inoreader.WindowsPhone/bin/x86
+/src/backup/Inoreader/Inoreader.WindowsPhone/obj
+/src/backup/Inoreader.Api/bin/x86
+/src/backup/Inoreader.Api/obj/ARM/Debug UWP
+/src/backup/Inoreader.Api/obj
+/src/backup/Inoreader.Domain/bin/x86
+/src/backup/Inoreader.Domain/obj
+/src/backup/Inoreader/Inoreader.WindowsPhone/Assets/DebugSignInData.json

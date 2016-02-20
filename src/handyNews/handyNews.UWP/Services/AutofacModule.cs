@@ -7,7 +7,6 @@ using handyNews.Domain.Services;
 using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.ViewModels.Controls;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
-using Inoreader;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
 using Newtonsoft.Json.Linq;

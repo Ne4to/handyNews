@@ -6,7 +6,6 @@ using Windows.Storage;
 using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.Model;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
-using Inoreader;
 using Newtonsoft.Json.Linq;
 
 // ReSharper disable ExplicitCallerInfoArgument

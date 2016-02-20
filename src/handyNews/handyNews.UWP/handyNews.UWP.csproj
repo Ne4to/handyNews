@@ -103,23 +103,17 @@
     <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Inoreader\Inoreader.WindowsPhone\ApplicationInsightsTelemetryManager.cs">
-      <Link>Services\ApplicationInsightsTelemetryManager.cs</Link>
-    </Compile>
-    <Compile Include="..\Inoreader\Inoreader.WindowsPhone\Behaviors\RichTextBlockHtmlBehavior.cs">
-      <Link>Behaviors\RichTextBlockHtmlBehavior.cs</Link>
-    </Compile>
-    <Compile Include="..\Inoreader\Inoreader.WindowsPhone\TelemetryEvents.cs">
-      <Link>TelemetryEvents.cs</Link>
-    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviors\RichTextBlockHtmlBehavior.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Model\BindableBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ApplicationInsightsTelemetryManager.cs" />
     <Compile Include="Services\AutofacModule.cs" />
     <Compile Include="Services\DelegateCommand.cs" />
+    <Compile Include="TelemetryEvents.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\ISignInDialogViewModel.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\ISubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\IStreamViewViewModel.cs" />
