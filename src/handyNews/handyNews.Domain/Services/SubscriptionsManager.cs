@@ -37,9 +37,9 @@ namespace handyNews.Domain.Services
 		{
 			var stopwatch = Stopwatch.StartNew();
 
-			var tags = await _apiClient.GetTagsAsync();
-			var subscriptions = await _apiClient.GetSubscriptionsAsync();
-			var unreadCount = await _apiClient.GetUnreadCountAsync();
+			var tags = await _apiClient.GetTagsAsync();//.ConfigureAwait(false);
+			var subscriptions = await _apiClient.GetSubscriptionsAsync();//.ConfigureAwait(false);
+			var unreadCount = await _apiClient.GetUnreadCountAsync();//.ConfigureAwait(false);
 
 			stopwatch.Stop();
 			_telemetryManager.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);

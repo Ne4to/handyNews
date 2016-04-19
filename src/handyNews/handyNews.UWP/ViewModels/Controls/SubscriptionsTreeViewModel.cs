@@ -9,6 +9,8 @@ using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.Model;
 using handyNews.UWP.Services;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
+using handyNews.UWP.Views.Controls;
+using JetBrains.Annotations;
 
 namespace handyNews.UWP.ViewModels.Controls
 {
@@ -17,6 +19,7 @@ namespace handyNews.UWP.ViewModels.Controls
         #region Fields
 
         private readonly ISubscriptionsManager _subscriptionsManager;
+        private readonly INavigationService _navigationService;
 
         private bool _isRoot = true;
         private List<SubscriptionItemBase> _rootItems;
@@ -49,10 +52,13 @@ namespace handyNews.UWP.ViewModels.Controls
 
         public ICommand ItemClickCommand => _itemClickCommand ?? (_itemClickCommand = new DelegateCommand(OnItemClick));
 
-        public SubscriptionsTreeViewModel(ISubscriptionsManager subscriptionsManager)
+        public SubscriptionsTreeViewModel([NotNull] ISubscriptionsManager subscriptionsManager,
+            [NotNull] INavigationService navigationService)
         {
             if (subscriptionsManager == null) throw new ArgumentNullException(nameof(subscriptionsManager));
+            if (navigationService == null) throw new ArgumentNullException(nameof(navigationService));
             _subscriptionsManager = subscriptionsManager;
+            _navigationService = navigationService;
         }
 
         public async void LoadSubscriptionsAsync()
@@ -78,8 +84,13 @@ namespace handyNews.UWP.ViewModels.Controls
             }
             catch (AuthenticationApiException)
             {
+                //_navigationService.Navigate(PageTo);
                 //_signInManager.SignOut();
                 //_navigationService.Navigate(PageTokens.SignIn, null);
+
+                SignInDialog dialog = new SignInDialog();
+                await dialog.ShowAsync();
+
                 return;
             }
             catch (Exception ex)

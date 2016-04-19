@@ -17,14 +17,14 @@
 // 	This code contains a helper class exposing property representations
 // 	of the string resources defined in the specified .ResW file
 // 
-// 	Generated: 02/20/2016 21:01:09
+// 	Generated: 04/01/2016 00:58:13
 // </auto-generatedInfo>
 // --------------------------------------------------------------------------------------------------
-
-using Windows.ApplicationModel.Resources;
-
 namespace handyNews.Domain.Strings
 {
+    using Windows.ApplicationModel.Resources;
+    
+    
     public partial class Resources
     {
         

@@ -121,6 +121,7 @@
     <Compile Include="ViewModels\Controls\StreamViewViewModel.cs" />
     <Compile Include="ViewModels\Controls\SubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
+    <Compile Include="ViewModels\PageTokens.cs" />
     <Compile Include="Views\Controls\SignInDialog.xaml.cs">
       <DependentUpon>SignInDialog.xaml</DependentUpon>
     </Compile>

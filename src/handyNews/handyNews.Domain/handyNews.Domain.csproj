@@ -107,7 +107,11 @@
     <None Include="project.json" />
     <PRIResource Include="Strings\ru-RU\Resources.resw" />
     <PRIResource Include="Strings\pt-BR\Resources.resw" />
-    <PRIResource Include="Strings\en-US\Resources.resw" />
+    <PRIResource Include="Strings\en-US\Resources.resw">
+      <Generator>reswfilecodegenerator</Generator>
+      <LastGenOutput>Resources1.cs</LastGenOutput>
+      <CustomToolNamespace>handyNews.Domain.Strings</CustomToolNamespace>
+    </PRIResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\BindableBaseEx.cs" />
@@ -136,6 +140,7 @@
     <Compile Include="Services\HtmlParser.cs" />
     <Compile Include="Services\ImageManager.cs" />
     <Compile Include="Services\Interfaces\ICredentialService.cs" />
+    <Compile Include="Services\Interfaces\INavigationService.cs" />
     <Compile Include="Services\Interfaces\INetworkManager.cs" />
     <Compile Include="Services\Interfaces\ISessionStore.cs" />
     <Compile Include="Services\Interfaces\ISettingsManager.cs" />
@@ -145,6 +150,7 @@
     <Compile Include="Services\Interfaces\ITagsManager.cs" />
     <Compile Include="Services\Interfaces\ITelemetryManager.cs" />
     <Compile Include="Services\Interfaces\ITileManager.cs" />
+    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Services\LocalStorageManager.cs" />
     <Compile Include="Services\NetworkManager.cs" />
     <Compile Include="Services\RichTextBlockBuilder.cs" />
@@ -160,7 +166,11 @@
     <Compile Include="Services\TagsManager.cs" />
     <Compile Include="Services\TileManager.cs" />
     <Compile Include="Services\VisualTreeUtilities.cs" />
-    <Compile Include="Strings\en-US\Resources.cs" />
+    <Compile Include="Strings\en-US\Resources1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resw</DependentUpon>
+    </Compile>
     <Compile Include="TelemetryEvents.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\ScrollUtils.cs" />
