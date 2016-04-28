@@ -110,8 +110,6 @@
     <Compile Include="ApiClient.cs" />
     <Compile Include="Exceptions\ApiException.cs" />
     <Compile Include="Exceptions\AuthorizationApiException.cs" />
-    <Compile Include="IApiSession.cs" />
-    <Compile Include="Models\SignInResponse.cs" />
     <Compile Include="Models\StreamResponse.cs" />
     <Compile Include="Models\SubscriptionsResponse.cs" />
     <Compile Include="Models\TagsResponse.cs" />

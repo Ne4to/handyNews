@@ -1,13 +1,14 @@
 ﻿using System.Threading.Tasks;
+using handyNews.API.Exceptions;
 
 namespace handyNews.Domain.Services.Interfaces
 {
-    public interface ISignInManager
+    public interface IAuthenticationManager
     {
-        bool SignInRequired { get; }
+        bool IsUserAuthenticated { get; }
 
         /// <exception cref="AuthenticationApiException"></exception>		
-        Task SignInAsync(string email, string password);
+        Task<bool> SignInAsync();
 
         void SignOut();
     }

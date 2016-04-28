@@ -17,23 +17,20 @@ namespace handyNews.UWP.Services
     {
         public IContainer Register()
         {
+            var authorizationDataStorage = new AuthorizationDataStorage();
+
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(new ApplicationInsightsTelemetryManager(new TelemetryClient()))
                 .As<ITelemetryManager>()
                 .SingleInstance();
 
-            builder.RegisterType<CredentialService>()
-                .As<ICredentialService>();
+            builder.RegisterInstance<IAuthorizationDataStorage>(authorizationDataStorage);
+            //builder.RegisterType<AuthorizationDataStorage>()
+            //    .As<IAuthorizationDataStorage>()
+            //    .SingleInstance();
 
-            builder.RegisterType<SessionStore>()
-                .As<ISessionStore>()
-                .SingleInstance();
-
-            builder.RegisterType<ApiSession>()
-                .As<IApiSession>();
-
-            var uri = new Uri("ms-appx:///Assets/ApiAuth.json");
+            var uri = new Uri("ms-appx:///Assets/AppSecret.json");
             var file = StorageFile.GetFileFromApplicationUriAsync(uri).AsTask().Result;
             var strData = FileIO.ReadTextAsync(file).AsTask().Result;
             var data = JObject.Parse(strData);
@@ -44,11 +41,12 @@ namespace handyNews.UWP.Services
             builder.RegisterType<ApiClient>()
                 .WithParameter("appId", appId)
                 .WithParameter("appKey", appKey)
+                .WithParameter("authorizationHandler", new AuthorizationHandler(authorizationDataStorage))
                 .As<ApiClient>()
                 .SingleInstance();
 
-            builder.RegisterType<SignInManager>()
-                .As<ISignInManager>()
+            builder.RegisterType<AuthenticationManager>()
+                .As<IAuthenticationManager>()
                 .SingleInstance();
 
             builder.RegisterType<SettingsManager>()
@@ -65,10 +63,6 @@ namespace handyNews.UWP.Services
 
             builder.RegisterType<NavigationService>()
                 .As<INavigationService>();
-
-            builder.RegisterType<SignInDialogViewModel>()
-                .As<ISignInDialogViewModel>()
-                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             builder.RegisterType<SubscriptionsTreeViewModel>()
                 .As<ISubscriptionsTreeViewModel>()

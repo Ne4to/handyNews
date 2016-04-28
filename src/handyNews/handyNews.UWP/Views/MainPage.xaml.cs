@@ -2,6 +2,7 @@
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using handyNews.API;
 using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using handyNews.UWP.Views.Controls;
@@ -37,12 +38,18 @@ namespace handyNews.UWP.Views
 
             Tree.ViewModel.SubscriptionSelected += ViewModel_SubscriptionSelected;
             
-            var signInManager = ServiceLocator.Current.GetInstance<ISignInManager>();
-            if (signInManager.SignInRequired)
+            // TODO move to ViewModel
+            var signInManager = ServiceLocator.Current.GetInstance<IAuthenticationManager>();
+            if (!signInManager.IsUserAuthenticated)
             {
-                SignInDialog dialog = new SignInDialog();
-                await dialog.ShowAsync();
+                await signInManager.SignInAsync();
+
+                
             }
+
+            // TODO remove, it is test code
+            var apiClient = ServiceLocator.Current.GetInstance<ApiClient>();
+            var subscriptions = await apiClient.GetSubscriptionsAsync();
         }
 
         private void Manager_BackRequested(object sender, BackRequestedEventArgs e)

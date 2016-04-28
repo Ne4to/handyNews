@@ -88,8 +88,9 @@ namespace handyNews.UWP.ViewModels.Controls
                 //_signInManager.SignOut();
                 //_navigationService.Navigate(PageTokens.SignIn, null);
 
-                SignInDialog dialog = new SignInDialog();
-                await dialog.ShowAsync();
+                throw;
+                //SignInDialog dialog = new SignInDialog();
+                //await dialog.ShowAsync();
 
                 return;
             }

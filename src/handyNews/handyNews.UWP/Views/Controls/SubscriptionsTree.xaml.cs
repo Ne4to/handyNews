@@ -29,7 +29,7 @@ namespace handyNews.UWP.Views.Controls
 
         private void SubscriptionsTree_OnLoaded(object sender, RoutedEventArgs e)
         {
-            ViewModel.LoadSubscriptionsAsync();
+            //TODO ViewModel.LoadSubscriptionsAsync();
         }
     }
 }

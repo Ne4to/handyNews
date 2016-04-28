@@ -34,8 +34,7 @@
 /src/handyNews/handyNews.UWP
 /src/handyNews/Inoreader.Tests/bin
 /src/handyNews/Inoreader.Tests/obj
-/src/handyNews/handyNews.UWP/Assets/ApiAuth.json
-/src/handyNews/handyNews.UWP/Assets/DebugSignInData.json
+/src/handyNews/handyNews.UWP/Assets/AppSecret.json
 /src/handyNews/handyNews.UWP/bin
 /src/handyNews/handyNews.UWP/obj
 

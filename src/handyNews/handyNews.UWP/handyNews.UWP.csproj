@@ -92,9 +92,8 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Content Include="Assets\ApiAuth.json" />
+    <Content Include="Assets\AppSecret.json" />
     <Content Include="Assets\CategoryIcon.png" />
-    <Content Include="Assets\DebugSignInData.json" />
     <None Include="handyNews.UWP_StoreKey.pfx" />
     <None Include="project.json" />
     <None Include="Service References\Application Insights\ConnectedService.json" />
@@ -114,17 +113,12 @@
     <Compile Include="Services\AutofacModule.cs" />
     <Compile Include="Services\DelegateCommand.cs" />
     <Compile Include="TelemetryEvents.cs" />
-    <Compile Include="ViewModels\Controls\Interfaces\ISignInDialogViewModel.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\ISubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\IStreamViewViewModel.cs" />
-    <Compile Include="ViewModels\Controls\SignInDialogViewModel.cs" />
     <Compile Include="ViewModels\Controls\StreamViewViewModel.cs" />
     <Compile Include="ViewModels\Controls\SubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\PageTokens.cs" />
-    <Compile Include="Views\Controls\SignInDialog.xaml.cs">
-      <DependentUpon>SignInDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Controls\StreamView.xaml.cs">
       <DependentUpon>StreamView.xaml</DependentUpon>
     </Compile>
@@ -163,10 +157,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Page>
-    <Page Include="Views\Controls\SignInDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\StreamView.xaml">
       <SubType>Designer</SubType>
