@@ -32,14 +32,38 @@ namespace handyNews.Domain.Services
             var authorizationCode = await GetAuthorizationCode(clientData).ConfigureAwait(false);
             var accessTokenData = await GetAccessTokenData(authorizationCode, clientData).ConfigureAwait(false);
 
-            _authorizationDataStorage.AccessToken = accessTokenData.AccessToken;
-            _authorizationDataStorage.AccessTokenExpireDate = DateTimeOffset.UtcNow.AddSeconds(accessTokenData.ExpiresIn);
-            _authorizationDataStorage.RefreshToken = accessTokenData.RefreshToken;
-            _authorizationDataStorage.Save();
+            SaveAccessToken(accessTokenData);
 
             //TelemetryManager.TrackEvent(TelemetryEvents.SignIn);
 
             return true;
+        }
+
+        private void SaveAccessToken(AccessTokenData accessTokenData)
+        {
+            _authorizationDataStorage.AccessToken = accessTokenData.AccessToken;
+            _authorizationDataStorage.AccessTokenExpireDate = DateTimeOffset.UtcNow.AddSeconds(accessTokenData.ExpiresIn);
+            _authorizationDataStorage.RefreshToken = accessTokenData.RefreshToken;
+            _authorizationDataStorage.Save();
+        }
+
+        public async Task RefreshTokenAsync()
+        {
+            var clientData = await GetClientDataAsync().ConfigureAwait(false);
+
+            var httpClient = new HttpClient();
+            var httpContent = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("client_id", clientData.ClientId),
+                new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
+                new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                new KeyValuePair<string, string>("refresh_token", _authorizationDataStorage.RefreshToken)
+            });
+
+            var getAccessTokenResponseMessage = await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent).ConfigureAwait(false);
+            var accessTokenDataJson = await getAccessTokenResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var accessTokenData = JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
+            SaveAccessToken(accessTokenData);
         }
 
         private async Task<string> GetAuthorizationCode(ClientData clientData)

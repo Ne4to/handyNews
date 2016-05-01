@@ -9,7 +9,7 @@ namespace handyNews.Domain.Services.Interfaces
 
         /// <exception cref="AuthenticationApiException"></exception>		
         Task<bool> SignInAsync();
-
+        Task RefreshTokenAsync();
         void SignOut();
     }
 }

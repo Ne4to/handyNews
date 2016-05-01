@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -11,11 +12,15 @@ namespace handyNews.Domain.Services
     public class AuthorizationHandler : DelegatingHandler
     {
         private readonly IAuthorizationDataStorage _authorizationDataStorage;
+        private readonly IAuthenticationManager _authenticationManager;
 
-        public AuthorizationHandler([NotNull] IAuthorizationDataStorage authorizationDataStorage)
+        public AuthorizationHandler([NotNull] IAuthorizationDataStorage authorizationDataStorage,
+            [NotNull] IAuthenticationManager authenticationManager)
         {
             if (authorizationDataStorage == null) throw new ArgumentNullException(nameof(authorizationDataStorage));
+            if (authenticationManager == null) throw new ArgumentNullException(nameof(authenticationManager));
             _authorizationDataStorage = authorizationDataStorage;
+            _authenticationManager = authenticationManager;
         }
 
         protected AuthorizationHandler(HttpMessageHandler innerHandler) 
@@ -23,14 +28,19 @@ namespace handyNews.Domain.Services
         {
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (_authorizationDataStorage.AccessToken == null)
                 throw new Exception("TODO user is not authenticated");
 
+            if (_authorizationDataStorage.AccessTokenExpireDate <= DateTimeOffset.UtcNow)
+            {                
+                await _authenticationManager.RefreshTokenAsync().ConfigureAwait(false);
+            }
+
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authorizationDataStorage.AccessToken);
 
-            return base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
     }
 }

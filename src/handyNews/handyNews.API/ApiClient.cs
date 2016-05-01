@@ -83,11 +83,6 @@ namespace handyNews.API
 			var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
 			var response = await _httpClient.SendAsync(requestMessage).ConfigureAwait(false);
-
-            // TODO validate exceptions, move to AuthorizationHandler
-			if (response.StatusCode == HttpStatusCode.Unauthorized)
-				throw new AuthenticationApiException(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
-
 			response.EnsureSuccessStatusCode();
 
 			var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

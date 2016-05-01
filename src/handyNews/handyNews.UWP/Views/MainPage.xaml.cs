@@ -43,8 +43,6 @@ namespace handyNews.UWP.Views
             if (!signInManager.IsUserAuthenticated)
             {
                 await signInManager.SignInAsync();
-
-                
             }
 
             // TODO remove, it is test code

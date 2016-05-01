@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Net.Http;
+using System.Reflection;
 using Windows.Storage;
 using Autofac;
+using Autofac.Core;
 using Autofac.Extras.CommonServiceLocator;
 using handyNews.API;
 using handyNews.Domain.Services;
@@ -17,36 +20,26 @@ namespace handyNews.UWP.Services
     {
         public IContainer Register()
         {
-            var authorizationDataStorage = new AuthorizationDataStorage();
-
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(new ApplicationInsightsTelemetryManager(new TelemetryClient()))
                 .As<ITelemetryManager>()
                 .SingleInstance();
 
-            builder.RegisterInstance<IAuthorizationDataStorage>(authorizationDataStorage);
-            //builder.RegisterType<AuthorizationDataStorage>()
-            //    .As<IAuthorizationDataStorage>()
-            //    .SingleInstance();
-
-            var uri = new Uri("ms-appx:///Assets/AppSecret.json");
-            var file = StorageFile.GetFileFromApplicationUriAsync(uri).AsTask().Result;
-            var strData = FileIO.ReadTextAsync(file).AsTask().Result;
-            var data = JObject.Parse(strData);
-
-            var appId = data["AppId"].ToString();
-            var appKey = data["AppKey"].ToString();
-            
-            builder.RegisterType<ApiClient>()
-                .WithParameter("appId", appId)
-                .WithParameter("appKey", appKey)
-                .WithParameter("authorizationHandler", new AuthorizationHandler(authorizationDataStorage))
-                .As<ApiClient>()
+            builder.RegisterType<AuthorizationDataStorage>()
+                .As<IAuthorizationDataStorage>()
                 .SingleInstance();
 
             builder.RegisterType<AuthenticationManager>()
                 .As<IAuthenticationManager>()
+                .SingleInstance();
+
+            builder.RegisterType<AuthorizationHandler>()
+                .SingleInstance();
+
+            builder.RegisterType<ApiClient>()
+                .As<ApiClient>()
+                .WithParameter(new ResolvedParameter(ApiClientParameterPredicate, ApiClientParameterAccessor))
                 .SingleInstance();
 
             builder.RegisterType<SettingsManager>()
@@ -70,7 +63,7 @@ namespace handyNews.UWP.Services
 
             builder.RegisterType<StreamViewViewModel>()
                 .As<IStreamViewViewModel>()
-                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);               
+                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             // Perform registrations and build the container.
             var container = builder.Build();
@@ -78,6 +71,19 @@ namespace handyNews.UWP.Services
             RegisterServiceLocator(container);
 
             return container;
+        }
+
+        private bool ApiClientParameterPredicate(ParameterInfo parameterInfo, IComponentContext context)
+        {
+            return parameterInfo.ParameterType == typeof(DelegatingHandler);
+        }
+
+        private object ApiClientParameterAccessor(ParameterInfo parameterInfo, IComponentContext context)
+        {
+            if (parameterInfo.ParameterType == typeof(DelegatingHandler))
+                return context.Resolve<AuthorizationHandler>();
+
+            return null;
         }
 
         private static void RegisterServiceLocator(IContainer container)
