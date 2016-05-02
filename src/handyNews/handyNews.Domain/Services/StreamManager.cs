@@ -39,12 +39,14 @@ namespace handyNews.Domain.Services
 
         private IEnumerable<StreamItem> GetItems(StreamResponse stream)
         {
+            // TODO implement fast version of HtmlUtilities.ConvertToText(it.title);
+
             var itemsQuery = from it in stream.items
                              select new StreamItem
                              {
                                  Id = it.id,
                                  Published = UnixTimeStampToDateTime(it.published),
-                                 Title = HtmlUtilities.ConvertToText(it.title),
+                                 Title = it.title,
                                  Content = it.summary.content,
                                  WebUri = GetWebUri(it),
                                  Starred = it.categories != null

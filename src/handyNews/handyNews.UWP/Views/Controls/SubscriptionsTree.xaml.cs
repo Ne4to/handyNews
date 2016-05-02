@@ -1,7 +1,9 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using handyNews.UWP.Events;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Microsoft.Practices.ServiceLocation;
+using PubSub;
 
 namespace handyNews.UWP.Views.Controls
 {
@@ -29,7 +31,7 @@ namespace handyNews.UWP.Views.Controls
 
         private void SubscriptionsTree_OnLoaded(object sender, RoutedEventArgs e)
         {
-            //TODO ViewModel.LoadSubscriptionsAsync();
+            ViewModel.OnNavigatedTo();
         }
     }
 }

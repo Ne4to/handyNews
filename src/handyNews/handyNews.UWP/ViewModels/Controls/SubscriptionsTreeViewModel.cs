@@ -6,11 +6,12 @@ using Windows.UI.Xaml.Controls;
 using handyNews.API.Exceptions;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.UWP.Events;
 using handyNews.UWP.Model;
 using handyNews.UWP.Services;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
-using handyNews.UWP.Views.Controls;
 using JetBrains.Annotations;
+using PubSub;
 
 namespace handyNews.UWP.ViewModels.Controls
 {
@@ -37,18 +38,16 @@ namespace handyNews.UWP.ViewModels.Controls
         public bool IsBusy
         {
             get { return _isBusy; }
-            set { SetProperty(ref _isBusy, value); }
+            set { SetProperty(ref _isBusy, value, nameof(IsBusy)); }
         }
 
         public List<SubscriptionItemBase> TreeItems
         {
             get { return _treeItems; }
-            private set { SetProperty(ref _treeItems, value); }
+            private set { SetProperty(ref _treeItems, value, nameof(TreeItems)); }
         }
 
         #endregion
-
-        public event EventHandler<SubscriptionSelectedEventArgs> SubscriptionSelected = delegate { }; 
 
         public ICommand ItemClickCommand => _itemClickCommand ?? (_itemClickCommand = new DelegateCommand(OnItemClick));
 
@@ -59,6 +58,16 @@ namespace handyNews.UWP.ViewModels.Controls
             if (navigationService == null) throw new ArgumentNullException(nameof(navigationService));
             _subscriptionsManager = subscriptionsManager;
             _navigationService = navigationService;
+        }
+
+        public void OnNavigatedTo()
+        {
+            this.Subscribe<RefreshTreeEvent>(OnRefreshTreeEvent);
+        }
+
+        private void OnRefreshTreeEvent(RefreshTreeEvent data)
+        {
+            LoadSubscriptionsAsync();
         }
 
         public async void LoadSubscriptionsAsync()
@@ -169,14 +178,7 @@ namespace handyNews.UWP.ViewModels.Controls
                 var subscriptionItem = clickEventArgs.ClickedItem as SubscriptionItem;
                 if (subscriptionItem != null)
                 {
-                    SubscriptionSelected(this, new SubscriptionSelectedEventArgs(subscriptionItem));
-                //    var pageToken = _settingsService.StreamView == StreamView.ExpandedView ? PageTokens.ExpandedStream : PageTokens.ListStream;
-                //    var navParam = new StreamPageNavigationParameter
-                //    {
-                //        StreamId = subscriptionItem.Id,
-                //        Title = subscriptionItem.PageTitle
-                //    };
-                //    _navigationService.Navigate(pageToken, navParam.ToJson());
+                    this.Publish(new ShowSubscriptionStreamEvent(subscriptionItem));
                 }
             }
         }

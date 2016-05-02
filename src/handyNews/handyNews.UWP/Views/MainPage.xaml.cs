@@ -1,17 +1,28 @@
-﻿using System;
-using Windows.UI.Core;
+﻿using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using handyNews.API;
-using handyNews.Domain.Services.Interfaces;
-using handyNews.UWP.ViewModels.Controls.Interfaces;
-using handyNews.UWP.Views.Controls;
+using handyNews.UWP.ViewModels;
 using Microsoft.Practices.ServiceLocation;
 
 namespace handyNews.UWP.Views
 {
     public sealed partial class MainPage : Page
     {
+        MainPageViewModel _viewModel;
+
+        public MainPageViewModel ViewModel
+        {
+            get
+            {
+                if (_viewModel == null)
+                {
+                    _viewModel = ServiceLocator.Current.GetInstance<MainPageViewModel>();
+                }
+
+                return _viewModel;
+            }
+        }
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -36,28 +47,12 @@ namespace handyNews.UWP.Views
             //    };
             //}
 
-            Tree.ViewModel.SubscriptionSelected += ViewModel_SubscriptionSelected;
-            
-            // TODO move to ViewModel
-            var signInManager = ServiceLocator.Current.GetInstance<IAuthenticationManager>();
-            if (!signInManager.IsUserAuthenticated)
-            {
-                await signInManager.SignInAsync();
-            }
-
-            // TODO remove, it is test code
-            var apiClient = ServiceLocator.Current.GetInstance<ApiClient>();
-            var subscriptions = await apiClient.GetSubscriptionsAsync();
+            ViewModel.OnNavigatedTo();
         }
 
         private void Manager_BackRequested(object sender, BackRequestedEventArgs e)
         {
             Tree.ViewModel.ShowRoot();
-        }
-
-        private void ViewModel_SubscriptionSelected(object sender, SubscriptionSelectedEventArgs e)
-        {
-            ItemsView.ViewModel.UpdateItems(e.Item.Id);            
         }
     }
 }

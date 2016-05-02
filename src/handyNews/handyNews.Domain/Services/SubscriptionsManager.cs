@@ -70,10 +70,12 @@ namespace handyNews.Domain.Services
 								select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max);
 
 				categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
-				categoryItem.Title = (from s in subscriptions.Subscriptions
+
+                // TODO implement fast version of select HtmlUtilities.ConvertToText(c.Label);
+                categoryItem.Title = (from s in subscriptions.Subscriptions
 									  from c in s.Categories
 									  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
-									  select HtmlUtilities.ConvertToText(c.Label)).FirstOrDefault();
+									  select c.Label).FirstOrDefault();
 
 				categoryItem.UnreadCount = categoryItem.Subscriptions.Sum(t => t.UnreadCount);
                 categoryItem.IsMaxUnread = categoryItem.Subscriptions.Any(t => t.IsMaxUnread);
@@ -134,15 +136,17 @@ namespace handyNews.Domain.Services
 				Url = s.Url,
 				HtmlUrl = s.HtmlUrl,
 				IconUrl = s.IconUrl,
-				Title = HtmlUtilities.ConvertToText(s.Title),
-				PageTitle = HtmlUtilities.ConvertToText(s.Title),
+				Title = s.Title,
+				PageTitle = s.Title,
 				FirstItemMsec = s.FirstItemMsec,
 				UnreadCount = unreadCount,
                 IsMaxUnread = unreadCount == maxUnread
 			};
-		}
 
-	    private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)
+            // TODO implement fast version of HtmlUtilities.ConvertToText(text); (Title, PageTitle)
+        }
+
+        private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)
 		{
 			int count;
 			return unreadCounts.TryGetValue(id, out count) ? count : 0;

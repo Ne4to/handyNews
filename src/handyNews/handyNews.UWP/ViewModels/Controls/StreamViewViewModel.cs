@@ -1,8 +1,10 @@
 ﻿using System;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.UWP.Events;
 using handyNews.UWP.Model;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
+using PubSub;
 
 namespace handyNews.UWP.ViewModels.Controls
 {
@@ -23,7 +25,7 @@ namespace handyNews.UWP.ViewModels.Controls
         public StreamItemCollection Items
         {
             get { return _items; }
-            private set { SetProperty(ref _items, value); }
+            private set { SetProperty(ref _items, value, nameof(Items)); }
         }
 
         #endregion
@@ -46,6 +48,16 @@ namespace handyNews.UWP.ViewModels.Controls
                 _telemetryManager, false, _settingsManager.PreloadItemCount);
             await streamItems.InitAsync();
             Items = streamItems;
+        }
+
+        public void OnNavigatedTo()
+        {
+            this.Subscribe<ShowSubscriptionStreamEvent>(OnShowSubscriptionStreamEvent);
+        }
+
+        private void OnShowSubscriptionStreamEvent(ShowSubscriptionStreamEvent eventData)
+        {
+            UpdateItems(eventData.Item.Id);
         }
     }
 }

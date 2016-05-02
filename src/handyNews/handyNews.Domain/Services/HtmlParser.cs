@@ -8,162 +8,163 @@ using handyNews.Domain.Models.Parser;
 
 namespace handyNews.Domain.Services
 {
-	public class HtmlParser
-	{
-		private static readonly Regex RemoveAdRegex;
+    public class HtmlParser
+    {
+        private static readonly Regex RemoveAdRegex;
 
-		static HtmlParser()
-		{
-			RemoveAdRegex = new Regex("(<center>).*(www.inoreader.com/adv).*(</center>)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-		}
+        static HtmlParser()
+        {
+            RemoveAdRegex = new Regex("(<center>).*(www.inoreader.com/adv).*(</center>)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        }
 
-		public string GetPlainText(string html, int maxLength)
-		{
-			if (html == null)
-				return String.Empty;
+        public string GetPlainText(string html, int maxLength)
+        {
+            if (html == null)
+                return String.Empty;
 
-			html = RemoveAdRegex.Replace(html, String.Empty);
-			var x = HtmlUtilities.ConvertToText(html);
-			var builder = new StringBuilder(x);
-			builder.Replace('\r', ' ');
-			builder.Replace('\n', ' ');
-			builder.Replace('\t', ' ');
+            html = RemoveAdRegex.Replace(html, String.Empty);
+            // TODO implement fast version of HtmlUtilities.ConvertToText(html);
+            var x = html;
+            var builder = new StringBuilder(x);
+            builder.Replace('\r', ' ');
+            builder.Replace('\n', ' ');
+            builder.Replace('\t', ' ');
 
-			int currentLength;
-			int newLength;
+            int currentLength;
+            int newLength;
 
-			do
-			{
-				currentLength = builder.Length;
-				builder.Replace("  ", " ");
-				newLength = builder.Length;
-			} while (currentLength != newLength);
+            do
+            {
+                currentLength = builder.Length;
+                builder.Replace("  ", " ");
+                newLength = builder.Length;
+            } while (currentLength != newLength);
 
-			if (newLength < maxLength)
-				return builder.ToString().Trim();
+            if (newLength < maxLength)
+                return builder.ToString().Trim();
 
-			return builder.ToString().Substring(0, maxLength).Trim();
-		}
-	
-		public ILexeme[] Parse(string html)
-		{
-			var strings = GetStrings(html);
-			return GetLexemes(strings);
-		}
+            return builder.ToString().Substring(0, maxLength).Trim();
+        }
 
-		private List<string> GetStrings(string html)
-		{
-			html = RemoveAdRegex.Replace(html, String.Empty);
+        public ILexeme[] Parse(string html)
+        {
+            var strings = GetStrings(html);
+            return GetLexemes(strings);
+        }
 
-			List<string> tokens = new List<string>(20);
-			var currentIndex = 0;
+        private List<string> GetStrings(string html)
+        {
+            html = RemoveAdRegex.Replace(html, String.Empty);
 
-			while (true)
-			{
-				var index = html.IndexOf('<', currentIndex);
-				if (index != -1)
-				{
-					if (index != currentIndex)
-					{
-						var zzz = html.Substring(currentIndex, index - currentIndex);
-						tokens.Add(zzz);
-					}
+            List<string> tokens = new List<string>(20);
+            var currentIndex = 0;
 
-					var index2 = html.IndexOf('>', index + 1);
-					if (index2 != -1)
-					{
-						var str = html.Substring(index, index2 - index + 1);
-						tokens.Add(str);
-						currentIndex = index2 + 1;
-					}
-					else
-					{
-						throw new Exception("bad format");
-					}
-				}
-				else
-				{
-					if (currentIndex < html.Length - 1)
-					{
-						tokens.Add(html.Substring(currentIndex));
-					}
-					break;
-				}
-			}
+            while (true)
+            {
+                var index = html.IndexOf('<', currentIndex);
+                if (index != -1)
+                {
+                    if (index != currentIndex)
+                    {
+                        var zzz = html.Substring(currentIndex, index - currentIndex);
+                        tokens.Add(zzz);
+                    }
 
-			tokens.RemoveAll(String.IsNullOrWhiteSpace);
-			return tokens;
-		}
+                    var index2 = html.IndexOf('>', index + 1);
+                    if (index2 != -1)
+                    {
+                        var str = html.Substring(index, index2 - index + 1);
+                        tokens.Add(str);
+                        currentIndex = index2 + 1;
+                    }
+                    else
+                    {
+                        throw new Exception("bad format");
+                    }
+                }
+                else
+                {
+                    if (currentIndex < html.Length - 1)
+                    {
+                        tokens.Add(html.Substring(currentIndex));
+                    }
+                    break;
+                }
+            }
 
-		private ILexeme[] GetLexemes(List<string> lexemes)
-		{
-			var q = from l in lexemes
-				let isTag = l[0] == '<' && l[l.Length - 1] == '>'
-				select isTag ? (ILexeme)GetHtmlTag(l) : (ILexeme)(new LiteralLexeme(l));
+            tokens.RemoveAll(String.IsNullOrWhiteSpace);
+            return tokens;
+        }
 
-			return q.ToArray();
-		}
+        private ILexeme[] GetLexemes(List<string> lexemes)
+        {
+            var q = from l in lexemes
+                    let isTag = l[0] == '<' && l[l.Length - 1] == '>'
+                    select isTag ? (ILexeme)GetHtmlTag(l) : (ILexeme)(new LiteralLexeme(l));
 
-		private HtmlTagLexeme GetHtmlTag(string token)
-		{
-			var tag = new HtmlTagLexeme();
+            return q.ToArray();
+        }
 
-			tag.IsOpen = token[1] != '/';
-			tag.IsClose = token[1] == '/' || token[token.Length - 2] == '/';
+        private HtmlTagLexeme GetHtmlTag(string token)
+        {
+            var tag = new HtmlTagLexeme();
 
-			var spacePos = token.IndexOf(' ');
-			if (spacePos != -1)
-			{
-				tag.Name = token.Substring(1, spacePos - 1);
+            tag.IsOpen = token[1] != '/';
+            tag.IsClose = token[1] == '/' || token[token.Length - 2] == '/';
 
-				var searchAttrStartPos = spacePos;
+            var spacePos = token.IndexOf(' ');
+            if (spacePos != -1)
+            {
+                tag.Name = token.Substring(1, spacePos - 1);
 
-				//<a href="http://channel9.msdn.com/Shows/This+Week+On+Channel+9/TWC9-NET-Core-OSS-Update-CoreCLR-on-GitHub-Windows-10-for-Raspberry-Pi-2-Super-Bowl-Stories-and-more#time=1m06s">
-				//<img src="https://www.inoreader.com/b/1438160281/1008166777" style="position: absolute; visibility: hidden">
+                var searchAttrStartPos = spacePos;
 
-				while (true)
-				{
-					var eqPos = token.IndexOf('=', searchAttrStartPos + 1);
-					if (eqPos != -1)
-					{
-						var attrName = token.Substring(searchAttrStartPos + 1, eqPos - searchAttrStartPos - 1).Trim();
-						var quoteSymb = token[eqPos + 1];
+                //<a href="http://channel9.msdn.com/Shows/This+Week+On+Channel+9/TWC9-NET-Core-OSS-Update-CoreCLR-on-GitHub-Windows-10-for-Raspberry-Pi-2-Super-Bowl-Stories-and-more#time=1m06s">
+                //<img src="https://www.inoreader.com/b/1438160281/1008166777" style="position: absolute; visibility: hidden">
 
-						var endQuotePos = token.IndexOf(quoteSymb, eqPos + 2);
-						if (endQuotePos != -1)
-						{
-							var attrValue = token.Substring(eqPos + 2, endQuotePos - eqPos - 2);
-							tag.Attributes[attrName] = attrValue;
+                while (true)
+                {
+                    var eqPos = token.IndexOf('=', searchAttrStartPos + 1);
+                    if (eqPos != -1)
+                    {
+                        var attrName = token.Substring(searchAttrStartPos + 1, eqPos - searchAttrStartPos - 1).Trim();
+                        var quoteSymb = token[eqPos + 1];
 
-							searchAttrStartPos = endQuotePos + 1;
-						}
-						else
-						{
-							break;
-						}
-					}
-					else
-					{
-						break;
-					}
-				}
-			}
-			else
-			{
-				if (tag.IsOpen && !tag.IsClose)
-				{
-					tag.Name = token.Substring(1, token.Length - 2);
-				}
-				else
-				{
-					if (!tag.IsOpen && tag.IsClose)
-					{
-						tag.Name = token.Substring(2, token.Length - 3);
-					}
-				}
-			}
+                        var endQuotePos = token.IndexOf(quoteSymb, eqPos + 2);
+                        if (endQuotePos != -1)
+                        {
+                            var attrValue = token.Substring(eqPos + 2, endQuotePos - eqPos - 2);
+                            tag.Attributes[attrName] = attrValue;
 
-			return tag;
-		}
-	}
+                            searchAttrStartPos = endQuotePos + 1;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (tag.IsOpen && !tag.IsClose)
+                {
+                    tag.Name = token.Substring(1, token.Length - 2);
+                }
+                else
+                {
+                    if (!tag.IsOpen && tag.IsClose)
+                    {
+                        tag.Name = token.Substring(2, token.Length - 3);
+                    }
+                }
+            }
+
+            return tag;
+        }
+    }
 }

@@ -8,6 +8,7 @@ using Autofac.Extras.CommonServiceLocator;
 using handyNews.API;
 using handyNews.Domain.Services;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.UWP.ViewModels;
 using handyNews.UWP.ViewModels.Controls;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Microsoft.ApplicationInsights;
@@ -64,6 +65,9 @@ namespace handyNews.UWP.Services
             builder.RegisterType<StreamViewViewModel>()
                 .As<IStreamViewViewModel>()
                 .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+
+            builder.RegisterType<MainPageViewModel>()
+                .SingleInstance();
 
             // Perform registrations and build the container.
             var container = builder.Build();

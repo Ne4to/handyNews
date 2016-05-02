@@ -7,5 +7,6 @@ namespace handyNews.UWP.ViewModels.Controls.Interfaces
     {
         StreamItemCollection Items { get; }
         void UpdateItems(string streamId);
+        void OnNavigatedTo();
     }
 }

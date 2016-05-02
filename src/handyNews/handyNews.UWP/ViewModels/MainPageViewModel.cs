@@ -1,12 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using handyNews.Domain.Services.Interfaces;
+using handyNews.UWP.Events;
+using handyNews.UWP.Model;
+using handyNews.UWP.ViewModels.Controls.Interfaces;
+using JetBrains.Annotations;
+using PubSub;
 
 namespace handyNews.UWP.ViewModels
 {
-	class MainPageViewModel
-	{
-	}
+    public class MainPageViewModel : BindableBase
+    {
+        private readonly IAuthenticationManager _authenticationManager;
+
+        public MainPageViewModel([NotNull] IAuthenticationManager authenticationManager)
+        {
+            if (authenticationManager == null) throw new ArgumentNullException(nameof(authenticationManager));
+            _authenticationManager = authenticationManager;
+        }
+
+        public async void OnNavigatedTo()
+        {                        
+            if (!_authenticationManager.IsUserAuthenticated)
+            {
+                await _authenticationManager.SignInAsync();
+            }
+
+            this.Publish(new RefreshTreeEvent());
+        }
+    }
 }

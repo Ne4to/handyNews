@@ -107,6 +107,7 @@
     </Compile>
     <Compile Include="Behaviors\RichTextBlockHtmlBehavior.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Events\RefreshTreeEvent.cs" />
     <Compile Include="Model\BindableBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ApplicationInsightsTelemetryManager.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="TelemetryEvents.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\ISubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\IStreamViewViewModel.cs" />
+    <Compile Include="Events\ShowSubscriptionStreamEvent.cs" />
     <Compile Include="ViewModels\Controls\StreamViewViewModel.cs" />
     <Compile Include="ViewModels\Controls\SubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />

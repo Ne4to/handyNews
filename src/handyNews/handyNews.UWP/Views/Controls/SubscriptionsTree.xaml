@@ -77,5 +77,8 @@
                 </core:EventTriggerBehavior>
             </interactivity:Interaction.Behaviors>
         </ListView>
+
+        <ProgressBar IsIndeterminate="True"                      
+                     Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </UserControl>

@@ -32,7 +32,8 @@ namespace handyNews.UWP.Views.Controls
 
         private void StreamView_OnLoaded(object sender, RoutedEventArgs e)
         {
-           // throw new NotImplementedException();
+            ViewModel.OnNavigatedTo();
+            // throw new NotImplementedException();
         }
     }
 }
