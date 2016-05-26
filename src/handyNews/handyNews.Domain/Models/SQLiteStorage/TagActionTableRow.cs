@@ -3,7 +3,7 @@ using SQLite.Net.Attributes;
 namespace handyNews.Domain.Models.SQLiteStorage
 {
     [Table("TAG_ACTION")]
-    class TagActionTableRow
+    internal class TagActionTableRow
     {
         [Column("ID")]
         [PrimaryKey]

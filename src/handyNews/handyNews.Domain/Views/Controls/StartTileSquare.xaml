@@ -6,11 +6,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Width="150" Height="150">
 
-	<Grid Background="Transparent">
-		<Image ImageOpened="ImageBrush_OnImageOpened" Source="ms-appx:///Assets/Logo.scale-240.png" Width="150" Height="150" />
+    <Grid Background="Transparent">
+        <Image ImageOpened="ImageBrush_OnImageOpened" Source="ms-appx:///Assets/Logo.scale-240.png" Width="150"
+               Height="150" />
 
-		<Grid Background="Black" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Top" Height="Auto" Width="Auto">
-			<TextBlock x:Name="CounterText" Text="1234" Margin="2,3,2,0" Foreground="White" FontSize="18" FontWeight="SemiBold" />
-		</Grid>
-	</Grid>
+        <Grid Background="Black" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Top" Height="Auto"
+              Width="Auto">
+            <TextBlock x:Name="CounterText" Text="1234" Margin="2,3,2,0" Foreground="White" FontSize="18"
+                       FontWeight="SemiBold" />
+        </Grid>
+    </Grid>
 </UserControl>

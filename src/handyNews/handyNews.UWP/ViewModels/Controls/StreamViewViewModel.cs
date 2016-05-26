@@ -10,15 +10,17 @@ namespace handyNews.UWP.ViewModels.Controls
 {
     public class StreamViewViewModel : BindableBase, IStreamViewViewModel
     {
-        #region Fields
+        public StreamViewViewModel(ISettingsManager settingsManager, IStreamManager streamManager,
+            ITelemetryManager telemetryManager)
+        {
+            if (settingsManager == null) throw new ArgumentNullException(nameof(settingsManager));
+            if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
+            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
 
-        private readonly ISettingsManager _settingsManager;
-        private readonly IStreamManager _streamManager;
-        private readonly ITelemetryManager _telemetryManager;
-
-        private StreamItemCollection _items;
-
-        #endregion
+            _settingsManager = settingsManager;
+            _streamManager = streamManager;
+            _telemetryManager = telemetryManager;
+        }
 
         #region Properties
 
@@ -29,18 +31,6 @@ namespace handyNews.UWP.ViewModels.Controls
         }
 
         #endregion
-
-
-        public StreamViewViewModel(ISettingsManager settingsManager, IStreamManager streamManager, ITelemetryManager telemetryManager)
-        {
-            if (settingsManager == null) throw new ArgumentNullException(nameof(settingsManager));
-            if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
-            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
-            
-            _settingsManager = settingsManager;
-            _streamManager = streamManager;
-            _telemetryManager = telemetryManager;
-        }
 
         public async void UpdateItems(string streamId)
         {
@@ -59,5 +49,15 @@ namespace handyNews.UWP.ViewModels.Controls
         {
             UpdateItems(eventData.Item.Id);
         }
+
+        #region Fields
+
+        private readonly ISettingsManager _settingsManager;
+        private readonly IStreamManager _streamManager;
+        private readonly ITelemetryManager _telemetryManager;
+
+        private StreamItemCollection _items;
+
+        #endregion
     }
 }

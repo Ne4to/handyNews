@@ -7,8 +7,9 @@ namespace handyNews.Domain.Services.Interfaces
     {
         bool IsUserAuthenticated { get; }
 
-        /// <exception cref="AuthenticationApiException"></exception>		
+        /// <exception cref="AuthenticationApiException"></exception>
         Task<bool> SignInAsync();
+
         Task RefreshTokenAsync();
         void SignOut();
     }

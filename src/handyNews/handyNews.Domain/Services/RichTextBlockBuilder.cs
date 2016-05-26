@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Imaging;
 using handyNews.Domain.Models.Parser;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.Domain.Strings;
 using Microsoft.Practices.ServiceLocation;
 
 //using Microsoft.Practices.Prism.Mvvm.Interfaces;
@@ -22,22 +23,24 @@ namespace handyNews.Domain.Services
 {
     public class RichTextBlockBuilder
     {
-        private readonly ITelemetryManager _telemetry;
-        private readonly ISettingsManager _appSettings;
-        private readonly List<Image> _allImages = new List<Image>();
-        private readonly double _maxImageWidth;
-        private readonly HttpClient _httpClient;
-        private readonly CoreDispatcher _dispatcher;
-
         private const string YoutubePreviewFormat = "http://img.youtube.com/vi/{0}/0.jpg";
 
-        private static readonly string[] YoutubeLinks = new[]
+        private static readonly string[] YoutubeLinks =
         {
             "http://www.youtube.com/embed/",
             "https://www.youtube.com/embed/",
             "http://youtube.com/embed/",
             "https://youtube.com/embed/"
         };
+
+        private readonly List<Image> _allImages = new List<Image>();
+        private readonly ISettingsManager _appSettings;
+        private readonly CoreDispatcher _dispatcher;
+        private readonly HttpClient _httpClient;
+        private readonly double _maxImageWidth;
+        private readonly ITelemetryManager _telemetry;
+
+        private readonly List<string> _youtubeAllVideos = new List<string>();
 
         public RichTextBlockBuilder()
         {
@@ -49,7 +52,12 @@ namespace handyNews.Domain.Services
 
             var displayInformation = DisplayInformation.GetForCurrentView();
             _maxImageWidth = ImageManager.GetMaxImageWidth(displayInformation);
-            _httpClient = new HttpClient(new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, AllowAutoRedirect = true });
+            _httpClient =
+                new HttpClient(new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                    AllowAutoRedirect = true
+                });
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
@@ -68,10 +76,10 @@ namespace handyNews.Domain.Services
                 var parser = new HtmlParser();
                 var lexemes = parser.Parse(html);
 
-                var paragraph = new Paragraph { TextAlignment = _appSettings.TextAlignment };
+                var paragraph = new Paragraph {TextAlignment = _appSettings.TextAlignment};
                 allParagraphs.Add(paragraph);
 
-                for (int lexemeIndex = 0; lexemeIndex < lexemes.Length; lexemeIndex++)
+                for (var lexemeIndex = 0; lexemeIndex < lexemes.Length; lexemeIndex++)
                 {
                     var lexeme = lexemes[lexemeIndex];
 
@@ -80,12 +88,12 @@ namespace handyNews.Domain.Services
                     {
                         Inline i = new Run();
                         //paragraph.Inlines.Add(new);
-                        paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
+                        paragraph.Inlines.Add(new Run {Text = literalLexeme.Text, FontSize = _appSettings.FontSize});
                         continue;
                     }
 
-                    var tagLexeme = (HtmlTagLexeme)lexeme;
-                    if (String.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
+                    var tagLexeme = (HtmlTagLexeme) lexeme;
+                    if (string.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
                     {
                         AddLineBreak(paragraph.Inlines);
                         continue;
@@ -93,7 +101,7 @@ namespace handyNews.Domain.Services
 
                     TryAddYoutubeVideo(tagLexeme, paragraph.Inlines);
 
-                    if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
                     {
                         AddImage(paragraph.Inlines, tagLexeme, null);
                         continue;
@@ -152,12 +160,12 @@ namespace handyNews.Domain.Services
 
             image.ImageOpened += (sender, args) =>
             {
-                var img = (Image)sender;
+                var img = (Image) sender;
                 var padding = ImageManager.GetImageHorizontalPadding(img);
                 ImageManager.UpdateImageSize(img, _maxImageWidth - padding);
             };
 
-            if (!String.IsNullOrWhiteSpace(navigationUri))
+            if (!string.IsNullOrWhiteSpace(navigationUri))
             {
                 image.IsTapEnabled = true;
                 var navigateUri = new Uri(navigationUri);
@@ -180,7 +188,10 @@ namespace handyNews.Domain.Services
                     return;
 
                 var tempFileName = Path.GetRandomFileName();
-                var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(tempFileName, CreationCollisionOption.GenerateUniqueName);
+                var file =
+                    await
+                        ApplicationData.Current.TemporaryFolder.CreateFileAsync(tempFileName,
+                            CreationCollisionOption.GenerateUniqueName);
 
                 using (var stream = await file.OpenStreamForWriteAsync())
                 {
@@ -192,26 +203,27 @@ namespace handyNews.Domain.Services
             }
         }
 
-        private void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex, StringParameters strParams)
+        private void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex,
+            StringParameters strParams)
         {
-            var startL = (HtmlTagLexeme)lexemes[lexemeIndex];
+            var startL = (HtmlTagLexeme) lexemes[lexemeIndex];
 
-            if (String.Equals(startL.Name, "p", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "p", StringComparison.OrdinalIgnoreCase))
             {
                 AddLineBreak(inlines);
             }
 
-            if (String.Equals(startL.Name, "li", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "li", StringComparison.OrdinalIgnoreCase))
             {
-                inlines.Add(new Run() { Text = "• ", FontSize = _appSettings.FontSize });
+                inlines.Add(new Run {Text = "• ", FontSize = _appSettings.FontSize});
             }
 
-            if (String.Equals(startL.Name, "div", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "div", StringComparison.OrdinalIgnoreCase))
             {
                 AddLineBreak(inlines);
             }
 
-            if (String.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
             {
                 string href;
                 if (startL.Attributes.TryGetValue("href", out href))
@@ -226,25 +238,25 @@ namespace handyNews.Domain.Services
                 }
             }
 
-            if (String.Equals(startL.Name, "strong", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "strong", StringComparison.OrdinalIgnoreCase))
             {
                 strParams.Bold = true;
             }
 
             SetHeadersValue(strParams, startL.Name, true);
-            if (String.Equals(startL.Name, "em", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "em", StringComparison.OrdinalIgnoreCase))
             {
                 strParams.Italic = true;
             }
 
-            if (String.Equals(startL.Name, "i", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "i", StringComparison.OrdinalIgnoreCase))
             {
                 strParams.Italic = true;
             }
 
             TryAddYoutubeVideo(startL, inlines);
 
-            for (int index = lexemeIndex + 1; index < closeIndex; index++)
+            for (var index = lexemeIndex + 1; index < closeIndex; index++)
             {
                 var lexeme = lexemes[index];
 
@@ -253,9 +265,9 @@ namespace handyNews.Domain.Services
                 {
                     var fontSize = GetFontSize(strParams);
 
-                    if (String.IsNullOrWhiteSpace(strParams.NavigateUri))
+                    if (string.IsNullOrWhiteSpace(strParams.NavigateUri))
                     {
-                        var item = new Run { Text = literalLexeme.Text, FontSize = fontSize };
+                        var item = new Run {Text = literalLexeme.Text, FontSize = fontSize};
 
                         if (IsHtmlHeader(strParams))
                             item.FontWeight = FontWeights.Bold;
@@ -268,22 +280,22 @@ namespace handyNews.Domain.Services
                     else
                     {
                         var navigateUri = new Uri(strParams.NavigateUri);
-                        var hyperlink = new Hyperlink { NavigateUri = navigateUri };
-                        hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
+                        var hyperlink = new Hyperlink {NavigateUri = navigateUri};
+                        hyperlink.Inlines.Add(new Run {Text = literalLexeme.Text, FontSize = _appSettings.FontSize});
                         inlines.Add(hyperlink);
-                        inlines.Add(new Run { Text = " ", FontSize = _appSettings.FontSize });
+                        inlines.Add(new Run {Text = " ", FontSize = _appSettings.FontSize});
                     }
                     continue;
                 }
 
-                var tagLexeme = (HtmlTagLexeme)lexeme;
-                if (String.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
+                var tagLexeme = (HtmlTagLexeme) lexeme;
+                if (string.Equals(tagLexeme.Name, "br", StringComparison.OrdinalIgnoreCase))
                 {
                     AddLineBreak(inlines);
                     continue;
                 }
 
-                if (String.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase)
+                if (string.Equals(tagLexeme.Name, "img", StringComparison.OrdinalIgnoreCase)
                     && tagLexeme.IsOpen
                     /*&& tagLexeme.IsClose*/)
                 {
@@ -304,37 +316,37 @@ namespace handyNews.Domain.Services
             }
 
             SetHeadersValue(strParams, startL.Name, false);
-            if (String.Equals(startL.Name, "em", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "em", StringComparison.OrdinalIgnoreCase))
             {
                 strParams.Italic = false;
             }
 
-            if (String.Equals(startL.Name, "i", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "i", StringComparison.OrdinalIgnoreCase))
             {
                 strParams.Italic = false;
             }
 
-            if (String.Equals(startL.Name, "p", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "p", StringComparison.OrdinalIgnoreCase))
             {
                 AddLineBreak(inlines);
             }
 
-            if (String.Equals(startL.Name, "li", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "li", StringComparison.OrdinalIgnoreCase))
             {
                 AddLineBreak(inlines);
             }
 
-            if (String.Equals(startL.Name, "div", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "div", StringComparison.OrdinalIgnoreCase))
             {
                 AddLineBreak(inlines);
             }
 
-            if (String.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "a", StringComparison.OrdinalIgnoreCase))
             {
                 strParams.NavigateUri = null;
             }
 
-            if (String.Equals(startL.Name, "strong", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(startL.Name, "strong", StringComparison.OrdinalIgnoreCase))
             {
                 strParams.Bold = false;
             }
@@ -342,7 +354,7 @@ namespace handyNews.Domain.Services
 
         private void AddLineBreak(InlineCollection inlines)
         {
-            if (inlines.Count == 0/* || inlines[inlines.Count - 1] is LineBreak*/)
+            if (inlines.Count == 0 /* || inlines[inlines.Count - 1] is LineBreak*/)
                 return;
 
             inlines.Add(new LineBreak());
@@ -413,16 +425,16 @@ namespace handyNews.Domain.Services
 
         private int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
         {
-            var startLexeme = (HtmlTagLexeme)lexemes[startLexemeIndex];
-            int deep = 1;
+            var startLexeme = (HtmlTagLexeme) lexemes[startLexemeIndex];
+            var deep = 1;
 
-            for (int index = startLexemeIndex + 1; index < lexemes.Length; index++)
+            for (var index = startLexemeIndex + 1; index < lexemes.Length; index++)
             {
                 var nextLexeme = lexemes[index] as HtmlTagLexeme;
                 if (nextLexeme == null)
                     continue;
 
-                if (!String.Equals(startLexeme.Name, nextLexeme.Name, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(startLexeme.Name, nextLexeme.Name, StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 if (nextLexeme.IsOpen && !nextLexeme.IsClose)
@@ -445,7 +457,7 @@ namespace handyNews.Domain.Services
 
         private void TryAddYoutubeVideo(HtmlTagLexeme tagLexeme, InlineCollection inlines)
         {
-            if (String.Equals(tagLexeme.Name, "iframe", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(tagLexeme.Name, "iframe", StringComparison.OrdinalIgnoreCase))
             {
                 string videoLink;
                 if (!tagLexeme.Attributes.TryGetValue("src", out videoLink))
@@ -455,7 +467,7 @@ namespace handyNews.Domain.Services
                 return;
             }
 
-            if (String.Equals(tagLexeme.Name, "object", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(tagLexeme.Name, "object", StringComparison.OrdinalIgnoreCase))
             {
                 string videoLink;
                 if (!tagLexeme.Attributes.TryGetValue("data", out videoLink))
@@ -465,7 +477,7 @@ namespace handyNews.Domain.Services
                 return;
             }
 
-            if (String.Equals(tagLexeme.Name, "embed", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(tagLexeme.Name, "embed", StringComparison.OrdinalIgnoreCase))
             {
                 string videoLink;
                 if (!tagLexeme.Attributes.TryGetValue("src", out videoLink))
@@ -474,8 +486,6 @@ namespace handyNews.Domain.Services
                 AddYoutubeLink(videoLink, inlines);
             }
         }
-
-        readonly List<String> _youtubeAllVideos = new List<string>();
 
         private void AddYoutubeLink(string videoLink, InlineCollection inlines)
         {
@@ -501,13 +511,18 @@ namespace handyNews.Domain.Services
 
         private void AddYoutubeLink(string id, string videoLink, InlineCollection inlines)
         {
-            var imageUrl = String.Format(YoutubePreviewFormat, id);
+            var imageUrl = string.Format(YoutubePreviewFormat, id);
 
             AddImage(inlines, imageUrl, videoLink);
 
             var navigateUri = new Uri(videoLink);
-            var hyperlink = new Hyperlink { NavigateUri = navigateUri };
-            hyperlink.Inlines.Add(new Run { Text = Strings.Resources.YoutubeVideoTitle, FontSize = _appSettings.FontSize, FontStyle = FontStyle.Italic });
+            var hyperlink = new Hyperlink {NavigateUri = navigateUri};
+            hyperlink.Inlines.Add(new Run
+            {
+                Text = Resources.YoutubeVideoTitle,
+                FontSize = _appSettings.FontSize,
+                FontStyle = FontStyle.Italic
+            });
             inlines.Add(hyperlink);
             AddLineBreak(inlines);
         }

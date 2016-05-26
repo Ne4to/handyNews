@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Data.Html;
 using handyNews.API;
 using handyNews.API.Models;
 using handyNews.Domain.Models;
@@ -42,17 +41,19 @@ namespace handyNews.Domain.Services
             // TODO implement fast version of HtmlUtilities.ConvertToText(it.title);
 
             var itemsQuery = from it in stream.items
-                             select new StreamItem
-                             {
-                                 Id = it.id,
-                                 Published = UnixTimeStampToDateTime(it.published),
-                                 Title = it.title,
-                                 Content = it.summary.content,
-                                 WebUri = GetWebUri(it),
-                                 Starred = it.categories != null
-                                           && it.categories.Any(c => c.EndsWith("/state/com.google/starred", StringComparison.OrdinalIgnoreCase)),
-                                 Unread = it.categories != null && !it.categories.Any(c => c.EndsWith("/state/com.google/read"))
-                             };
+                select new StreamItem
+                {
+                    Id = it.id,
+                    Published = UnixTimeStampToDateTime(it.published),
+                    Title = it.title,
+                    Content = it.summary.content,
+                    WebUri = GetWebUri(it),
+                    Starred = it.categories != null
+                              &&
+                              it.categories.Any(
+                                  c => c.EndsWith("/state/com.google/starred", StringComparison.OrdinalIgnoreCase)),
+                    Unread = it.categories != null && !it.categories.Any(c => c.EndsWith("/state/com.google/read"))
+                };
             return itemsQuery;
         }
 
@@ -62,15 +63,18 @@ namespace handyNews.Domain.Services
                 return null;
 
             var q = from a in item.alternate
-                    where String.Equals(a.type, "text/html", StringComparison.OrdinalIgnoreCase)
-                    select a.href;
+                where string.Equals(a.type, "text/html", StringComparison.OrdinalIgnoreCase)
+                select a.href;
 
             return q.FirstOrDefault();
         }
 
         private async Task<StreamResponse> LoadAsync(GetItemsOptions options)
         {
-            return await _apiClient.GetStreamAsync(options.StreamId, options.ShowNewestFirst, options.Count, options.Continuation, options.IncludeRead);
+            return
+                await
+                    _apiClient.GetStreamAsync(options.StreamId, options.ShowNewestFirst, options.Count,
+                        options.Continuation, options.IncludeRead);
         }
 
         private DateTimeOffset UnixTimeStampToDateTime(int unixTimeStamp)

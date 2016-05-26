@@ -6,7 +6,6 @@ namespace handyNews.Domain.Services
     {
         public void Navigate(string viewToken, object parameter)
         {
-
             //ContentDialog
         }
     }

@@ -1,15 +1,18 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using handyNews.UWP.Events;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Microsoft.Practices.ServiceLocation;
-using PubSub;
 
 namespace handyNews.UWP.Views.Controls
 {
     public sealed partial class SubscriptionsTree : UserControl
     {
-        ISubscriptionsTreeViewModel _viewModel;
+        private ISubscriptionsTreeViewModel _viewModel;
+
+        public SubscriptionsTree()
+        {
+            InitializeComponent();
+        }
 
         public ISubscriptionsTreeViewModel ViewModel
         {
@@ -22,11 +25,6 @@ namespace handyNews.UWP.Views.Controls
 
                 return _viewModel;
             }
-        }
-
-        public SubscriptionsTree()
-        {
-            this.InitializeComponent();
         }
 
         private void SubscriptionsTree_OnLoaded(object sender, RoutedEventArgs e)

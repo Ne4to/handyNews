@@ -1,7 +1,4 @@
-﻿using System;
-using handyNews.Domain.Services;
-using handyNews.UWP.Services;
-using Microsoft.ApplicationInsights;
+﻿using handyNews.Domain.Services;
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 
 namespace handyNews.Domain.Tests

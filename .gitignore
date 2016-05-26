@@ -51,3 +51,5 @@
 /src/backup/Inoreader/Inoreader.WindowsPhone/Assets/DebugSignInData.json
 bin/
 obj/
+/src/handyNews/handyNews.UWP/AppPackages/
+/src/handyNews/handyNews.Domain.Tests/AppPackages/

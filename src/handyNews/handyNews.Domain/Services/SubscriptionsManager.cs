@@ -4,161 +4,168 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Data.Html;
 using handyNews.API;
 using handyNews.API.Models;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.Domain.Strings;
 
 namespace handyNews.Domain.Services
 {
-	public class SubscriptionsManager : ISubscriptionsManager
-	{
-		private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
+    public class SubscriptionsManager : ISubscriptionsManager
+    {
+        private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
         private const string CategoryAllIconUrl = "ms-appx:///Assets/CategoryIcon.png";
-        private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-		private readonly ApiClient _apiClient;
-		private readonly ITelemetryManager _telemetryManager;
-		private readonly ISettingsManager _settingsService;
+        private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-		public SubscriptionsManager(ApiClient apiClient, ITelemetryManager telemetryManager, ISettingsManager settingsService)
-		{
-			if (apiClient == null) throw new ArgumentNullException(nameof(apiClient));
-			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
-			if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
+        private readonly ApiClient _apiClient;
+        private readonly ISettingsManager _settingsService;
+        private readonly ITelemetryManager _telemetryManager;
 
-			_apiClient = apiClient;
-			_telemetryManager = telemetryManager;
-			_settingsService = settingsService;
-		}
+        public SubscriptionsManager(ApiClient apiClient, ITelemetryManager telemetryManager,
+            ISettingsManager settingsService)
+        {
+            if (apiClient == null) throw new ArgumentNullException(nameof(apiClient));
+            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+            if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
 
-		public async Task<List<SubscriptionItemBase>> LoadSubscriptionsAsync()
-		{
-			var stopwatch = Stopwatch.StartNew();
+            _apiClient = apiClient;
+            _telemetryManager = telemetryManager;
+            _settingsService = settingsService;
+        }
 
-			var tags = await _apiClient.GetTagsAsync();//.ConfigureAwait(false);
-			var subscriptions = await _apiClient.GetSubscriptionsAsync();//.ConfigureAwait(false);
-			var unreadCount = await _apiClient.GetUnreadCountAsync();//.ConfigureAwait(false);
+        public async Task<List<SubscriptionItemBase>> LoadSubscriptionsAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
 
-			stopwatch.Stop();
-			_telemetryManager.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime, stopwatch.Elapsed.TotalSeconds);
+            var tags = await _apiClient.GetTagsAsync(); //.ConfigureAwait(false);
+            var subscriptions = await _apiClient.GetSubscriptionsAsync(); //.ConfigureAwait(false);
+            var unreadCount = await _apiClient.GetUnreadCountAsync(); //.ConfigureAwait(false);
 
-			var unreadCountDictionary = new Dictionary<string, int>();
-			foreach (var unreadcount in unreadCount.UnreadCounts)
-			{
-				unreadCountDictionary[unreadcount.Id] = unreadcount.Count;
-			}
+            stopwatch.Stop();
+            _telemetryManager.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime,
+                stopwatch.Elapsed.TotalSeconds);
 
-			var catsQuery = from tag in tags.Tags
-							where CategoryRegex.IsMatch(tag.Id)
-							select new CategoryItem
-							{
-								Id = tag.Id,
-								SortId = tag.SortId,
-                                IconUrl = CategoryAllIconUrl
-							};
+            var unreadCountDictionary = new Dictionary<string, int>();
+            foreach (var unreadcount in unreadCount.UnreadCounts)
+            {
+                unreadCountDictionary[unreadcount.Id] = unreadcount.Count;
+            }
 
-			var categories = catsQuery.ToList();
+            var catsQuery = from tag in tags.Tags
+                where CategoryRegex.IsMatch(tag.Id)
+                select new CategoryItem
+                {
+                    Id = tag.Id,
+                    SortId = tag.SortId,
+                    IconUrl = CategoryAllIconUrl
+                };
 
-			foreach (var categoryItem in categories)
-			{
-				var subsQuery = from s in subscriptions.Subscriptions
-								where s.Categories != null
-									  && s.Categories.Any(c => String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
-								orderby s.Title// descending 
-								select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max);
+            var categories = catsQuery.ToList();
 
-				categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
+            foreach (var categoryItem in categories)
+            {
+                var subsQuery = from s in subscriptions.Subscriptions
+                    where s.Categories != null
+                          &&
+                          s.Categories.Any(c => string.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
+                    orderby s.Title
+                    // descending 
+                    select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max);
+
+                categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
 
                 // TODO implement fast version of select HtmlUtilities.ConvertToText(c.Label);
                 categoryItem.Title = (from s in subscriptions.Subscriptions
-									  from c in s.Categories
-									  where String.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
-									  select c.Label).FirstOrDefault();
+                    from c in s.Categories
+                    where string.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
+                    select c.Label).FirstOrDefault();
 
-				categoryItem.UnreadCount = categoryItem.Subscriptions.Sum(t => t.UnreadCount);
+                categoryItem.UnreadCount = categoryItem.Subscriptions.Sum(t => t.UnreadCount);
                 categoryItem.IsMaxUnread = categoryItem.Subscriptions.Any(t => t.IsMaxUnread);
 
                 var readAllItem = new SubscriptionItem
-				{
-					Id = categoryItem.Id,
-					SortId = categoryItem.SortId,
-					IconUrl = ReadAllIconUrl,
-					Title = Strings.Resources.ReadAllSubscriptionItem,
-					PageTitle = categoryItem.Title,
-					UnreadCount = categoryItem.UnreadCount,
+                {
+                    Id = categoryItem.Id,
+                    SortId = categoryItem.SortId,
+                    IconUrl = ReadAllIconUrl,
+                    Title = Resources.ReadAllSubscriptionItem,
+                    PageTitle = categoryItem.Title,
+                    UnreadCount = categoryItem.UnreadCount,
                     IsMaxUnread = categoryItem.IsMaxUnread
-				};
+                };
 
-				categoryItem.Subscriptions.Insert(0, readAllItem);
-			}
+                categoryItem.Subscriptions.Insert(0, readAllItem);
+            }
 
-			// hide empty groups
-			categories.RemoveAll(c => c.Subscriptions.Count == 0);
+            // hide empty groups
+            categories.RemoveAll(c => c.Subscriptions.Count == 0);
 
-			var singleItems = (from s in subscriptions.Subscriptions
-							   where s.Categories == null || s.Categories.Length == 0
-							   orderby s.Title
-							   select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max)).ToList();
+            var singleItems = (from s in subscriptions.Subscriptions
+                where s.Categories == null || s.Categories.Length == 0
+                orderby s.Title
+                select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max)).ToList();
 
-			var allItems = new List<SubscriptionItemBase>(categories.OrderBy(c => c.Title));
-			allItems.AddRange(singleItems);
+            var allItems = new List<SubscriptionItemBase>(categories.OrderBy(c => c.Title));
+            allItems.AddRange(singleItems);
 
-			var totalUnreadCount = allItems.Sum(t => t.UnreadCount);
-		    var isTotalMax = allItems.Any(t => t.IsMaxUnread);
-			var readAllRootItem = new SubscriptionItem
-			{
-				Id = SpecialTags.Read,
-				IconUrl = ReadAllIconUrl,
-				Title = Strings.Resources.ReadAllSubscriptionItem,
-				PageTitle = Strings.Resources.ReadAllSubscriptionItem,
-				UnreadCount = totalUnreadCount,
+            var totalUnreadCount = allItems.Sum(t => t.UnreadCount);
+            var isTotalMax = allItems.Any(t => t.IsMaxUnread);
+            var readAllRootItem = new SubscriptionItem
+            {
+                Id = SpecialTags.Read,
+                IconUrl = ReadAllIconUrl,
+                Title = Resources.ReadAllSubscriptionItem,
+                PageTitle = Resources.ReadAllSubscriptionItem,
+                UnreadCount = totalUnreadCount,
                 IsMaxUnread = isTotalMax
-			};
-			allItems.Insert(0, readAllRootItem);
+            };
+            allItems.Insert(0, readAllRootItem);
 
-			if (_settingsService.HideEmptySubscriptions)
-			{
-				HideEmpty(allItems);
-			}
+            if (_settingsService.HideEmptySubscriptions)
+            {
+                HideEmpty(allItems);
+            }
 
-			return allItems;			
-		}
+            return allItems;
+        }
 
-		private static SubscriptionItem CreateSubscriptionItem(Subscription s, Dictionary<string, int> unreadCountDictionary, int maxUnread)
-		{
-		    var unreadCount = GetUnreadCount(unreadCountDictionary, s.Id);
-		    return new SubscriptionItem
-			{
-				Id = s.Id,
-				SortId = s.SortId,
-				Url = s.Url,
-				HtmlUrl = s.HtmlUrl,
-				IconUrl = s.IconUrl,
-				Title = s.Title,
-				PageTitle = s.Title,
-				FirstItemMsec = s.FirstItemMsec,
-				UnreadCount = unreadCount,
+        private static SubscriptionItem CreateSubscriptionItem(Subscription s,
+            Dictionary<string, int> unreadCountDictionary, int maxUnread)
+        {
+            var unreadCount = GetUnreadCount(unreadCountDictionary, s.Id);
+            return new SubscriptionItem
+            {
+                Id = s.Id,
+                SortId = s.SortId,
+                Url = s.Url,
+                HtmlUrl = s.HtmlUrl,
+                IconUrl = s.IconUrl,
+                Title = s.Title,
+                PageTitle = s.Title,
+                FirstItemMsec = s.FirstItemMsec,
+                UnreadCount = unreadCount,
                 IsMaxUnread = unreadCount == maxUnread
-			};
+            };
 
             // TODO implement fast version of HtmlUtilities.ConvertToText(text); (Title, PageTitle)
         }
 
         private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)
-		{
-			int count;
-			return unreadCounts.TryGetValue(id, out count) ? count : 0;
-		}
+        {
+            int count;
+            return unreadCounts.TryGetValue(id, out count) ? count : 0;
+        }
 
-		private void HideEmpty(List<SubscriptionItemBase> allItems)
-		{
-			allItems.RemoveAll(c => c.UnreadCount == 0);
-			foreach (var cat in allItems.OfType<CategoryItem>())
-			{
-				cat.Subscriptions.RemoveAll(c => c.UnreadCount == 0);
-			}
-		}
-	}
+        private void HideEmpty(List<SubscriptionItemBase> allItems)
+        {
+            allItems.RemoveAll(c => c.UnreadCount == 0);
+            foreach (var cat in allItems.OfType<CategoryItem>())
+            {
+                cat.Subscriptions.RemoveAll(c => c.UnreadCount == 0);
+            }
+        }
+    }
 }

@@ -1,7 +1,6 @@
 ﻿namespace handyNews.Domain.Models
 {
-	public class HeaderSpaceStreamItem : StreamItem
-	{
-		 
-	}
+    public class HeaderSpaceStreamItem : StreamItem
+    {
+    }
 }

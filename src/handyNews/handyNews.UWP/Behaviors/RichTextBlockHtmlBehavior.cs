@@ -9,11 +9,12 @@ namespace handyNews.UWP.Behaviors
 {
     public class RichTextBlockHtmlBehavior : DependencyObject, IBehavior
     {
+        public static readonly DependencyProperty HtmlContentProperty = DependencyProperty.Register(
+            "HtmlContent", typeof(object), typeof(RichTextBlockHtmlBehavior),
+            new PropertyMetadata(null, OnHtmlContentPropertyChanged));
+
         private long _callbackToken;
         private bool _created;
-
-        public static readonly DependencyProperty HtmlContentProperty = DependencyProperty.Register(
-            "HtmlContent", typeof(object), typeof(RichTextBlockHtmlBehavior), new PropertyMetadata(null, OnHtmlContentPropertyChanged));
 
         public object HtmlContent
         {
@@ -21,29 +22,39 @@ namespace handyNews.UWP.Behaviors
             set { SetValue(HtmlContentProperty, value); }
         }
 
+        public DependencyObject AssociatedObject { get; private set; }
+
+        public void Detach()
+        {
+            AssociatedObject?.UnregisterPropertyChangedCallback(UIElement.VisibilityProperty, _callbackToken);
+            AssociatedObject = null;
+        }
+
         public void Attach(DependencyObject associatedObject)
         {
             AssociatedObject = associatedObject;
 
-            var richTextBlock = (RichTextBlock)AssociatedObject;
+            var richTextBlock = (RichTextBlock) AssociatedObject;
             richTextBlock.Loaded += richTextBlock_Loaded;
 
-            _callbackToken = AssociatedObject.RegisterPropertyChangedCallback(UIElement.VisibilityProperty, OnVisibilityPropertyChanged);
+            _callbackToken = AssociatedObject.RegisterPropertyChangedCallback(UIElement.VisibilityProperty,
+                OnVisibilityPropertyChanged);
         }
 
         private void OnVisibilityPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
-            var richTextBlock = (RichTextBlock)AssociatedObject;
+            var richTextBlock = (RichTextBlock) AssociatedObject;
             if (!_created && richTextBlock.Visibility == Visibility.Visible && HtmlContent is string)
             {
                 UpdateTextBlock(richTextBlock);
             }
         }
 
-        void richTextBlock_Loaded(object sender, RoutedEventArgs e)
+        private void richTextBlock_Loaded(object sender, RoutedEventArgs e)
         {
-            var richTextBlock = (RichTextBlock)AssociatedObject;
-            if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string && richTextBlock.Blocks.Count == 0)
+            var richTextBlock = (RichTextBlock) AssociatedObject;
+            if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string &&
+                richTextBlock.Blocks.Count == 0)
             {
                 UpdateTextBlock(richTextBlock);
             }
@@ -53,7 +64,7 @@ namespace handyNews.UWP.Behaviors
         {
             var builder = new RichTextBlockBuilder();
             IList<Image> images;
-            var paragraphs = builder.GetParagraphs((string)HtmlContent, out images);
+            var paragraphs = builder.GetParagraphs((string) HtmlContent, out images);
 
             foreach (var paragraph in paragraphs)
             {
@@ -68,12 +79,12 @@ namespace handyNews.UWP.Behaviors
 
         private static void OnHtmlContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((RichTextBlockHtmlBehavior)d).OnHtmlContentChanged();
+            ((RichTextBlockHtmlBehavior) d).OnHtmlContentChanged();
         }
 
         private void OnHtmlContentChanged()
         {
-            var richTextBlock = (RichTextBlock)AssociatedObject;
+            var richTextBlock = (RichTextBlock) AssociatedObject;
             if (richTextBlock == null)
                 return;
 
@@ -84,18 +95,6 @@ namespace handyNews.UWP.Behaviors
             {
                 UpdateTextBlock(richTextBlock);
             }
-        }
-
-        public void Detach()
-        {
-            AssociatedObject?.UnregisterPropertyChangedCallback(UIElement.VisibilityProperty, _callbackToken);
-            AssociatedObject = null;
-        }
-
-        public DependencyObject AssociatedObject
-        {
-            get;
-            private set;
         }
     }
 }

@@ -3,7 +3,7 @@ using SQLite.Net.Attributes;
 namespace handyNews.Domain.Models.SQLiteStorage
 {
     [Table("SUB_CAT_SUB_ITEM")]
-    class SubCatSubItemTableRow
+    internal class SubCatSubItemTableRow
     {
         [Column("CAT_ID")]
         public string CatId { get; set; }

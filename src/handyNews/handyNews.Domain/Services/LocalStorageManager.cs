@@ -43,7 +43,8 @@ namespace handyNews.Domain.Services
 																			CONTENT TEXT, 
 																			IMAGE_FOLDER TEXT);");
 
-                connection.Execute(@"CREATE TABLE IF NOT EXISTS TAG_ACTION (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                connection.Execute(
+                    @"CREATE TABLE IF NOT EXISTS TAG_ACTION (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 							ITEM_ID TEXT,
 							TAG TEXT,
 							ACTION_KIND INTEGER);");
@@ -57,9 +58,11 @@ namespace handyNews.Domain.Services
 
                 connection.Execute(@"CREATE TABLE IF NOT EXISTS SUB_CAT_SUB_ITEM (CAT_ID TEXT, ITEM_ID TEXT);");
 
-                connection.Execute(@"CREATE TABLE IF NOT EXISTS STREAM_COLLECTION (STREAM_ID TEXT PRIMARY KEY NOT NULL, CONTINUATION TEXT, SHOW_NEWEST_FIRST INTEGER, STREAM_TIMESTAMP INTEGER, FAULT INTEGER);");
+                connection.Execute(
+                    @"CREATE TABLE IF NOT EXISTS STREAM_COLLECTION (STREAM_ID TEXT PRIMARY KEY NOT NULL, CONTINUATION TEXT, SHOW_NEWEST_FIRST INTEGER, STREAM_TIMESTAMP INTEGER, FAULT INTEGER);");
 
-                connection.Execute(@"CREATE TABLE IF NOT EXISTS STREAM_ITEM (ID TEXT PRIMARY KEY NOT NULL, STREAM_ID TEXT REFERENCES STREAM_COLLECTION(STREAM_ID) ON DELETE CASCADE, PUBLISHED TEXT, TITLE TEXT, WEB_URI TEXT, CONTENT TEXT, UNREAD INTEGER, NEED_SET_READ_EXPLICITLY INTEGER, IS_SELECTED INTEGER, STARRED INTEGER, SAVED INTEGER);");
+                connection.Execute(
+                    @"CREATE TABLE IF NOT EXISTS STREAM_ITEM (ID TEXT PRIMARY KEY NOT NULL, STREAM_ID TEXT REFERENCES STREAM_COLLECTION(STREAM_ID) ON DELETE CASCADE, PUBLISHED TEXT, TITLE TEXT, WEB_URI TEXT, CONTENT TEXT, UNREAD INTEGER, NEED_SET_READ_EXPLICITLY INTEGER, IS_SELECTED INTEGER, STARRED INTEGER, SAVED INTEGER);");
 
                 if (GetSchemaVersion(connection) < AddMaxCountColumnSchemaVersion)
                 {
@@ -93,7 +96,9 @@ namespace handyNews.Domain.Services
 
             using (var connection = GetConnection())
             {
-                var command = connection.CreateCommand(@"INSERT OR REPLACE INTO SAVED_STREAM_ITEM(ID, TITLE, PUBLISHED, WEBURI, SHORT_CONTENT, CONTENT, IMAGE_FOLDER) 
+                var command =
+                    connection.CreateCommand(
+                        @"INSERT OR REPLACE INTO SAVED_STREAM_ITEM(ID, TITLE, PUBLISHED, WEBURI, SHORT_CONTENT, CONTENT, IMAGE_FOLDER) 
 																			VALUES(@ID, @TITLE, @PUBLISHED, @WEBURI, @SHORT_CONTENT, @CONTENT, @IMAGE_FOLDER);");
 
                 command.Bind("@ID", item.Id);
@@ -224,8 +229,8 @@ namespace handyNews.Domain.Services
             var cats = items.OfType<CategoryItem>().ToArray();
             var subItems = items.OfType<SubscriptionItem>().Union(cats.SelectMany(c => c.Subscriptions)).ToArray();
             var catItemsLinks = (from c in cats
-                                 from s in c.Subscriptions
-                                 select new Tuple<string, string>(c.Id, s.Id)).ToArray();
+                from s in c.Subscriptions
+                select new Tuple<string, string>(c.Id, s.Id)).ToArray();
 
             return Task.Run(() =>
             {
@@ -280,7 +285,9 @@ namespace handyNews.Domain.Services
 
             var skipIdList = new List<string>(subItems.Length);
 
-            var statement = connection.CreateCommand("INSERT INTO SUB_ITEM(ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC, IS_MAX_COUNT) VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @URL, @HTML_URL, @ICON_URL, @FIRST_ITEM_MSEC, @IS_MAX_COUNT);");
+            var statement =
+                connection.CreateCommand(
+                    "INSERT INTO SUB_ITEM(ID, SORT_ID, TITLE, UNREAD_COUNT, URL, HTML_URL, ICON_URL, FIRST_ITEM_MSEC, IS_MAX_COUNT) VALUES(@ID, @SORT_ID, @TITLE, @UNREAD_COUNT, @URL, @HTML_URL, @ICON_URL, @FIRST_ITEM_MSEC, @IS_MAX_COUNT);");
 
             foreach (var item in subItems)
             {
@@ -333,7 +340,6 @@ namespace handyNews.Domain.Services
         {
             return Task.Run(() =>
             {
-
                 List<CategoryItem> cats;
                 List<SubscriptionItem> items;
                 List<SubCatSubItemTableRow> links;
@@ -530,7 +536,7 @@ namespace handyNews.Domain.Services
 
         private StreamItem[] LoadStreamCollectionItems(SQLiteConnection connection, string streamId)
         {
-            List<StreamItem> items = new List<StreamItem>();
+            var items = new List<StreamItem>();
             items.Add(new HeaderSpaceStreamItem());
 
             throw new NotImplementedException();
@@ -649,7 +655,6 @@ namespace handyNews.Domain.Services
 
         private void SetCachedItemAsStarredInternal(string id, bool newValue)
         {
-
             using (var connection = GetConnection())
             {
                 throw new NotImplementedException();

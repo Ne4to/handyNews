@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Windows.Data.Html;
 using handyNews.Domain.Models.Parser;
 
 namespace handyNews.Domain.Services
@@ -14,15 +13,16 @@ namespace handyNews.Domain.Services
 
         static HtmlParser()
         {
-            RemoveAdRegex = new Regex("(<center>).*(www.inoreader.com/adv).*(</center>)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            RemoveAdRegex = new Regex("(<center>).*(www.inoreader.com/adv).*(</center>)",
+                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         }
 
         public string GetPlainText(string html, int maxLength)
         {
             if (html == null)
-                return String.Empty;
+                return string.Empty;
 
-            html = RemoveAdRegex.Replace(html, String.Empty);
+            html = RemoveAdRegex.Replace(html, string.Empty);
             // TODO implement fast version of HtmlUtilities.ConvertToText(html);
             var x = html;
             var builder = new StringBuilder(x);
@@ -54,9 +54,9 @@ namespace handyNews.Domain.Services
 
         private List<string> GetStrings(string html)
         {
-            html = RemoveAdRegex.Replace(html, String.Empty);
+            html = RemoveAdRegex.Replace(html, string.Empty);
 
-            List<string> tokens = new List<string>(20);
+            var tokens = new List<string>(20);
             var currentIndex = 0;
 
             while (true)
@@ -92,15 +92,15 @@ namespace handyNews.Domain.Services
                 }
             }
 
-            tokens.RemoveAll(String.IsNullOrWhiteSpace);
+            tokens.RemoveAll(string.IsNullOrWhiteSpace);
             return tokens;
         }
 
         private ILexeme[] GetLexemes(List<string> lexemes)
         {
             var q = from l in lexemes
-                    let isTag = l[0] == '<' && l[l.Length - 1] == '>'
-                    select isTag ? (ILexeme)GetHtmlTag(l) : (ILexeme)(new LiteralLexeme(l));
+                let isTag = l[0] == '<' && l[l.Length - 1] == '>'
+                select isTag ? (ILexeme) GetHtmlTag(l) : (ILexeme) new LiteralLexeme(l);
 
             return q.ToArray();
         }

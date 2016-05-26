@@ -1,6 +1,6 @@
 namespace handyNews.Domain.Models.SQLiteStorage
 {
-    static class StorageExtensions
+    internal static class StorageExtensions
     {
         public static CategoryItem ToModel(this SubCatTableRow row)
         {

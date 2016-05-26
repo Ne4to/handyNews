@@ -1,7 +1,5 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Reflection;
-using Windows.Storage;
 using Autofac;
 using Autofac.Core;
 using Autofac.Extras.CommonServiceLocator;
@@ -13,11 +11,10 @@ using handyNews.UWP.ViewModels.Controls;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Microsoft.ApplicationInsights;
 using Microsoft.Practices.ServiceLocation;
-using Newtonsoft.Json.Linq;
 
 namespace handyNews.UWP.Services
 {
-    class AutofacModule
+    internal class AutofacModule
     {
         public IContainer Register()
         {

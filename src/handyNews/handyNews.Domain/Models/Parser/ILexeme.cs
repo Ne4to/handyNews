@@ -1,6 +1,6 @@
 namespace handyNews.Domain.Models.Parser
 {
-	public interface ILexeme
-	{
-	}
+    public interface ILexeme
+    {
+    }
 }

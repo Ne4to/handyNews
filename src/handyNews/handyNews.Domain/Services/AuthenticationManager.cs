@@ -12,7 +12,7 @@ namespace handyNews.Domain.Services
 {
     public class AuthenticationManager : IAuthenticationManager
     {
-        const string SCOPES = "read write";
+        private const string SCOPES = "read write";
 
         private readonly IAuthorizationDataStorage _authorizationDataStorage;
 
@@ -39,14 +39,6 @@ namespace handyNews.Domain.Services
             return true;
         }
 
-        private void SaveAccessToken(AccessTokenData accessTokenData)
-        {
-            _authorizationDataStorage.AccessToken = accessTokenData.AccessToken;
-            _authorizationDataStorage.AccessTokenExpireDate = DateTimeOffset.UtcNow.AddSeconds(accessTokenData.ExpiresIn);
-            _authorizationDataStorage.RefreshToken = accessTokenData.RefreshToken;
-            _authorizationDataStorage.Save();
-        }
-
         public async Task RefreshTokenAsync()
         {
             var clientData = await GetClientDataAsync().ConfigureAwait(false);
@@ -60,21 +52,43 @@ namespace handyNews.Domain.Services
                 new KeyValuePair<string, string>("refresh_token", _authorizationDataStorage.RefreshToken)
             });
 
-            var getAccessTokenResponseMessage = await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent).ConfigureAwait(false);
-            var accessTokenDataJson = await getAccessTokenResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var getAccessTokenResponseMessage =
+                await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent).ConfigureAwait(false);
+            var accessTokenDataJson =
+                await getAccessTokenResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             var accessTokenData = JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
             SaveAccessToken(accessTokenData);
         }
 
+        public void SignOut()
+        {
+            _authorizationDataStorage.Clear();
+            _authorizationDataStorage.Save();
+        }
+
+        private void SaveAccessToken(AccessTokenData accessTokenData)
+        {
+            _authorizationDataStorage.AccessToken = accessTokenData.AccessToken;
+            _authorizationDataStorage.AccessTokenExpireDate = DateTimeOffset.UtcNow.AddSeconds(accessTokenData.ExpiresIn);
+            _authorizationDataStorage.RefreshToken = accessTokenData.RefreshToken;
+            _authorizationDataStorage.Save();
+        }
+
         private async Task<string> GetAuthorizationCode(ClientData clientData)
         {
-            Uri callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
+            var callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
             var state = Guid.NewGuid().ToString("N");
-            var uri = $"https://www.inoreader.com/oauth2/auth?client_id={clientData.ClientId}&redirect_uri={Uri.EscapeUriString(callbackUri.ToString())}&response_type=code&scope={Uri.EscapeUriString(SCOPES)}&state={state}";
+            var uri =
+                $"https://www.inoreader.com/oauth2/auth?client_id={clientData.ClientId}&redirect_uri={Uri.EscapeUriString(callbackUri.ToString())}&response_type=code&scope={Uri.EscapeUriString(SCOPES)}&state={state}";
 
-            var authenticationResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, new Uri(uri)).AsTask().ConfigureAwait(false);
+            var authenticationResult =
+                await
+                    WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, new Uri(uri))
+                        .AsTask()
+                        .ConfigureAwait(false);
             var authorizationCodeResponseDataUri = new Uri(authenticationResult.ResponseData);
-            var authorizationCodeResponseData = authorizationCodeResponseDataUri.GetComponents(UriComponents.Query, UriFormat.Unescaped)
+            var authorizationCodeResponseData = authorizationCodeResponseDataUri.GetComponents(UriComponents.Query,
+                UriFormat.Unescaped)
                 .Split('&')
                 .Select(str => str.Split('='))
                 .ToDictionary(arr => arr[0], arr => arr[1]);
@@ -97,18 +111,14 @@ namespace handyNews.Domain.Services
                 new KeyValuePair<string, string>("client_id", clientData.ClientId),
                 new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
                 new KeyValuePair<string, string>("scope", string.Empty),
-                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                new KeyValuePair<string, string>("grant_type", "authorization_code")
             });
 
-            var getAccessTokenResponseMessage = await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent).ConfigureAwait(false);
-            var accessTokenDataJson = await getAccessTokenResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var getAccessTokenResponseMessage =
+                await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent).ConfigureAwait(false);
+            var accessTokenDataJson =
+                await getAccessTokenResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
-        }
-
-        public void SignOut()
-        {
-            _authorizationDataStorage.Clear();
-            _authorizationDataStorage.Save();
         }
 
         // TODO implement RefreshTokenMethod
@@ -122,25 +132,30 @@ namespace handyNews.Domain.Services
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
-        class AccessTokenData
+        private class AccessTokenData
         {
             [JsonProperty("access_token")]
             public string AccessToken { get; set; }
+
             [JsonProperty("expires_in")]
             public int ExpiresIn { get; set; }
+
             [JsonProperty("token_type")]
             public string TokenType { get; set; }
+
             [JsonProperty("scope")]
             public string Scope { get; set; }
+
             [JsonProperty("refresh_token")]
             public string RefreshToken { get; set; }
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
-        class ClientData
+        private class ClientData
         {
             [JsonProperty("clientId")]
             public string ClientId { get; set; }
+
             [JsonProperty("clientSecret")]
             public string ClientSecret { get; set; }
         }

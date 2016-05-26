@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -11,8 +10,8 @@ namespace handyNews.Domain.Services
 {
     public class AuthorizationHandler : DelegatingHandler
     {
-        private readonly IAuthorizationDataStorage _authorizationDataStorage;
         private readonly IAuthenticationManager _authenticationManager;
+        private readonly IAuthorizationDataStorage _authorizationDataStorage;
 
         public AuthorizationHandler([NotNull] IAuthorizationDataStorage authorizationDataStorage,
             [NotNull] IAuthenticationManager authenticationManager)
@@ -23,22 +22,24 @@ namespace handyNews.Domain.Services
             _authenticationManager = authenticationManager;
         }
 
-        protected AuthorizationHandler(HttpMessageHandler innerHandler) 
+        protected AuthorizationHandler(HttpMessageHandler innerHandler)
             : base(innerHandler)
         {
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
             if (_authorizationDataStorage.AccessToken == null)
                 throw new Exception("TODO user is not authenticated");
 
             if (_authorizationDataStorage.AccessTokenExpireDate <= DateTimeOffset.UtcNow)
-            {                
+            {
                 await _authenticationManager.RefreshTokenAsync().ConfigureAwait(false);
             }
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authorizationDataStorage.AccessToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",
+                _authorizationDataStorage.AccessToken);
 
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }

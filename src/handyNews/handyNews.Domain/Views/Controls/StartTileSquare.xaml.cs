@@ -6,24 +6,24 @@ using Windows.UI.Xaml.Controls;
 
 namespace handyNews.Domain.Views.Controls
 {
-	public sealed partial class StartTileSquare : UserControl, ITile
-	{
-		readonly TaskCompletionSource<int> _taskCompletionSource = new TaskCompletionSource<int>();
+    public sealed partial class StartTileSquare : UserControl, ITile
+    {
+        private readonly TaskCompletionSource<int> _taskCompletionSource = new TaskCompletionSource<int>();
 
-		public Task LoadComplete
-		{
-			get { return _taskCompletionSource.Task; }
-		}
+        public StartTileSquare(long count)
+        {
+            InitializeComponent();
+            CounterText.Text = count.ToString();
+        }
 
-		public StartTileSquare(long count)
-		{
-			this.InitializeComponent();
-			CounterText.Text = count.ToString();
-		}
+        public Task LoadComplete
+        {
+            get { return _taskCompletionSource.Task; }
+        }
 
-		private void ImageBrush_OnImageOpened(object sender, RoutedEventArgs e)
-		{
-			_taskCompletionSource.SetResult(0);
-		}
-	}
+        private void ImageBrush_OnImageOpened(object sender, RoutedEventArgs e)
+        {
+            _taskCompletionSource.SetResult(0);
+        }
+    }
 }

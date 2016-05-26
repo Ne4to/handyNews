@@ -14,82 +14,82 @@ using JetBrains.Annotations;
 
 namespace handyNews.Domain.Models
 {
-	public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged, INotifyPropertyChanged
-	{
-	    private readonly ITelemetryManager _telemetryManager;
-	    private readonly IStreamManager _streamManager;
+    public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged,
+        INotifyPropertyChanged
+    {
+        private readonly int _preloadItemsCount;
+        private readonly bool _showNewestFirst;
 
-	    private readonly string _streamId;
-	    private readonly bool _showNewestFirst;
-	    private string _continuation;
-	    private int _streamTimestamp;
-	    private bool _fault;
+        private readonly IStreamManager _streamManager;
+        private readonly ITelemetryManager _telemetryManager;
+        private readonly bool _allArticles;
+        private string _continuation;
+        private bool _fault;
 
-	    public string StreamId
-		{
-			get { return _streamId; }
-		}
+        private bool _isBusy;
 
-	    public int StreamTimestamp
-		{
-			get { return _streamTimestamp; }
-		}
+        public StreamItemCollection(IStreamManager streamManager, string streamId, bool showNewestFirst,
+            ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
+            : base(preloadItemsCount)
+        {
+            if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
+            if (streamId == null) throw new ArgumentNullException(nameof(streamId));
+            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
 
-	    bool _isBusy;
-	    private bool _allArticles;
-	    private readonly int _preloadItemsCount;
+            _streamManager = streamManager;
+            StreamId = streamId;
+            _telemetryManager = telemetryManager;
+            _showNewestFirst = showNewestFirst;
+            _allArticles = allArticles;
+            _preloadItemsCount = preloadItemsCount;
+        }
 
-	    public bool IsBusy
-	    {
-	        get { return _isBusy; }
+        public StreamItemCollection([NotNull] StreamItemCollectionState state,
+            [NotNull] IStreamManager streamManager,
+            [NotNull] ITelemetryManager telemetryManager,
+            int preloadItemsCount)
+            : base(state.Items.Length)
+        {
+            if (state == null) throw new ArgumentNullException(nameof(state));
+            if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
+            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+
+            _streamManager = streamManager;
+            _telemetryManager = telemetryManager;
+
+            StreamId = state.StreamId;
+            _showNewestFirst = state.ShowNewestFirst;
+            _continuation = state.Continuation;
+            StreamTimestamp = state.StreamTimestamp;
+            _fault = state.Fault;
+            AddRange(state.Items);
+            _preloadItemsCount = preloadItemsCount;
+        }
+
+        public string StreamId { get; }
+
+        public int StreamTimestamp { get; private set; }
+
+        public bool IsBusy
+        {
+            get { return _isBusy; }
             set
             {
                 _isBusy = value;
                 OnPropertyChanged();
             }
-	    }
+        }
 
-		public event EventHandler LoadMoreItemsError;
+        #region INotifyCollectionChanged
 
-		public StreamItemCollection(IStreamManager streamManager, string streamId, bool showNewestFirst, ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
-			: base(preloadItemsCount)
-		{
-		    if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
-		    if (streamId == null) throw new ArgumentNullException(nameof(streamId));
-		    if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-		    _streamManager = streamManager;
-		    _streamId = streamId;
-			_telemetryManager = telemetryManager;
-			_showNewestFirst = showNewestFirst;
-			_allArticles = allArticles;
-			_preloadItemsCount = preloadItemsCount;
-		}
+        #endregion
 
-		public StreamItemCollection([NotNull] StreamItemCollectionState state,
-			[NotNull] IStreamManager streamManager,
-			[NotNull] ITelemetryManager telemetryManager,
-			int preloadItemsCount)
-			: base(state.Items.Length)
-		{
-		    if (state == null) throw new ArgumentNullException(nameof(state));
-		    if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
-		    if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+        public event EventHandler LoadMoreItemsError;
 
-		    _streamManager = streamManager;
-		    _telemetryManager = telemetryManager;
-			
-			_streamId = state.StreamId;
-			_showNewestFirst = state.ShowNewestFirst;
-			_continuation = state.Continuation;
-			_streamTimestamp = state.StreamTimestamp;
-			_fault = state.Fault;
-			AddRange(state.Items);
-			_preloadItemsCount = preloadItemsCount;
-		}
-
-		public async Task InitAsync()
-		{
+        public async Task InitAsync()
+        {
             StreamItem[] items;
 
             IsBusy = true;
@@ -101,60 +101,30 @@ namespace handyNews.Domain.Models
                     Count = _preloadItemsCount,
                     Continuation = null,
                     ShowNewestFirst = _showNewestFirst,
-                    StreamId = _streamId,
+                    StreamId = StreamId,
                     IncludeRead = _allArticles
                 };
 
-		        var result = await _streamManager.GetItemsAsync(options);
-		        items = result.Items;
-		        _continuation = result.Continuation;
-                _streamTimestamp = result.Timestamp;
+                var result = await _streamManager.GetItemsAsync(options);
+                items = result.Items;
+                _continuation = result.Continuation;
+                StreamTimestamp = result.Timestamp;
             }
-		    finally
-		    {
-		        IsBusy = false;
-		    }
-            
-			Add(new HeaderSpaceStreamItem());
-			AddRange(items);
-			Add(new EmptySpaceStreamItem());
-			OnPropertyChanged("Count");
-		}
-
-	    #region ISupportIncrementalLoading
-
-		public bool HasMoreItems
-		{
-			get { return /*!_initCompleted ||*/ (!String.IsNullOrEmpty(_continuation) && !_fault); }
-		}
-
-		public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
-		{
-			if (IsBusy)
-			{
-                //return AsyncInfo.Run(c => Task.FromResult(new LoadMoreItemsResult()));
-                throw new InvalidOperationException("Only one operation in flight at a time");
+            finally
+            {
+                IsBusy = false;
             }
 
-            IsBusy = true;
+            Add(new HeaderSpaceStreamItem());
+            AddRange(items);
+            Add(new EmptySpaceStreamItem());
+            OnPropertyChanged("Count");
+        }
 
-			var loadCount = Math.Max(count, (uint)_preloadItemsCount);
-
-			return AsyncInfo.Run(c => LoadMoreItemsAsync(c, loadCount));
-		}
-
-		#endregion
-
-		#region INotifyCollectionChanged
-
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-		#endregion
-
-		async Task<LoadMoreItemsResult> LoadMoreItemsAsync(CancellationToken c, uint count)
-		{
-			try
-			{
+        private async Task<LoadMoreItemsResult> LoadMoreItemsAsync(CancellationToken c, uint count)
+        {
+            try
+            {
                 StreamItem[] items;
                 IsBusy = true;
 
@@ -166,85 +136,110 @@ namespace handyNews.Domain.Models
                         Continuation = _continuation,
                         IncludeRead = _allArticles,
                         ShowNewestFirst = _showNewestFirst,
-                        StreamId = _streamId
+                        StreamId = StreamId
                     };
 
-			        var result = await _streamManager.GetItemsAsync(options);
-			        items = result.Items;
-			        _continuation = result.Continuation;
-			        _streamTimestamp = result.Timestamp;
-			    }
-			    finally
-			    {
-			        IsBusy = false;
-			    }
+                    var result = await _streamManager.GetItemsAsync(options);
+                    items = result.Items;
+                    _continuation = result.Continuation;
+                    StreamTimestamp = result.Timestamp;
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
 
                 var baseIndex = Count - 1;
 
-				InsertRange(Count - 1, items);
-				OnPropertyChanged("Count");
+                InsertRange(Count - 1, items);
+                OnPropertyChanged("Count");
 
-				// Now notify of the new items
-				NotifyOfInsertedItems(baseIndex, items.Length);
+                // Now notify of the new items
+                NotifyOfInsertedItems(baseIndex, items.Length);
 
-				return new LoadMoreItemsResult { Count = (uint)items.Length };
-			}
-			catch (Exception ex)
-			{
-				_fault = true;
-				_telemetryManager.TrackError(ex);
+                return new LoadMoreItemsResult {Count = (uint) items.Length};
+            }
+            catch (Exception ex)
+            {
+                _fault = true;
+                _telemetryManager.TrackError(ex);
 
-				if (LoadMoreItemsError != null)
-					LoadMoreItemsError(this, EventArgs.Empty);
+                if (LoadMoreItemsError != null)
+                    LoadMoreItemsError(this, EventArgs.Empty);
 
-				return new LoadMoreItemsResult { Count = 0 };
-			}
-			finally
-			{
+                return new LoadMoreItemsResult {Count = 0};
+            }
+            finally
+            {
                 IsBusy = false;
-			}
-		}
+            }
+        }
 
-	    void NotifyOfInsertedItems(int baseIndex, int count)
-		{
-			if (CollectionChanged == null)
-			{
-				return;
-			}
+        private void NotifyOfInsertedItems(int baseIndex, int count)
+        {
+            if (CollectionChanged == null)
+            {
+                return;
+            }
 
-			for (int i = 0; i < count; i++)
-			{
-				var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this[baseIndex], baseIndex);
-				CollectionChanged(this, args);
-			}
-		}
+            for (var i = 0; i < count; i++)
+            {
+                var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this[baseIndex],
+                    baseIndex);
+                CollectionChanged(this, args);
+            }
+        }
 
-		#region INotifyPropertyChanged
+        public StreamItemCollectionState GetSate()
+        {
+            var state = new StreamItemCollectionState();
 
-		public event PropertyChangedEventHandler PropertyChanged;
+            state.StreamId = StreamId;
+            state.Continuation = _continuation;
+            state.Items = ToArray();
+            state.ShowNewestFirst = _showNewestFirst;
+            state.StreamTimestamp = StreamTimestamp;
+            state.Fault = _fault;
 
-		[NotifyPropertyChangedInvocator]
-		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-		{
-			var handler = PropertyChanged;
-			if (handler != null)
-				handler(this, new PropertyChangedEventArgs(propertyName));
-		}
+            return state;
+        }
 
-		#endregion
+        #region ISupportIncrementalLoading
 
-		public StreamItemCollectionState GetSate()
-		{
-			var state = new StreamItemCollectionState();
+        public bool HasMoreItems
+        {
+            get { return /*!_initCompleted ||*/ !string.IsNullOrEmpty(_continuation) && !_fault; }
+        }
 
-			state.StreamId = _streamId;
-			state.Continuation = _continuation;
-			state.Items = this.ToArray();
-			state.ShowNewestFirst = _showNewestFirst;
-			state.StreamTimestamp = _streamTimestamp;
-			state.Fault = _fault;
+        public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        {
+            if (IsBusy)
+            {
+                //return AsyncInfo.Run(c => Task.FromResult(new LoadMoreItemsResult()));
+                throw new InvalidOperationException("Only one operation in flight at a time");
+            }
 
-			return state;
-		}
-	}
+            IsBusy = true;
+
+            var loadCount = Math.Max(count, (uint) _preloadItemsCount);
+
+            return AsyncInfo.Run(c => LoadMoreItemsAsync(c, loadCount));
+        }
+
+        #endregion
+
+        #region INotifyPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
+    }
 }

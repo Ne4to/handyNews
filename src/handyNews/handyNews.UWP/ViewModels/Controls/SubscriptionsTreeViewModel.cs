@@ -17,40 +17,6 @@ namespace handyNews.UWP.ViewModels.Controls
 {
     public class SubscriptionsTreeViewModel : BindableBase, ISubscriptionsTreeViewModel
     {
-        #region Fields
-
-        private readonly ISubscriptionsManager _subscriptionsManager;
-        private readonly INavigationService _navigationService;
-
-        private bool _isRoot = true;
-        private List<SubscriptionItemBase> _rootItems;
-        private string _categoryId;
-
-        private ICommand _itemClickCommand;
-
-        private bool _isBusy;
-        private List<SubscriptionItemBase> _treeItems;
-
-        #endregion
-        
-        #region Properties
-
-        public bool IsBusy
-        {
-            get { return _isBusy; }
-            set { SetProperty(ref _isBusy, value, nameof(IsBusy)); }
-        }
-
-        public List<SubscriptionItemBase> TreeItems
-        {
-            get { return _treeItems; }
-            private set { SetProperty(ref _treeItems, value, nameof(TreeItems)); }
-        }
-
-        #endregion
-
-        public ICommand ItemClickCommand => _itemClickCommand ?? (_itemClickCommand = new DelegateCommand(OnItemClick));
-
         public SubscriptionsTreeViewModel([NotNull] ISubscriptionsManager subscriptionsManager,
             [NotNull] INavigationService navigationService)
         {
@@ -60,14 +26,11 @@ namespace handyNews.UWP.ViewModels.Controls
             _navigationService = navigationService;
         }
 
+        public ICommand ItemClickCommand => _itemClickCommand ?? (_itemClickCommand = new DelegateCommand(OnItemClick));
+
         public void OnNavigatedTo()
         {
             this.Subscribe<RefreshTreeEvent>(OnRefreshTreeEvent);
-        }
-
-        private void OnRefreshTreeEvent(RefreshTreeEvent data)
-        {
-            LoadSubscriptionsAsync();
         }
 
         public async void LoadSubscriptionsAsync()
@@ -89,7 +52,7 @@ namespace handyNews.UWP.ViewModels.Controls
                 //    _tileManager.UpdateAsync(readAllItem.UnreadCount);
                 //}
 
-               // await _localStorageManager.SaveSubscriptionsAsync(subscriptionItems);
+                // await _localStorageManager.SaveSubscriptionsAsync(subscriptionItems);
             }
             catch (AuthenticationApiException)
             {
@@ -127,7 +90,8 @@ namespace handyNews.UWP.ViewModels.Controls
                 _rootItems = subscriptionItems;
 
                 var cat = subscriptionItems.OfType<CategoryItem>()
-                    .FirstOrDefault(c => !_isRoot && String.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefault(
+                        c => !_isRoot && string.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
 
                 if (cat != null)
                 {
@@ -161,9 +125,14 @@ namespace handyNews.UWP.ViewModels.Controls
             }
         }
 
+        private void OnRefreshTreeEvent(RefreshTreeEvent data)
+        {
+            LoadSubscriptionsAsync();
+        }
+
         private void OnItemClick(object args)
         {
-            var clickEventArgs = (ItemClickEventArgs)args;
+            var clickEventArgs = (ItemClickEventArgs) args;
 
             var categoryItem = clickEventArgs.ClickedItem as CategoryItem;
             if (categoryItem != null)
@@ -182,5 +151,37 @@ namespace handyNews.UWP.ViewModels.Controls
                 }
             }
         }
+
+        #region Fields
+
+        private readonly ISubscriptionsManager _subscriptionsManager;
+        private readonly INavigationService _navigationService;
+
+        private bool _isRoot = true;
+        private List<SubscriptionItemBase> _rootItems;
+        private string _categoryId;
+
+        private ICommand _itemClickCommand;
+
+        private bool _isBusy;
+        private List<SubscriptionItemBase> _treeItems;
+
+        #endregion
+
+        #region Properties
+
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set { SetProperty(ref _isBusy, value, nameof(IsBusy)); }
+        }
+
+        public List<SubscriptionItemBase> TreeItems
+        {
+            get { return _treeItems; }
+            private set { SetProperty(ref _treeItems, value, nameof(TreeItems)); }
+        }
+
+        #endregion
     }
 }

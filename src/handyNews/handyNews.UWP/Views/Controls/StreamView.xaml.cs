@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
 using Microsoft.Practices.ServiceLocation;
@@ -10,7 +9,12 @@ namespace handyNews.UWP.Views.Controls
 {
     public sealed partial class StreamView : UserControl
     {
-        IStreamViewViewModel _viewModel;
+        private IStreamViewViewModel _viewModel;
+
+        public StreamView()
+        {
+            InitializeComponent();
+        }
 
         public IStreamViewViewModel ViewModel
         {
@@ -23,11 +27,6 @@ namespace handyNews.UWP.Views.Controls
 
                 return _viewModel;
             }
-        }
-
-        public StreamView()
-        {
-            this.InitializeComponent();
         }
 
         private void StreamView_OnLoaded(object sender, RoutedEventArgs e)

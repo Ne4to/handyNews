@@ -7,13 +7,13 @@ namespace handyNews.UWP.Services
     {
         private readonly Action<object> _executeAction;
 
-        public event EventHandler CanExecuteChanged;
-
         public DelegateCommand(Action<object> executeAction)
         {
             if (executeAction == null) throw new ArgumentNullException(nameof(executeAction));
             _executeAction = executeAction;
         }
+
+        public event EventHandler CanExecuteChanged;
 
         public bool CanExecute(object parameter)
         {

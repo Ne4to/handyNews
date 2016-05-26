@@ -31,24 +31,21 @@
                 </Grid.ColumnDefinitions>
 
                 <Image Width="16" Height="16" Source="{x:Bind IconUrl}" Margin="0,0,5,0" />
-                <TextBlock Grid.Column="1" Text="{x:Bind Title}" Style="{StaticResource TreeItemTextStyle}" TextTrimming="CharacterEllipsis"
-								    />
+                <TextBlock Grid.Column="1" Text="{x:Bind Title}" Style="{StaticResource TreeItemTextStyle}"
+                           TextTrimming="CharacterEllipsis" />
 
                 <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
 
                 <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="5,0,0,0">
-                    <TextBlock Text="{x:Bind UnreadCount}" Style="{StaticResource TreeItemTextStyle}"
-								    />
+                    <TextBlock Text="{x:Bind UnreadCount}" Style="{StaticResource TreeItemTextStyle}" />
 
                     <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
 
                     <TextBlock Text="+" Style="{StaticResource TreeItemTextStyle}"
-								   Visibility="{x:Bind IsMaxUnread, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                               Visibility="{x:Bind IsMaxUnread, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                     <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
                 </StackPanel>
-
-
 
 
                 <!--FontSize="{Binding Source={StaticResource StylesContainer}, Converter={StaticResource DynamicResourcesConverter}, ConverterParameter=SubscriptionTreeItemFontSize}"-->
@@ -59,12 +56,12 @@
     </UserControl.Resources>
 
     <Grid>
-        <ListView 
-				  x:Name="TreeItemsListView"				  
-				  ItemsSource="{x:Bind ViewModel.TreeItems, Mode=OneWay}"
-				  ItemTemplate="{StaticResource ItemDataTemplate}"
-				  IsItemClickEnabled="True"
-				  ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+        <ListView
+            x:Name="TreeItemsListView"
+            ItemsSource="{x:Bind ViewModel.TreeItems, Mode=OneWay}"
+            ItemTemplate="{StaticResource ItemDataTemplate}"
+            IsItemClickEnabled="True"
+            ContinuumNavigationTransitionInfo.ExitElementContainer="True">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -78,7 +75,7 @@
             </interactivity:Interaction.Behaviors>
         </ListView>
 
-        <ProgressBar IsIndeterminate="True"                      
+        <ProgressBar IsIndeterminate="True"
                      Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </UserControl>

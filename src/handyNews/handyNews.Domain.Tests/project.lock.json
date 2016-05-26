@@ -338,6 +338,14 @@
           "lib/uap10.0/NotificationsExtensions.winmd": {}
         }
       },
+      "PubSub/1.4.1": {
+        "compile": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        }
+      },
       "reactiveui/6.5.0": {
         "dependencies": {
           "reactiveui-core": "[6.5.0]"
@@ -2320,6 +2328,14 @@
           "lib/uap10.0/NotificationsExtensions.winmd": {}
         }
       },
+      "PubSub/1.4.1": {
+        "compile": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        }
+      },
       "reactiveui/6.5.0": {
         "dependencies": {
           "reactiveui-core": "[6.5.0]"
@@ -4148,6 +4164,14 @@
           "lib/uap10.0/NotificationsExtensions.winmd": {}
         }
       },
+      "PubSub/1.4.1": {
+        "compile": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        }
+      },
       "reactiveui/6.5.0": {
         "dependencies": {
           "reactiveui-core": "[6.5.0]"
@@ -5972,6 +5996,14 @@
         },
         "runtime": {
           "lib/uap10.0/NotificationsExtensions.winmd": {}
+        }
+      },
+      "PubSub/1.4.1": {
+        "compile": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
         }
       },
       "reactiveui/6.5.0": {
@@ -7802,6 +7834,14 @@
           "lib/uap10.0/NotificationsExtensions.winmd": {}
         }
       },
+      "PubSub/1.4.1": {
+        "compile": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        }
+      },
       "reactiveui/6.5.0": {
         "dependencies": {
           "reactiveui-core": "[6.5.0]"
@@ -9626,6 +9666,14 @@
         },
         "runtime": {
           "lib/uap10.0/NotificationsExtensions.winmd": {}
+        }
+      },
+      "PubSub/1.4.1": {
+        "compile": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
         }
       },
       "reactiveui/6.5.0": {
@@ -11456,6 +11504,14 @@
           "lib/uap10.0/NotificationsExtensions.winmd": {}
         }
       },
+      "PubSub/1.4.1": {
+        "compile": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll": {}
+        }
+      },
       "reactiveui/6.5.0": {
         "dependencies": {
           "reactiveui-core": "[6.5.0]"
@@ -13216,13 +13272,11 @@
       ]
     },
     "Microsoft.NETCore.Runtime.CoreCLR-arm/1.0.0": {
-      "sha512": "hoJfIl981eXwn9Tz8onO/J1xaYApIfp/YrhjSh9rRhml1U5Wj80LBgyp/6n+KI3VlvcAraThhnHnCTp+M3Uh+w==",
-      "type": "Package",
+      "sha512": "vUQyaKbHCa7BJAAzdfCP2FfBYOSt0YnDw7VMJLmD1/k68HIJgw1QO7GAfHhqoa39zkkvimC47QBH27wG4C5OGQ==",
+      "type": "package",
       "files": [
+        "Microsoft.NETCore.Runtime.CoreCLR-arm.1.0.0.nupkg.sha512",
         "Microsoft.NETCore.Runtime.CoreCLR-arm.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
-        "package/services/metadata/core-properties/c1cbeaed81514106b6b7971ac193f132.psmdcp",
         "ref/dotnet/_._",
         "runtimes/win8-arm/lib/dotnet/mscorlib.ni.dll",
         "runtimes/win8-arm/native/clretwrc.dll",
@@ -13737,12 +13791,11 @@
       ]
     },
     "NotificationsExtensions.Win10/10586.0.2": {
-      "sha512": "iNcgYPxhjNu9DZcBmIl0nqJHYsoguq4MlZn0YdtmMR7HLBUxiiOIz9192hBUWxpbz8qFAKPRmngyzr3Ay1SimA==",
-      "type": "Package",
+      "sha512": "aK0M0hQdG0L1qjkmrHIp4WYro6afeBg6ljMfg6jP5cswqQg4gW2WppFOcCLJaWa+ZGVGSgYXkazWEbA0MwRpow==",
+      "type": "package",
       "files": [
+        "NotificationsExtensions.Win10.10586.0.2.nupkg.sha512",
         "NotificationsExtensions.Win10.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/dotnet/NotificationsExtensions.Win10.NETCore.XML",
         "lib/dotnet/NotificationsExtensions.Win10.NETCore.dll",
         "lib/dotnet/NotificationsExtensions.Win10.NETCore.pdb",
@@ -13753,8 +13806,16 @@
         "lib/uap10.0/NotificationsExtensions.pri",
         "lib/uap10.0/NotificationsExtensions.winmd",
         "lib/uap10.0/NotificationsExtensions.winmd.xml",
-        "lib/uap10.0/NotificationsExtensions.xml",
-        "package/services/metadata/core-properties/49df0f54ac15402c9123916d2b4cb9fe.psmdcp"
+        "lib/uap10.0/NotificationsExtensions.xml"
+      ]
+    },
+    "PubSub/1.4.1": {
+      "sha512": "atTiZraaU+aqLxPhbirh9DCXZsj8LgUoAKwUIVTMJVvrAvoHmLP4SYH2QvJ+qe091SoM2A3pGJ6OBtBRqyPlhw==",
+      "type": "package",
+      "files": [
+        "PubSub.1.4.1.nupkg.sha512",
+        "PubSub.nuspec",
+        "lib/portable-net45+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/PubSub.dll"
       ]
     },
     "reactiveui/6.5.0": {

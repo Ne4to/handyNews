@@ -3,7 +3,7 @@ using SQLite.Net.Attributes;
 namespace handyNews.Domain.Models.SQLiteStorage
 {
     [Table("SUB_CAT")]
-    class SubCatTableRow
+    internal class SubCatTableRow
     {
         [Column("ID")]
         [PrimaryKey]

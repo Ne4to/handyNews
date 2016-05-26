@@ -3,7 +3,7 @@ using SQLite.Net.Attributes;
 namespace handyNews.Domain.Models.SQLiteStorage
 {
     [Table("STREAM_COLLECTION")]
-    class StreamCollectionTableRow
+    internal class StreamCollectionTableRow
     {
         [Column("STREAM_ID")]
         [PrimaryKey]

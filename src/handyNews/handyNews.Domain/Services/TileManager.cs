@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Windows.Graphics.Display;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml;
@@ -18,45 +17,45 @@ using NotificationsExtensions.Tiles;
 
 namespace handyNews.Domain.Services
 {
-	public class TileManager : ITileManager
-	{
-		private const string DrawCanvasName = "DrawCanvas";
-		private const string WideFileName = "WideTile.png";
-		private const string SquareFileName = "SquareTile.png";
-		private const string SquareSmallFileName = "SquareSmallTile.png";
+    public class TileManager : ITileManager
+    {
+        private const string DrawCanvasName = "DrawCanvas";
+        private const string WideFileName = "WideTile.png";
+        private const string SquareFileName = "SquareTile.png";
+        private const string SquareSmallFileName = "SquareSmallTile.png";
 
-		private readonly ITelemetryManager _telemetryManager;
+        private readonly ITelemetryManager _telemetryManager;
 
-		public TileManager([NotNull] ITelemetryManager telemetryManager)
-		{
-			if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
-			_telemetryManager = telemetryManager;
-		}
+        public TileManager([NotNull] ITelemetryManager telemetryManager)
+        {
+            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+            _telemetryManager = telemetryManager;
+        }
 
-		public async void UpdatePrimaryTile(long count)
-		{
-			try
-			{
-				var wideImage = await RenderAsync(new StartTileWide(count), 310, 150);
-				if (wideImage == null)
-					return;
-				var wideName = await SaveFileAsync(wideImage, WideFileName, 310U, 150U);
+        public async void UpdatePrimaryTile(long count)
+        {
+            try
+            {
+                var wideImage = await RenderAsync(new StartTileWide(count), 310, 150);
+                if (wideImage == null)
+                    return;
+                var wideName = await SaveFileAsync(wideImage, WideFileName, 310U, 150U);
 
-				var squareImage = await RenderAsync(new StartTileSquare(count), 150, 150);
-				if (squareImage == null)
-					return;
-				var squareName =await SaveFileAsync(squareImage, SquareFileName, 150U, 150U);
+                var squareImage = await RenderAsync(new StartTileSquare(count), 150, 150);
+                if (squareImage == null)
+                    return;
+                var squareName = await SaveFileAsync(squareImage, SquareFileName, 150U, 150U);
 
-				var squareSmallImage = await RenderAsync(new StartTileSquareSmall(count), 71, 71);
-				if (squareSmallImage == null)
-					return;
-				var squareSmallName = await SaveFileAsync(squareSmallImage, SquareSmallFileName, 71U, 71U);
+                var squareSmallImage = await RenderAsync(new StartTileSquareSmall(count), 71, 71);
+                if (squareSmallImage == null)
+                    return;
+                var squareSmallName = await SaveFileAsync(squareSmallImage, SquareSmallFileName, 71U, 71U);
 
 
                 var tile = new TileContent
                 {
-			        Visual = new TileVisual
-			        {
+                    Visual = new TileVisual
+                    {
                         TileWide = new TileBinding
                         {
                             Branding = TileBranding.Name,
@@ -91,99 +90,103 @@ namespace handyNews.Domain.Services
                             }
                         }
                     }
-			    };
+                };
 
                 var doc = tile.GetXml();
                 var tileNotification = new TileNotification(doc);
-				tileNotification.ExpirationTime = DateTimeOffset.Now.AddDays(1D);
+                tileNotification.ExpirationTime = DateTimeOffset.Now.AddDays(1D);
 
-				var tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();			
-				tileUpdater.Clear();
-				tileUpdater.Update(tileNotification);
-			}
-			catch (Exception ex)
-			{
-				_telemetryManager.TrackError(ex);
-			}
-		}
+                var tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
+                tileUpdater.Clear();
+                tileUpdater.Update(tileNotification);
+            }
+            catch (Exception ex)
+            {
+                _telemetryManager.TrackError(ex);
+            }
+        }
 
-		private static async Task<string> SaveFileAsync(RenderTargetBitmap image, string fileName, uint imageWidth, uint imageHeight)
-		{
-			var file = await ApplicationData.Current.LocalFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-			using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
-			{
-				var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-				var pixelsBuffer = await image.GetPixelsAsync();
-				byte[] bytes = pixelsBuffer.ToArray();
+        private static async Task<string> SaveFileAsync(RenderTargetBitmap image, string fileName, uint imageWidth,
+            uint imageHeight)
+        {
+            var file =
+                await
+                    ApplicationData.Current.LocalFolder.CreateFileAsync(fileName,
+                        CreationCollisionOption.ReplaceExisting);
+            using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+            {
+                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+                var pixelsBuffer = await image.GetPixelsAsync();
+                var bytes = pixelsBuffer.ToArray();
 
-				var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
+                var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
 
-				encoder.SetPixelData(BitmapPixelFormat.Bgra8,
-					BitmapAlphaMode.Straight,
-					(uint)image.PixelWidth, (uint)image.PixelHeight,
-					dpi, dpi, bytes);
-				
-				await encoder.FlushAsync();
-				stream.Dispose();
-			}
+                encoder.SetPixelData(BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Straight,
+                    (uint) image.PixelWidth, (uint) image.PixelHeight,
+                    dpi, dpi, bytes);
 
-			return file.Name;
-		}
+                await encoder.FlushAsync();
+                stream.Dispose();
+            }
 
-		private async Task<RenderTargetBitmap> RenderAsync(FrameworkElement drawControl, int width, int height)
-		{
-			var frame = Window.Current.Content as Frame;
-			if (frame == null)
-				return null;
+            return file.Name;
+        }
 
-			var page = frame.Content as Page;
-			if (page == null)
-				return null;
+        private async Task<RenderTargetBitmap> RenderAsync(FrameworkElement drawControl, int width, int height)
+        {
+            var frame = Window.Current.Content as Frame;
+            if (frame == null)
+                return null;
 
-			var grid = page.Content as Grid;
-			if (grid == null)
-				return null;
+            var page = frame.Content as Page;
+            if (page == null)
+                return null;
 
-			var canvas = grid.FindName(DrawCanvasName) as Canvas;
-			if (canvas == null)
-			{
-				canvas = new Canvas();
-				canvas.Name = DrawCanvasName;
-				canvas.Opacity = 0;
-				canvas.Background = new SolidColorBrush(Colors.Transparent);
-				canvas.IsHitTestVisible = false;
+            var grid = page.Content as Grid;
+            if (grid == null)
+                return null;
 
-				if (grid.ColumnDefinitions.Count > 1)
-					Grid.SetColumnSpan(canvas, grid.ColumnDefinitions.Count);
+            var canvas = grid.FindName(DrawCanvasName) as Canvas;
+            if (canvas == null)
+            {
+                canvas = new Canvas();
+                canvas.Name = DrawCanvasName;
+                canvas.Opacity = 0;
+                canvas.Background = new SolidColorBrush(Colors.Transparent);
+                canvas.IsHitTestVisible = false;
 
-				if (grid.RowDefinitions.Count > 1)
-					Grid.SetRowSpan(canvas, grid.RowDefinitions.Count);
+                if (grid.ColumnDefinitions.Count > 1)
+                    Grid.SetColumnSpan(canvas, grid.ColumnDefinitions.Count);
 
-				grid.Children.Add(canvas);
-			}
+                if (grid.RowDefinitions.Count > 1)
+                    Grid.SetRowSpan(canvas, grid.RowDefinitions.Count);
 
-			var ctrl = drawControl;
-			ctrl.Width = width;
-			ctrl.Height = height;
+                grid.Children.Add(canvas);
+            }
 
-			canvas.Children.Add(ctrl);
-			canvas.InvalidateMeasure();
-			canvas.UpdateLayout();
+            var ctrl = drawControl;
+            ctrl.Width = width;
+            ctrl.Height = height;
 
-			var tile = ctrl as ITile;
-			if (tile != null)
-			{
-				await tile.LoadComplete;
-			}
+            canvas.Children.Add(ctrl);
+            canvas.InvalidateMeasure();
+            canvas.UpdateLayout();
 
-			RenderTargetBitmap rtb = new RenderTargetBitmap();
-			await rtb.RenderAsync(ctrl, width, height);
+            var tile = ctrl as ITile;
+            if (tile != null)
+            {
+                await tile.LoadComplete;
+            }
 
-			var result = rtb;
+            var rtb = new RenderTargetBitmap();
+            await rtb.RenderAsync(ctrl, width, height);
 
-			canvas.Children.Clear();
+            var result = rtb;
 
-			return result;
-		}
-	}
+            canvas.Children.Clear();
+
+            return result;
+        }
+    }
 }

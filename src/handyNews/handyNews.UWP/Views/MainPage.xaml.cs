@@ -8,7 +8,12 @@ namespace handyNews.UWP.Views
 {
     public sealed partial class MainPage : Page
     {
-        MainPageViewModel _viewModel;
+        private MainPageViewModel _viewModel;
+
+        public MainPage()
+        {
+            InitializeComponent();
+        }
 
         public MainPageViewModel ViewModel
         {
@@ -23,12 +28,7 @@ namespace handyNews.UWP.Views
             }
         }
 
-        public MainPage()
-        {
-            this.InitializeComponent();
-        }
-
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             var manager = SystemNavigationManager.GetForCurrentView();
             manager.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;

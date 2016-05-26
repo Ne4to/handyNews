@@ -2,7 +2,6 @@
 using handyNews.Domain.Services.Interfaces;
 using handyNews.UWP.Events;
 using handyNews.UWP.Model;
-using handyNews.UWP.ViewModels.Controls.Interfaces;
 using JetBrains.Annotations;
 using PubSub;
 
@@ -19,7 +18,7 @@ namespace handyNews.UWP.ViewModels
         }
 
         public async void OnNavigatedTo()
-        {                        
+        {
             if (!_authenticationManager.IsUserAuthenticated)
             {
                 await _authenticationManager.SignInAsync();
