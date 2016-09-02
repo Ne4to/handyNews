@@ -18,14 +18,5 @@
                                  RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True"
                                  RelativePanel.AlignBottomWithPanel="True" />
         </RelativePanel>
-
-        <!--<Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>-->
-
-        <!--<controls:SubscriptionsTree x:Name="Tree" VerticalAlignment="Stretch" Grid.Column="0" />
-        <controls:StreamView x:Name="ItemsView" VerticalAlignment="Stretch" Background="Aqua" Grid.Column="1" HorizontalAlignment="Stretch" />-->
-
     </Grid>
 </Page>

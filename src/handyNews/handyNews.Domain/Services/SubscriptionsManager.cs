@@ -9,13 +9,14 @@ using handyNews.API.Models;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
 using handyNews.Domain.Strings;
+using handyNews.Domain.Utils;
 
 namespace handyNews.Domain.Services
 {
     public class SubscriptionsManager : ISubscriptionsManager
     {
-        private const string ReadAllIconUrl = "ms-appx:///Assets/ReadAll.png";
-        private const string CategoryAllIconUrl = "ms-appx:///Assets/CategoryIcon.png";
+        private const string READ_ALL_ICON_URL = "ms-appx:///Assets/ReadAll.png";
+        private const string CATEGORY_ALL_ICON_URL = "ms-appx:///Assets/CategoryIcon.png";
 
         private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -60,7 +61,7 @@ namespace handyNews.Domain.Services
                 {
                     Id = tag.Id,
                     SortId = tag.SortId,
-                    IconUrl = CategoryAllIconUrl
+                    IconUrl = CATEGORY_ALL_ICON_URL
                 };
 
             var categories = catsQuery.ToList();
@@ -69,19 +70,17 @@ namespace handyNews.Domain.Services
             {
                 var subsQuery = from s in subscriptions.Subscriptions
                     where s.Categories != null
-                          &&
-                          s.Categories.Any(c => string.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase))
+                          && s.Categories.Any(c => c.Id.EqualsOrdinalIgnoreCase(categoryItem.Id))
                     orderby s.Title
                     // descending 
                     select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max);
 
                 categoryItem.Subscriptions = new List<SubscriptionItem>(subsQuery);
 
-                // TODO implement fast version of select HtmlUtilities.ConvertToText(c.Label);
                 categoryItem.Title = (from s in subscriptions.Subscriptions
                     from c in s.Categories
-                    where string.Equals(c.Id, categoryItem.Id, StringComparison.OrdinalIgnoreCase)
-                    select c.Label).FirstOrDefault();
+                    where c.Id.EqualsOrdinalIgnoreCase(categoryItem.Id)
+                    select c.Label.ConvertHtmlToText()).FirstOrDefault();
 
                 categoryItem.UnreadCount = categoryItem.Subscriptions.Sum(t => t.UnreadCount);
                 categoryItem.IsMaxUnread = categoryItem.Subscriptions.Any(t => t.IsMaxUnread);
@@ -90,7 +89,7 @@ namespace handyNews.Domain.Services
                 {
                     Id = categoryItem.Id,
                     SortId = categoryItem.SortId,
-                    IconUrl = ReadAllIconUrl,
+                    IconUrl = READ_ALL_ICON_URL,
                     Title = Resources.ReadAllSubscriptionItem,
                     PageTitle = categoryItem.Title,
                     UnreadCount = categoryItem.UnreadCount,
@@ -116,7 +115,7 @@ namespace handyNews.Domain.Services
             var readAllRootItem = new SubscriptionItem
             {
                 Id = SpecialTags.Read,
-                IconUrl = ReadAllIconUrl,
+                IconUrl = READ_ALL_ICON_URL,
                 Title = Resources.ReadAllSubscriptionItem,
                 PageTitle = Resources.ReadAllSubscriptionItem,
                 UnreadCount = totalUnreadCount,
@@ -136,6 +135,7 @@ namespace handyNews.Domain.Services
             Dictionary<string, int> unreadCountDictionary, int maxUnread)
         {
             var unreadCount = GetUnreadCount(unreadCountDictionary, s.Id);
+
             return new SubscriptionItem
             {
                 Id = s.Id,
@@ -143,14 +143,12 @@ namespace handyNews.Domain.Services
                 Url = s.Url,
                 HtmlUrl = s.HtmlUrl,
                 IconUrl = s.IconUrl,
-                Title = s.Title,
-                PageTitle = s.Title,
+                Title = s.Title.ConvertHtmlToText(),
+                PageTitle = s.Title.ConvertHtmlToText(),
                 FirstItemMsec = s.FirstItemMsec,
                 UnreadCount = unreadCount,
                 IsMaxUnread = unreadCount == maxUnread
             };
-
-            // TODO implement fast version of HtmlUtilities.ConvertToText(text); (Title, PageTitle)
         }
 
         private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)

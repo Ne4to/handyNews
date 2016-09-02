@@ -40,31 +40,31 @@ namespace handyNews.Domain.Models
         public bool Unread
         {
             get { return _unread; }
-            set { SetProperty(ref _unread, value); }
+            set { SetProperty(ref _unread, value, nameof(Unread)); }
         }
 
         public bool NeedSetReadExplicitly
         {
             get { return _needSetReadExplicitly; }
-            set { SetProperty(ref _needSetReadExplicitly, value); }
+            set { SetProperty(ref _needSetReadExplicitly, value, nameof(NeedSetReadExplicitly)); }
         }
 
         public bool IsSelected
         {
             get { return _isSelected; }
-            set { SetProperty(ref _isSelected, value); }
+            set { SetProperty(ref _isSelected, value, nameof(IsSelected)); }
         }
 
         public bool Starred
         {
             get { return _starred; }
-            set { SetProperty(ref _starred, value); }
+            set { SetProperty(ref _starred, value, nameof(Starred)); }
         }
 
         public bool Saved
         {
             get { return _saved; }
-            set { SetProperty(ref _saved, value); }
+            set { SetProperty(ref _saved, value, nameof(Saved)); }
         }
 
         #endregion

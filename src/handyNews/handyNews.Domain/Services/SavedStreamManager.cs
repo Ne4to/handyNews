@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using handyNews.Domain.Models;
 using handyNews.Domain.Models.Parser;
+using handyNews.Domain.Utils;
 using JetBrains.Annotations;
 
 namespace handyNews.Domain.Services
 {
     public class SavedStreamManager
     {
-        private const string CacheFolderName = "SavedItems";
+        private const string CACHE_FOLDER_NAME = "SavedItems";
 
         private readonly Lazy<List<SavedStreamItem>> _items;
         private readonly StorageFolder _rootCacheFolder = ApplicationData.Current.LocalFolder;
@@ -23,7 +24,7 @@ namespace handyNews.Domain.Services
 
         public SavedStreamManager([NotNull] LocalStorageManager storageManager)
         {
-            if (storageManager == null) throw new ArgumentNullException("storageManager");
+            if (storageManager == null) throw new ArgumentNullException(nameof(storageManager));
             _storageManager = storageManager;
 
             _items = new Lazy<List<SavedStreamItem>>(InitItems);
@@ -49,12 +50,13 @@ namespace handyNews.Domain.Services
             var parser = new HtmlParser();
             var plainText = parser.GetPlainText(item.Content, 200);
 
-            var cacheFolder =
-                await
-                    _rootCacheFolder.CreateFolderAsync(CacheFolderName, CreationCollisionOption.OpenIfExists)
+            var cacheFolder = await _rootCacheFolder.CreateFolderAsync(CACHE_FOLDER_NAME, CreationCollisionOption.OpenIfExists)
                         .AsTask()
                         .ConfigureAwait(false);
-            var folder = await cacheFolder.CreateFolderAsync(folderName).AsTask().ConfigureAwait(false);
+
+            var folder = await cacheFolder.CreateFolderAsync(folderName)
+                .AsTask()
+                .ConfigureAwait(false);
 
             var newHtml = await SaveImagesAsync(folder, item.Content).ConfigureAwait(false);
 
@@ -83,20 +85,26 @@ namespace handyNews.Domain.Services
 
             foreach (var lexeme in lexemes.OfType<HtmlTagLexeme>())
             {
-                if (!string.Equals(lexeme.Name, "img", StringComparison.OrdinalIgnoreCase))
+                if (!lexeme.Name.EqualsOrdinalIgnoreCase(HtmlTag.IMAGE))
+                {
                     continue;
+                }
 
                 var src = lexeme.Attributes["src"];
-                if (fixedImages.Any(s => string.Equals(s, src, StringComparison.OrdinalIgnoreCase)))
+                if (fixedImages.Any(s => s.EqualsOrdinalIgnoreCase(src)))
+                {
                     continue;
+                }
 
                 var fileName = await DownloadImageAsync(src, folder).ConfigureAwait(false);
                 if (fileName == null)
+                {
                     continue;
+                }
 
                 fixedImages.Add(src);
 
-                var newSrc = string.Format("ms-appdata:///local/{0}/{1}/{2}", CacheFolderName, folder.Name, fileName);
+                var newSrc = string.Format("ms-appdata:///local/{0}/{1}/{2}", CACHE_FOLDER_NAME, folder.Name, fileName);
                 localHtml.Replace(src, newSrc);
             }
 
@@ -133,7 +141,7 @@ namespace handyNews.Domain.Services
 
         public async Task DeleteAsync([NotNull] string itemId)
         {
-            if (itemId == null) throw new ArgumentNullException("itemId");
+            if (itemId == null) throw new ArgumentNullException(nameof(itemId));
 
             var item = _items.Value.FirstOrDefault(a => a.Id == itemId);
             if (item == null)
@@ -142,14 +150,17 @@ namespace handyNews.Domain.Services
             _items.Value.Remove(item);
             _storageManager.DeleteSavedStreamItem(item.Id);
 
-            var cacheFolder =
-                await
-                    _rootCacheFolder.CreateFolderAsync(CacheFolderName, CreationCollisionOption.OpenIfExists)
+            var cacheFolder = await _rootCacheFolder.CreateFolderAsync(CACHE_FOLDER_NAME, CreationCollisionOption.OpenIfExists)
                         .AsTask()
                         .ConfigureAwait(false);
 
-            var folder = await cacheFolder.GetFolderAsync(item.ImageFolder).AsTask().ConfigureAwait(false);
-            await folder.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask().ConfigureAwait(false);
+            var folder = await cacheFolder.GetFolderAsync(item.ImageFolder)
+                .AsTask()
+                .ConfigureAwait(false);
+
+            await folder.DeleteAsync(StorageDeleteOption.PermanentDelete)
+                .AsTask()
+                .ConfigureAwait(false);
         }
     }
 }

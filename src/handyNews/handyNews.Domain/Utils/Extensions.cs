@@ -12,7 +12,7 @@ namespace handyNews.Domain.Utils
         {
             object obj;
             if (container.Values.TryGetValue(key, out obj))
-                return (T) obj;
+                return (T)obj;
 
             return defaultValue;
         }
@@ -23,7 +23,7 @@ namespace handyNews.Domain.Utils
             if (!dictionary.TryGetValue(key, out o))
                 return defaultValue;
 
-            return (T) o;
+            return (T)o;
         }
 
         public static DateTime GetBeginWeekDate(this DateTime date, DayOfWeek startOfWeek = DayOfWeek.Monday)
@@ -34,7 +34,7 @@ namespace handyNews.Domain.Utils
                 diff += 7;
             }
 
-            return date.AddDays(-1*diff).Date;
+            return date.AddDays(-1 * diff).Date;
         }
 
         public static string ToJson(this object obj)
@@ -55,6 +55,37 @@ namespace handyNews.Domain.Utils
 
                 throw;
             }
+        }
+
+        public static string ConvertHtmlToText(this string html)
+        {
+            if (html == null)
+            {
+                return null;
+            }
+
+            html = html.Replace("&amp;", "&")
+                .Replace("&gt;", ">")
+                .Replace("&lt;", "<")
+                .Replace("\n", string.Empty)
+                .Trim();
+
+            return html;
+        }
+
+        public static bool StartsWithOrdinalIgnoreCase(this string text, string value)
+        {
+            return text.StartsWith(value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool EndsWithOrdinalIgnoreCase(this string text, string value)
+        {
+            return text.EndsWith(value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool EqualsOrdinalIgnoreCase(this string text, string value)
+        {
+            return text.Equals(value, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

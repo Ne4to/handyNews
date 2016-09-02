@@ -23,17 +23,18 @@ namespace handyNews.Domain.Models
         /// <param name="storage">Reference to a property with both getter and setter.</param>
         /// <param name="value">Desired value for the property.</param>
         /// <param name="propertyName">
-        ///     Name of the property used to notify listeners. This
-        ///     value is optional and can be provided automatically when invoked from compilers that
-        ///     support CallerMemberName.
+        ///     Name of the property used to notify listeners.
         /// </param>
         /// <returns>
         ///     True if the value was changed, false if the existing value matched the
         ///     desired value.
         /// </returns>
-        protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected virtual bool SetProperty<T>(ref T storage, T value, string propertyName)
         {
-            if (Equals(storage, value)) return false;
+            if (Equals(storage, value))
+            {
+                return false;
+            }
 
             storage = value;
             OnPropertyChanged(propertyName);
@@ -49,13 +50,9 @@ namespace handyNews.Domain.Models
         ///     value is optional and can be provided automatically when invoked from compilers
         ///     that support <see cref="CallerMemberNameAttribute" />.
         /// </param>
-        protected void OnPropertyChanged(string propertyName)
+        private void OnPropertyChanged(string propertyName)
         {
-            var eventHandler = PropertyChanged;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

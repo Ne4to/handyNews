@@ -1,13 +1,14 @@
+using handyNews.Domain.Utils;
+
 namespace handyNews.Domain.Models.Parser
 {
     public class LiteralLexeme : ILexeme
     {
+        public string Text { get; }
+
         public LiteralLexeme(string text)
         {
-            // TODO implement fast version of HtmlUtilities.ConvertToText(text);
-            Text = text;
+            Text = text.ConvertHtmlToText();
         }
-
-        public string Text { get; set; }
     }
 }

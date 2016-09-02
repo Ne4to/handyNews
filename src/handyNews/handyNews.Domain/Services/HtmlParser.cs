@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using handyNews.Domain.Models.Parser;
+using handyNews.Domain.Utils;
 
 namespace handyNews.Domain.Services
 {
@@ -20,11 +21,12 @@ namespace handyNews.Domain.Services
         public string GetPlainText(string html, int maxLength)
         {
             if (html == null)
+            {
                 return string.Empty;
+            }
 
             html = RemoveAdRegex.Replace(html, string.Empty);
-            // TODO implement fast version of HtmlUtilities.ConvertToText(html);
-            var x = html;
+            var x = html.ConvertHtmlToText();
             var builder = new StringBuilder(x);
             builder.Replace('\r', ' ');
             builder.Replace('\n', ' ');
@@ -41,7 +43,9 @@ namespace handyNews.Domain.Services
             } while (currentLength != newLength);
 
             if (newLength < maxLength)
+            {
                 return builder.ToString().Trim();
+            }
 
             return builder.ToString().Substring(0, maxLength).Trim();
         }
@@ -118,9 +122,6 @@ namespace handyNews.Domain.Services
                 tag.Name = token.Substring(1, spacePos - 1);
 
                 var searchAttrStartPos = spacePos;
-
-                //<a href="http://channel9.msdn.com/Shows/This+Week+On+Channel+9/TWC9-NET-Core-OSS-Update-CoreCLR-on-GitHub-Windows-10-for-Raspberry-Pi-2-Super-Bowl-Stories-and-more#time=1m06s">
-                //<img src="https://www.inoreader.com/b/1438160281/1008166777" style="position: absolute; visibility: hidden">
 
                 while (true)
                 {

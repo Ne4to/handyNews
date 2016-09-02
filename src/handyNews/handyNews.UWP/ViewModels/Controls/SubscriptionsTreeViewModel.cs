@@ -6,6 +6,7 @@ using Windows.UI.Xaml.Controls;
 using handyNews.API.Exceptions;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.Domain.Utils;
 using handyNews.UWP.Events;
 using handyNews.UWP.Model;
 using handyNews.UWP.Services;
@@ -91,7 +92,7 @@ namespace handyNews.UWP.ViewModels.Controls
 
                 var cat = subscriptionItems.OfType<CategoryItem>()
                     .FirstOrDefault(
-                        c => !_isRoot && string.Equals(c.Id, _categoryId, StringComparison.OrdinalIgnoreCase));
+                        c => !_isRoot && c.Id.EqualsOrdinalIgnoreCase(_categoryId));
 
                 if (cat != null)
                 {

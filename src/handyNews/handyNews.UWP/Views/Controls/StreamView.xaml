@@ -44,7 +44,7 @@
                                                PointerOverForeground="{ThemeResource SystemControlHighlightAltBaseHighBrush}"
                                                PressedBackground="{ThemeResource SystemControlHighlightListMediumBrush}"
                                                PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}"
-                                               PointerOverBackground="{ThemeResource SystemControlHighlightListLowBrush}"
+                                               
                                                ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
                                                SelectedPressedBackground="{ThemeResource SystemControlHighlightListAccentHighBrush}"
                                                SelectionCheckMarkVisualEnabled="True"
@@ -52,6 +52,8 @@
                                                SelectedPointerOverBackground="{ThemeResource SystemControlHighlightListAccentMediumBrush}"
                                                SelectedBackground="{ThemeResource SystemControlHighlightListAccentLowBrush}"
                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+                        <!--PointerOverBackground="{ThemeResource SystemControlHighlightListLowBrush}"-->
                     </ControlTemplate>
 
                     <!--<ControlTemplate TargetType="ListViewItem">
@@ -70,22 +72,17 @@
                   IsItemClickEnabled="True" ItemContainerStyle="{StaticResource ListViewItemStyle1}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <RichTextBlock IsTextSelectionEnabled="False">
-                            <interactivity:Interaction.Behaviors>
-                                <behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding Content}" />
-                            </interactivity:Interaction.Behaviors>
-                        </RichTextBlock>
-                    </Grid>
-                    <!--<RelativePanel HorizontalAlignment="Stretch">
-                        <TextBlock Text="{Binding Title}" x:Name="ItemHeader" />
+                    <RelativePanel HorizontalAlignment="Stretch">
+                        <TextBlock x:Name="ItemHeader" 
+                                   Text="{Binding Title}" 
+                                   Style="{StaticResource SubheaderTextBlockStyle}" />
 
                         <RichTextBlock IsTextSelectionEnabled="False" RelativePanel.Below="ItemHeader">
                             <interactivity:Interaction.Behaviors>
                                 <behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding Content}" />
                             </interactivity:Interaction.Behaviors>
                         </RichTextBlock>
-                    </RelativePanel>-->
+                    </RelativePanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
             <!--ItemContainerStyle="{StaticResource ListViewItemStyle1}"

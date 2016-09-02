@@ -86,7 +86,9 @@ namespace handyNews.UWP.Behaviors
         {
             var richTextBlock = (RichTextBlock) AssociatedObject;
             if (richTextBlock == null)
+            {
                 return;
+            }
 
             _created = false;
             richTextBlock.Blocks.Clear();

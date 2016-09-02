@@ -10,6 +10,16 @@ namespace handyNews.UWP.ViewModels.Controls
 {
     public class StreamViewViewModel : BindableBase, IStreamViewViewModel
     {
+        #region Fields
+
+        private readonly ISettingsManager _settingsManager;
+        private readonly IStreamManager _streamManager;
+        private readonly ITelemetryManager _telemetryManager;
+
+        private StreamItemCollection _items;
+
+        #endregion
+
         public StreamViewViewModel(ISettingsManager settingsManager, IStreamManager streamManager,
             ITelemetryManager telemetryManager)
         {
@@ -49,15 +59,5 @@ namespace handyNews.UWP.ViewModels.Controls
         {
             UpdateItems(eventData.Item.Id);
         }
-
-        #region Fields
-
-        private readonly ISettingsManager _settingsManager;
-        private readonly IStreamManager _streamManager;
-        private readonly ITelemetryManager _telemetryManager;
-
-        private StreamItemCollection _items;
-
-        #endregion
     }
 }

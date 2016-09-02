@@ -14016,11 +14016,11 @@
     },
     "Rx-Xaml/2.2.5": {
       "sha512": "RzA/HcKP1U44i7ZchRdR3v3GdepNmr/93ydyixV+LwZs++Yxo13fsODRTqGIyz11ERSIKgnnSs6tbJUys4qRSw==",
-      "type": "Package",
+      "type": "package",
+      "path": "Rx-Xaml/2.2.5",
       "files": [
-        "Rx-XAML.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
+        "Rx-Xaml.2.2.5.nupkg.sha512",
+        "Rx-Xaml.nuspec",
         "lib/net40/System.Reactive.Windows.Threading.XML",
         "lib/net40/System.Reactive.Windows.Threading.dll",
         "lib/net45/System.Reactive.Windows.Threading.XML",
@@ -14034,8 +14034,7 @@
         "lib/windowsphone71/System.Reactive.Windows.Threading.XML",
         "lib/windowsphone71/System.Reactive.Windows.Threading.dll",
         "lib/windowsphone8/System.Reactive.Windows.Threading.XML",
-        "lib/windowsphone8/System.Reactive.Windows.Threading.dll",
-        "package/services/metadata/core-properties/b5441fe1cc3e4525b27d164c5a5518ce.psmdcp"
+        "lib/windowsphone8/System.Reactive.Windows.Threading.dll"
       ]
     },
     "Splat/1.6.2": {

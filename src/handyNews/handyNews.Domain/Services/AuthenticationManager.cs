@@ -78,14 +78,12 @@ namespace handyNews.Domain.Services
         {
             var callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
             var state = Guid.NewGuid().ToString("N");
-            var uri =
-                $"https://www.inoreader.com/oauth2/auth?client_id={clientData.ClientId}&redirect_uri={Uri.EscapeUriString(callbackUri.ToString())}&response_type=code&scope={Uri.EscapeUriString(SCOPES)}&state={state}";
+            var uri = $"https://www.inoreader.com/oauth2/auth?client_id={clientData.ClientId}&redirect_uri={Uri.EscapeUriString(callbackUri.ToString())}&response_type=code&scope={Uri.EscapeUriString(SCOPES)}&state={state}";
 
-            var authenticationResult =
-                await
-                    WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, new Uri(uri))
+            var authenticationResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, new Uri(uri))
                         .AsTask()
                         .ConfigureAwait(false);
+
             var authorizationCodeResponseDataUri = new Uri(authenticationResult.ResponseData);
             var authorizationCodeResponseData = authorizationCodeResponseDataUri.GetComponents(UriComponents.Query,
                 UriFormat.Unescaped)
@@ -94,7 +92,9 @@ namespace handyNews.Domain.Services
                 .ToDictionary(arr => arr[0], arr => arr[1]);
 
             if (authorizationCodeResponseData["state"] != state)
+            {
                 throw new Exception("Invalid state");
+            }
 
             return authorizationCodeResponseData["code"];
         }
@@ -114,10 +114,13 @@ namespace handyNews.Domain.Services
                 new KeyValuePair<string, string>("grant_type", "authorization_code")
             });
 
-            var getAccessTokenResponseMessage =
-                await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent).ConfigureAwait(false);
-            var accessTokenDataJson =
-                await getAccessTokenResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var getAccessTokenResponseMessage = await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent)
+                .ConfigureAwait(false);
+
+            var accessTokenDataJson = await getAccessTokenResponseMessage.Content
+                .ReadAsStringAsync()
+                .ConfigureAwait(false);
+
             return JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
         }
 

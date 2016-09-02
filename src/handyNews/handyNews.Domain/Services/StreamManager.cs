@@ -6,6 +6,7 @@ using handyNews.API;
 using handyNews.API.Models;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.Domain.Utils;
 
 namespace handyNews.Domain.Services
 {
@@ -38,21 +39,19 @@ namespace handyNews.Domain.Services
 
         private IEnumerable<StreamItem> GetItems(StreamResponse stream)
         {
-            // TODO implement fast version of HtmlUtilities.ConvertToText(it.title);
-
             var itemsQuery = from it in stream.items
                 select new StreamItem
                 {
                     Id = it.id,
                     Published = UnixTimeStampToDateTime(it.published),
-                    Title = it.title,
+                    Title = it.title.ConvertHtmlToText(),
                     Content = it.summary.content,
                     WebUri = GetWebUri(it),
                     Starred = it.categories != null
                               &&
                               it.categories.Any(
-                                  c => c.EndsWith("/state/com.google/starred", StringComparison.OrdinalIgnoreCase)),
-                    Unread = it.categories != null && !it.categories.Any(c => c.EndsWith("/state/com.google/read"))
+                                  c => c.EndsWithOrdinalIgnoreCase("/state/com.google/starred")),
+                    Unread = it.categories != null && !it.categories.Any(c => c.EndsWithOrdinalIgnoreCase("/state/com.google/read"))
                 };
             return itemsQuery;
         }
@@ -60,10 +59,12 @@ namespace handyNews.Domain.Services
         private static string GetWebUri(Item item)
         {
             if (item.alternate == null)
+            {
                 return null;
+            }
 
             var q = from a in item.alternate
-                where string.Equals(a.type, "text/html", StringComparison.OrdinalIgnoreCase)
+                where a.type.EqualsOrdinalIgnoreCase("text/html")
                 select a.href;
 
             return q.FirstOrDefault();

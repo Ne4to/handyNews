@@ -76,7 +76,7 @@ namespace handyNews.Domain.Models
             set
             {
                 _isBusy = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsBusy));
             }
         }
 
@@ -118,7 +118,7 @@ namespace handyNews.Domain.Models
             Add(new HeaderSpaceStreamItem());
             AddRange(items);
             Add(new EmptySpaceStreamItem());
-            OnPropertyChanged("Count");
+            OnPropertyChanged(nameof(Count));
         }
 
         private async Task<LoadMoreItemsResult> LoadMoreItemsAsync(CancellationToken c, uint count)
@@ -132,7 +132,7 @@ namespace handyNews.Domain.Models
                 {
                     var options = new GetItemsOptions
                     {
-                        Count = (int) count,
+                        Count = (int)count,
                         Continuation = _continuation,
                         IncludeRead = _allArticles,
                         ShowNewestFirst = _showNewestFirst,
@@ -152,12 +152,12 @@ namespace handyNews.Domain.Models
                 var baseIndex = Count - 1;
 
                 InsertRange(Count - 1, items);
-                OnPropertyChanged("Count");
+                OnPropertyChanged(nameof(Count));
 
                 // Now notify of the new items
                 NotifyOfInsertedItems(baseIndex, items.Length);
 
-                return new LoadMoreItemsResult {Count = (uint) items.Length};
+                return new LoadMoreItemsResult { Count = (uint)items.Length };
             }
             catch (Exception ex)
             {
@@ -167,7 +167,7 @@ namespace handyNews.Domain.Models
                 if (LoadMoreItemsError != null)
                     LoadMoreItemsError(this, EventArgs.Empty);
 
-                return new LoadMoreItemsResult {Count = 0};
+                return new LoadMoreItemsResult { Count = 0 };
             }
             finally
             {
@@ -221,7 +221,7 @@ namespace handyNews.Domain.Models
 
             IsBusy = true;
 
-            var loadCount = Math.Max(count, (uint) _preloadItemsCount);
+            var loadCount = Math.Max(count, (uint)_preloadItemsCount);
 
             return AsyncInfo.Run(c => LoadMoreItemsAsync(c, loadCount));
         }
@@ -232,12 +232,9 @@ namespace handyNews.Domain.Models
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion
