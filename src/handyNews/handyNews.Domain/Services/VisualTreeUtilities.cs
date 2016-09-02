@@ -14,9 +14,13 @@ namespace handyNews.Domain.Services
                 var v = VisualTreeHelper.GetChild(parent, i);
                 child = v as T;
                 if (child == null)
+                {
                     child = GetVisualChild<T>(v);
+                }
                 if (child != null)
+                {
                     break;
+                }
             }
             return child;
         }
@@ -30,7 +34,9 @@ namespace handyNews.Domain.Services
             {
                 var typedControl = current as T;
                 if (typedControl != null)
+                {
                     return typedControl;
+                }
 
                 current = VisualTreeHelper.GetParent(current);
             }

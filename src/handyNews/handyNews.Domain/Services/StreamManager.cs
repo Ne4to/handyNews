@@ -16,7 +16,10 @@ namespace handyNews.Domain.Services
 
         public StreamManager(ApiClient apiClient)
         {
-            if (apiClient == null) throw new ArgumentNullException(nameof(apiClient));
+            if (apiClient == null)
+            {
+                throw new ArgumentNullException(nameof(apiClient));
+            }
             _apiClient = apiClient;
         }
 
@@ -25,11 +28,12 @@ namespace handyNews.Domain.Services
             var stream = await LoadAsync(options);
 
             return new GetItemsResult
-            {
-                Items = GetItems(stream).ToArray(),
-                Continuation = stream.continuation,
-                Timestamp = stream.updated
-            };
+                   {
+                       Items = GetItems(stream)
+                           .ToArray(),
+                       Continuation = stream.continuation,
+                       Timestamp = stream.updated
+                   };
         }
 
         public Task MarkAllAsReadAsync(string streamId, int streamTimestamp)
@@ -41,18 +45,18 @@ namespace handyNews.Domain.Services
         {
             var itemsQuery = from it in stream.items
                 select new StreamItem
-                {
-                    Id = it.id,
-                    Published = UnixTimeStampToDateTime(it.published),
-                    Title = it.title.ConvertHtmlToText(),
-                    Content = it.summary.content,
-                    WebUri = GetWebUri(it),
-                    Starred = it.categories != null
-                              &&
-                              it.categories.Any(
-                                  c => c.EndsWithOrdinalIgnoreCase("/state/com.google/starred")),
-                    Unread = it.categories != null && !it.categories.Any(c => c.EndsWithOrdinalIgnoreCase("/state/com.google/read"))
-                };
+                       {
+                           Id = it.id,
+                           Published = UnixTimeStampToDateTime(it.published),
+                           Title = it.title.ConvertHtmlToText(),
+                           Content = it.summary.content,
+                           WebUri = GetWebUri(it),
+                           Starred = (it.categories != null)
+                                     &&
+                                     it.categories.Any(
+                                           c => c.EndsWithOrdinalIgnoreCase("/state/com.google/starred")),
+                           Unread = (it.categories != null) && !it.categories.Any(c => c.EndsWithOrdinalIgnoreCase("/state/com.google/read"))
+                       };
             return itemsQuery;
         }
 
@@ -75,7 +79,7 @@ namespace handyNews.Domain.Services
             return
                 await
                     _apiClient.GetStreamAsync(options.StreamId, options.ShowNewestFirst, options.Count,
-                        options.Continuation, options.IncludeRead);
+                                              options.Continuation, options.IncludeRead);
         }
 
         private DateTimeOffset UnixTimeStampToDateTime(int unixTimeStamp)

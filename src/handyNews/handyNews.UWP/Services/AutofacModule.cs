@@ -21,50 +21,50 @@ namespace handyNews.UWP.Services
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(new ApplicationInsightsTelemetryManager(new TelemetryClient()))
-                .As<ITelemetryManager>()
-                .SingleInstance();
+                   .As<ITelemetryManager>()
+                   .SingleInstance();
 
             builder.RegisterType<AuthorizationDataStorage>()
-                .As<IAuthorizationDataStorage>()
-                .SingleInstance();
+                   .As<IAuthorizationDataStorage>()
+                   .SingleInstance();
 
             builder.RegisterType<AuthenticationManager>()
-                .As<IAuthenticationManager>()
-                .SingleInstance();
+                   .As<IAuthenticationManager>()
+                   .SingleInstance();
 
             builder.RegisterType<AuthorizationHandler>()
-                .SingleInstance();
+                   .SingleInstance();
 
             builder.RegisterType<ApiClient>()
-                .As<ApiClient>()
-                .WithParameter(new ResolvedParameter(ApiClientParameterPredicate, ApiClientParameterAccessor))
-                .SingleInstance();
+                   .As<ApiClient>()
+                   .WithParameter(new ResolvedParameter(ApiClientParameterPredicate, ApiClientParameterAccessor))
+                   .SingleInstance();
 
             builder.RegisterType<SettingsManager>()
-                .As<ISettingsManager>();
+                   .As<ISettingsManager>();
 
             builder.RegisterType<SubscriptionsManager>()
-                .As<ISubscriptionsManager>();
+                   .As<ISubscriptionsManager>();
 
             builder.RegisterType<StreamManager>()
-                .As<IStreamManager>();
+                   .As<IStreamManager>();
 
             builder.RegisterType<ImageManager>()
-                .As<ImageManager>();
+                   .As<ImageManager>();
 
             builder.RegisterType<NavigationService>()
-                .As<INavigationService>();
+                   .As<INavigationService>();
 
             builder.RegisterType<SubscriptionsTreeViewModel>()
-                .As<ISubscriptionsTreeViewModel>()
-                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+                   .As<ISubscriptionsTreeViewModel>()
+                   .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             builder.RegisterType<StreamViewViewModel>()
-                .As<IStreamViewViewModel>()
-                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+                   .As<IStreamViewViewModel>()
+                   .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             builder.RegisterType<MainPageViewModel>()
-                .SingleInstance();
+                   .SingleInstance();
 
             // Perform registrations and build the container.
             var container = builder.Build();
@@ -82,7 +82,9 @@ namespace handyNews.UWP.Services
         private object ApiClientParameterAccessor(ParameterInfo parameterInfo, IComponentContext context)
         {
             if (parameterInfo.ParameterType == typeof(DelegatingHandler))
+            {
                 return context.Resolve<AuthorizationHandler>();
+            }
 
             return null;
         }

@@ -13,7 +13,10 @@ namespace handyNews.UWP.ViewModels
 
         public MainPageViewModel([NotNull] IAuthenticationManager authenticationManager)
         {
-            if (authenticationManager == null) throw new ArgumentNullException(nameof(authenticationManager));
+            if (authenticationManager == null)
+            {
+                throw new ArgumentNullException(nameof(authenticationManager));
+            }
             _authenticationManager = authenticationManager;
         }
 

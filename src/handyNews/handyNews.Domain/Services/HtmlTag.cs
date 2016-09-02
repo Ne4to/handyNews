@@ -39,6 +39,7 @@
         /// </summary>
         public const string ANCHOR = "a";
 
+        // TODO Add suppport for Preformatted text
         /// <summary>
         ///     Preformatted text. All of the whitespace within this element is regarded as semantically relevant (whereas other
         ///     elements will consider the likes of indentations or multiple consecutive spaces to be meaningless).

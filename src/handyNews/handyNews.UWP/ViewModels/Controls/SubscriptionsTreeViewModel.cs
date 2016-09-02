@@ -19,10 +19,16 @@ namespace handyNews.UWP.ViewModels.Controls
     public class SubscriptionsTreeViewModel : BindableBase, ISubscriptionsTreeViewModel
     {
         public SubscriptionsTreeViewModel([NotNull] ISubscriptionsManager subscriptionsManager,
-            [NotNull] INavigationService navigationService)
+                                          [NotNull] INavigationService navigationService)
         {
-            if (subscriptionsManager == null) throw new ArgumentNullException(nameof(subscriptionsManager));
-            if (navigationService == null) throw new ArgumentNullException(nameof(navigationService));
+            if (subscriptionsManager == null)
+            {
+                throw new ArgumentNullException(nameof(subscriptionsManager));
+            }
+            if (navigationService == null)
+            {
+                throw new ArgumentNullException(nameof(navigationService));
+            }
             _subscriptionsManager = subscriptionsManager;
             _navigationService = navigationService;
         }
@@ -91,8 +97,8 @@ namespace handyNews.UWP.ViewModels.Controls
                 _rootItems = subscriptionItems;
 
                 var cat = subscriptionItems.OfType<CategoryItem>()
-                    .FirstOrDefault(
-                        c => !_isRoot && c.Id.EqualsOrdinalIgnoreCase(_categoryId));
+                                           .FirstOrDefault(
+                                               c => !_isRoot && c.Id.EqualsOrdinalIgnoreCase(_categoryId));
 
                 if (cat != null)
                 {

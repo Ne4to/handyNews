@@ -11,8 +11,10 @@ namespace handyNews.Domain.Utils
     {
         public static void ScrollItem(ListViewBase control, int indexDelta)
         {
-            if (control == null || control.Items == null)
+            if ((control == null) || (control.Items == null))
+            {
                 return;
+            }
 
             var scrollViewer = VisualTreeUtilities.GetVisualChild<ScrollViewer>(control);
 
@@ -22,18 +24,21 @@ namespace handyNews.Domain.Utils
 
             var q =
                 from lvi in
-                    VisualTreeHelper.FindElementsInHostCoordinates(checkPoint, scrollViewer).OfType<ListViewItem>()
+                VisualTreeHelper.FindElementsInHostCoordinates(checkPoint, scrollViewer)
+                                .OfType<ListViewItem>()
                 where lvi.Content != null
                 select lvi.Content;
 
             var item = q.FirstOrDefault();
 
             if (item == null)
+            {
                 return;
+            }
 
             var index = control.Items.IndexOf(item);
             var nextItemIndex = index + indexDelta;
-            if (index != -1 && nextItemIndex >= 0 && nextItemIndex < control.Items.Count)
+            if ((index != -1) && (nextItemIndex >= 0) && (nextItemIndex < control.Items.Count))
             {
                 var nextItem = control.Items[nextItemIndex];
                 control.ScrollIntoView(nextItem, ScrollIntoViewAlignment.Leading);

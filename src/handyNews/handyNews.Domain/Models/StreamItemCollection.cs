@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,24 +16,33 @@ namespace handyNews.Domain.Models
     public class StreamItemCollection : List<StreamItem>, ISupportIncrementalLoading, INotifyCollectionChanged,
         INotifyPropertyChanged
     {
+        private readonly bool _allArticles;
         private readonly int _preloadItemsCount;
         private readonly bool _showNewestFirst;
 
         private readonly IStreamManager _streamManager;
         private readonly ITelemetryManager _telemetryManager;
-        private readonly bool _allArticles;
         private string _continuation;
         private bool _fault;
 
         private bool _isBusy;
 
         public StreamItemCollection(IStreamManager streamManager, string streamId, bool showNewestFirst,
-            ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
+                                    ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
             : base(preloadItemsCount)
         {
-            if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
-            if (streamId == null) throw new ArgumentNullException(nameof(streamId));
-            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+            if (streamManager == null)
+            {
+                throw new ArgumentNullException(nameof(streamManager));
+            }
+            if (streamId == null)
+            {
+                throw new ArgumentNullException(nameof(streamId));
+            }
+            if (telemetryManager == null)
+            {
+                throw new ArgumentNullException(nameof(telemetryManager));
+            }
 
             _streamManager = streamManager;
             StreamId = streamId;
@@ -45,14 +53,23 @@ namespace handyNews.Domain.Models
         }
 
         public StreamItemCollection([NotNull] StreamItemCollectionState state,
-            [NotNull] IStreamManager streamManager,
-            [NotNull] ITelemetryManager telemetryManager,
-            int preloadItemsCount)
+                                    [NotNull] IStreamManager streamManager,
+                                    [NotNull] ITelemetryManager telemetryManager,
+                                    int preloadItemsCount)
             : base(state.Items.Length)
         {
-            if (state == null) throw new ArgumentNullException(nameof(state));
-            if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
-            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+            if (state == null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+            if (streamManager == null)
+            {
+                throw new ArgumentNullException(nameof(streamManager));
+            }
+            if (telemetryManager == null)
+            {
+                throw new ArgumentNullException(nameof(telemetryManager));
+            }
 
             _streamManager = streamManager;
             _telemetryManager = telemetryManager;
@@ -97,13 +114,13 @@ namespace handyNews.Domain.Models
             try
             {
                 var options = new GetItemsOptions
-                {
-                    Count = _preloadItemsCount,
-                    Continuation = null,
-                    ShowNewestFirst = _showNewestFirst,
-                    StreamId = StreamId,
-                    IncludeRead = _allArticles
-                };
+                              {
+                                  Count = _preloadItemsCount,
+                                  Continuation = null,
+                                  ShowNewestFirst = _showNewestFirst,
+                                  StreamId = StreamId,
+                                  IncludeRead = _allArticles
+                              };
 
                 var result = await _streamManager.GetItemsAsync(options);
                 items = result.Items;
@@ -131,13 +148,13 @@ namespace handyNews.Domain.Models
                 try
                 {
                     var options = new GetItemsOptions
-                    {
-                        Count = (int)count,
-                        Continuation = _continuation,
-                        IncludeRead = _allArticles,
-                        ShowNewestFirst = _showNewestFirst,
-                        StreamId = StreamId
-                    };
+                                  {
+                                      Count = (int) count,
+                                      Continuation = _continuation,
+                                      IncludeRead = _allArticles,
+                                      ShowNewestFirst = _showNewestFirst,
+                                      StreamId = StreamId
+                                  };
 
                     var result = await _streamManager.GetItemsAsync(options);
                     items = result.Items;
@@ -157,7 +174,10 @@ namespace handyNews.Domain.Models
                 // Now notify of the new items
                 NotifyOfInsertedItems(baseIndex, items.Length);
 
-                return new LoadMoreItemsResult { Count = (uint)items.Length };
+                return new LoadMoreItemsResult
+                       {
+                           Count = (uint) items.Length
+                       };
             }
             catch (Exception ex)
             {
@@ -165,9 +185,14 @@ namespace handyNews.Domain.Models
                 _telemetryManager.TrackError(ex);
 
                 if (LoadMoreItemsError != null)
+                {
                     LoadMoreItemsError(this, EventArgs.Empty);
+                }
 
-                return new LoadMoreItemsResult { Count = 0 };
+                return new LoadMoreItemsResult
+                       {
+                           Count = 0
+                       };
             }
             finally
             {
@@ -185,7 +210,7 @@ namespace handyNews.Domain.Models
             for (var i = 0; i < count; i++)
             {
                 var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this[baseIndex],
-                    baseIndex);
+                                                                baseIndex);
                 CollectionChanged(this, args);
             }
         }
@@ -215,13 +240,12 @@ namespace handyNews.Domain.Models
         {
             if (IsBusy)
             {
-                //return AsyncInfo.Run(c => Task.FromResult(new LoadMoreItemsResult()));
                 throw new InvalidOperationException("Only one operation in flight at a time");
             }
 
             IsBusy = true;
 
-            var loadCount = Math.Max(count, (uint)_preloadItemsCount);
+            var loadCount = Math.Max(count, (uint) _preloadItemsCount);
 
             return AsyncInfo.Run(c => LoadMoreItemsAsync(c, loadCount));
         }

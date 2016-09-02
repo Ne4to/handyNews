@@ -19,18 +19,27 @@ namespace handyNews.Domain.Services
         private const string CATEGORY_ALL_ICON_URL = "ms-appx:///Assets/CategoryIcon.png";
 
         private static readonly Regex CategoryRegex = new Regex("^user/[0-9]*/label/",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                                                                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         private readonly ApiClient _apiClient;
         private readonly ISettingsManager _settingsService;
         private readonly ITelemetryManager _telemetryManager;
 
         public SubscriptionsManager(ApiClient apiClient, ITelemetryManager telemetryManager,
-            ISettingsManager settingsService)
+                                    ISettingsManager settingsService)
         {
-            if (apiClient == null) throw new ArgumentNullException(nameof(apiClient));
-            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
-            if (settingsService == null) throw new ArgumentNullException(nameof(settingsService));
+            if (apiClient == null)
+            {
+                throw new ArgumentNullException(nameof(apiClient));
+            }
+            if (telemetryManager == null)
+            {
+                throw new ArgumentNullException(nameof(telemetryManager));
+            }
+            if (settingsService == null)
+            {
+                throw new ArgumentNullException(nameof(settingsService));
+            }
 
             _apiClient = apiClient;
             _telemetryManager = telemetryManager;
@@ -47,29 +56,27 @@ namespace handyNews.Domain.Services
 
             stopwatch.Stop();
             _telemetryManager.TrackMetric(TemetryMetrics.GetSubscriptionsTotalResponseTime,
-                stopwatch.Elapsed.TotalSeconds);
+                                          stopwatch.Elapsed.TotalSeconds);
 
             var unreadCountDictionary = new Dictionary<string, int>();
             foreach (var unreadcount in unreadCount.UnreadCounts)
-            {
                 unreadCountDictionary[unreadcount.Id] = unreadcount.Count;
-            }
 
             var catsQuery = from tag in tags.Tags
                 where CategoryRegex.IsMatch(tag.Id)
                 select new CategoryItem
-                {
-                    Id = tag.Id,
-                    SortId = tag.SortId,
-                    IconUrl = CATEGORY_ALL_ICON_URL
-                };
+                       {
+                           Id = tag.Id,
+                           SortId = tag.SortId,
+                           IconUrl = CATEGORY_ALL_ICON_URL
+                       };
 
             var categories = catsQuery.ToList();
 
             foreach (var categoryItem in categories)
             {
                 var subsQuery = from s in subscriptions.Subscriptions
-                    where s.Categories != null
+                    where (s.Categories != null)
                           && s.Categories.Any(c => c.Id.EqualsOrdinalIgnoreCase(categoryItem.Id))
                     orderby s.Title
                     // descending 
@@ -86,15 +93,15 @@ namespace handyNews.Domain.Services
                 categoryItem.IsMaxUnread = categoryItem.Subscriptions.Any(t => t.IsMaxUnread);
 
                 var readAllItem = new SubscriptionItem
-                {
-                    Id = categoryItem.Id,
-                    SortId = categoryItem.SortId,
-                    IconUrl = READ_ALL_ICON_URL,
-                    Title = Resources.ReadAllSubscriptionItem,
-                    PageTitle = categoryItem.Title,
-                    UnreadCount = categoryItem.UnreadCount,
-                    IsMaxUnread = categoryItem.IsMaxUnread
-                };
+                                  {
+                                      Id = categoryItem.Id,
+                                      SortId = categoryItem.SortId,
+                                      IconUrl = READ_ALL_ICON_URL,
+                                      Title = Resources.ReadAllSubscriptionItem,
+                                      PageTitle = categoryItem.Title,
+                                      UnreadCount = categoryItem.UnreadCount,
+                                      IsMaxUnread = categoryItem.IsMaxUnread
+                                  };
 
                 categoryItem.Subscriptions.Insert(0, readAllItem);
             }
@@ -103,7 +110,7 @@ namespace handyNews.Domain.Services
             categories.RemoveAll(c => c.Subscriptions.Count == 0);
 
             var singleItems = (from s in subscriptions.Subscriptions
-                where s.Categories == null || s.Categories.Length == 0
+                where (s.Categories == null) || (s.Categories.Length == 0)
                 orderby s.Title
                 select CreateSubscriptionItem(s, unreadCountDictionary, unreadCount.Max)).ToList();
 
@@ -113,14 +120,14 @@ namespace handyNews.Domain.Services
             var totalUnreadCount = allItems.Sum(t => t.UnreadCount);
             var isTotalMax = allItems.Any(t => t.IsMaxUnread);
             var readAllRootItem = new SubscriptionItem
-            {
-                Id = SpecialTags.Read,
-                IconUrl = READ_ALL_ICON_URL,
-                Title = Resources.ReadAllSubscriptionItem,
-                PageTitle = Resources.ReadAllSubscriptionItem,
-                UnreadCount = totalUnreadCount,
-                IsMaxUnread = isTotalMax
-            };
+                                  {
+                                      Id = SpecialTags.Read,
+                                      IconUrl = READ_ALL_ICON_URL,
+                                      Title = Resources.ReadAllSubscriptionItem,
+                                      PageTitle = Resources.ReadAllSubscriptionItem,
+                                      UnreadCount = totalUnreadCount,
+                                      IsMaxUnread = isTotalMax
+                                  };
             allItems.Insert(0, readAllRootItem);
 
             if (_settingsService.HideEmptySubscriptions)
@@ -132,23 +139,23 @@ namespace handyNews.Domain.Services
         }
 
         private static SubscriptionItem CreateSubscriptionItem(Subscription s,
-            Dictionary<string, int> unreadCountDictionary, int maxUnread)
+                                                               Dictionary<string, int> unreadCountDictionary, int maxUnread)
         {
             var unreadCount = GetUnreadCount(unreadCountDictionary, s.Id);
 
             return new SubscriptionItem
-            {
-                Id = s.Id,
-                SortId = s.SortId,
-                Url = s.Url,
-                HtmlUrl = s.HtmlUrl,
-                IconUrl = s.IconUrl,
-                Title = s.Title.ConvertHtmlToText(),
-                PageTitle = s.Title.ConvertHtmlToText(),
-                FirstItemMsec = s.FirstItemMsec,
-                UnreadCount = unreadCount,
-                IsMaxUnread = unreadCount == maxUnread
-            };
+                   {
+                       Id = s.Id,
+                       SortId = s.SortId,
+                       Url = s.Url,
+                       HtmlUrl = s.HtmlUrl,
+                       IconUrl = s.IconUrl,
+                       Title = s.Title.ConvertHtmlToText(),
+                       PageTitle = s.Title.ConvertHtmlToText(),
+                       FirstItemMsec = s.FirstItemMsec,
+                       UnreadCount = unreadCount,
+                       IsMaxUnread = unreadCount == maxUnread
+                   };
         }
 
         private static int GetUnreadCount(Dictionary<string, int> unreadCounts, string id)
@@ -161,9 +168,7 @@ namespace handyNews.Domain.Services
         {
             allItems.RemoveAll(c => c.UnreadCount == 0);
             foreach (var cat in allItems.OfType<CategoryItem>())
-            {
                 cat.Subscriptions.RemoveAll(c => c.UnreadCount == 0);
-            }
         }
     }
 }

@@ -22,12 +22,12 @@ namespace handyNews.Domain.Services
 
                 var handler = NetworkChanged;
                 if (handler != null)
+                {
                     handler(this, new NetworkChangedEventArgs(connected));
+                }
             }
-                // ReSharper disable once EmptyGeneralCatchClause
-            catch (Exception)
-            {
-            }
+            // ReSharper disable once EmptyGeneralCatchClause
+            catch (Exception) {}
         }
     }
 }

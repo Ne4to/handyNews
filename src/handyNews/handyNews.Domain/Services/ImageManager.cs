@@ -22,7 +22,8 @@ namespace handyNews.Domain.Services
 
         public ImageManager()
         {
-            DisplayInformation.GetForCurrentView().OrientationChanged += DisplayInformation_OrientationChanged;
+            DisplayInformation.GetForCurrentView()
+                              .OrientationChanged += DisplayInformation_OrientationChanged;
         }
 
         public static void SetImageHorizontalPadding(DependencyObject element, double value)
@@ -41,9 +42,7 @@ namespace handyNews.Domain.Services
             if (_allBlocks.TryGetValue(textBlock, out oldImages))
             {
                 foreach (var oldImage in oldImages)
-                {
                     oldImage.Unloaded -= textBlock_Unloaded;
-                }
             }
 
             _allBlocks[textBlock] = images;
@@ -61,8 +60,8 @@ namespace handyNews.Domain.Services
         {
             var maxImageWidth = Window.Current.Bounds.Width;
 
-            if (display.CurrentOrientation == DisplayOrientations.Landscape
-                || display.CurrentOrientation == DisplayOrientations.LandscapeFlipped)
+            if ((display.CurrentOrientation == DisplayOrientations.Landscape)
+                || (display.CurrentOrientation == DisplayOrientations.LandscapeFlipped))
             {
                 var frame = Window.Current.Content as Frame;
                 if (frame != null)
@@ -73,7 +72,9 @@ namespace handyNews.Domain.Services
                         var bottomAppBar = page.BottomAppBar;
 
                         if (bottomAppBar != null)
+                        {
                             maxImageWidth -= bottomAppBar.ActualHeight;
+                        }
                     }
                 }
             }
@@ -84,12 +85,16 @@ namespace handyNews.Domain.Services
         {
             var imgSource = image.Source as BitmapImage;
             if (imgSource == null)
+            {
                 return;
+            }
 
             var width = Math.Min(imgSource.PixelWidth, maxImageWidth);
 
             if (!(Math.Abs(width) > 0.1D))
+            {
                 return;
+            }
 
             var k = width/imgSource.PixelWidth;
 
@@ -102,12 +107,8 @@ namespace handyNews.Domain.Services
             var maxImageWidth = GetMaxImageWidth(display) - StremPageImageHorizontalPadding;
 
             foreach (var list in _allBlocks.Values)
-            {
                 foreach (var image in list)
-                {
                     UpdateImageSize(image, maxImageWidth);
-                }
-            }
         }
     }
 }

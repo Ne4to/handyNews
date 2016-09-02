@@ -38,13 +38,13 @@ namespace handyNews.UWP.Behaviors
             richTextBlock.Loaded += richTextBlock_Loaded;
 
             _callbackToken = AssociatedObject.RegisterPropertyChangedCallback(UIElement.VisibilityProperty,
-                OnVisibilityPropertyChanged);
+                                                                              OnVisibilityPropertyChanged);
         }
 
         private void OnVisibilityPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             var richTextBlock = (RichTextBlock) AssociatedObject;
-            if (!_created && richTextBlock.Visibility == Visibility.Visible && HtmlContent is string)
+            if (!_created && (richTextBlock.Visibility == Visibility.Visible) && HtmlContent is string)
             {
                 UpdateTextBlock(richTextBlock);
             }
@@ -53,8 +53,8 @@ namespace handyNews.UWP.Behaviors
         private void richTextBlock_Loaded(object sender, RoutedEventArgs e)
         {
             var richTextBlock = (RichTextBlock) AssociatedObject;
-            if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string &&
-                richTextBlock.Blocks.Count == 0)
+            if ((richTextBlock.Visibility == Visibility.Visible) && HtmlContent is string &&
+                (richTextBlock.Blocks.Count == 0))
             {
                 UpdateTextBlock(richTextBlock);
             }
@@ -67,9 +67,7 @@ namespace handyNews.UWP.Behaviors
             var paragraphs = builder.GetParagraphs((string) HtmlContent, out images);
 
             foreach (var paragraph in paragraphs)
-            {
                 richTextBlock.Blocks.Add(paragraph);
-            }
 
             _created = true;
 
@@ -93,7 +91,7 @@ namespace handyNews.UWP.Behaviors
             _created = false;
             richTextBlock.Blocks.Clear();
 
-            if (richTextBlock.Visibility == Visibility.Visible && HtmlContent is string)
+            if ((richTextBlock.Visibility == Visibility.Visible) && HtmlContent is string)
             {
                 UpdateTextBlock(richTextBlock);
             }

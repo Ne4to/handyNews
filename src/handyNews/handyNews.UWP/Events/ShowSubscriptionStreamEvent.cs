@@ -7,7 +7,10 @@ namespace handyNews.UWP.Events
     {
         public ShowSubscriptionStreamEvent(SubscriptionItem item)
         {
-            if (item == null) throw new ArgumentNullException(nameof(item));
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
 
             Item = item;
         }

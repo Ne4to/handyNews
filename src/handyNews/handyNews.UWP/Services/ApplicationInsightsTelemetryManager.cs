@@ -12,7 +12,10 @@ namespace handyNews.UWP.Services
 
         public ApplicationInsightsTelemetryManager(TelemetryClient telemetryClient)
         {
-            if (telemetryClient == null) throw new ArgumentNullException(nameof(telemetryClient));
+            if (telemetryClient == null)
+            {
+                throw new ArgumentNullException(nameof(telemetryClient));
+            }
             _telemetryClient = telemetryClient;
         }
 
@@ -25,9 +28,7 @@ namespace handyNews.UWP.Services
         {
             var eventTelemetry = new EventTelemetry(eventName);
             foreach (var kvp in properties)
-            {
                 eventTelemetry.Properties.Add(kvp.Key, kvp.Value);
-            }
 
             _telemetryClient.TrackEvent(eventTelemetry);
         }

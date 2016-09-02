@@ -14,19 +14,22 @@ namespace handyNews.API
 
         public ApiClient(DelegatingHandler authorizationHandler)
         {
-            if (authorizationHandler == null) throw new ArgumentNullException(nameof(authorizationHandler));
+            if (authorizationHandler == null)
+            {
+                throw new ArgumentNullException(nameof(authorizationHandler));
+            }
 
             var httpClientHandler = new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
+                                    {
+                                        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                                    };
             authorizationHandler.InnerHandler = httpClientHandler;
 
             _httpClient = new HttpClient(authorizationHandler);
             _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
-            {
-                NoCache = true
-            };
+                                                             {
+                                                                 NoCache = true
+                                                             };
         }
 
         public Task<UserInfoResponse> GetUserInfoAsync()
@@ -50,17 +53,21 @@ namespace handyNews.API
         }
 
         public Task<StreamResponse> GetStreamAsync(string id, bool showNewestFirst = true, int count = 20,
-            string continuation = null, bool includeRead = false)
+                                                   string continuation = null, bool includeRead = false)
         {
             var uri = string.Format(
                 "https://www.inoreader.com/reader/api/0/stream/contents/{0}?n={1}&output=json&r={2}",
                 WebUtility.UrlEncode(id), count, showNewestFirst ? "n" : "o");
 
             if (!includeRead)
+            {
                 uri += "&xt=user/-/state/com.google/read";
+            }
 
             if (continuation != null)
+            {
                 uri += "&c=" + continuation;
+            }
 
             return GetAsync<StreamResponse>(uri);
         }
@@ -68,21 +75,21 @@ namespace handyNews.API
         public Task AddTagAsync(string tag, string itemId)
         {
             var uri = string.Format("https://www.inoreader.com/reader/api/0/edit-tag?a={0}&i={1}",
-                WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
+                                    WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
             return GetNoResultAsync(uri);
         }
 
         public Task RemoveTagAsync(string tag, string itemId)
         {
             var uri = string.Format("https://www.inoreader.com/reader/api/0/edit-tag?r={0}&i={1}",
-                WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
+                                    WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
             return GetNoResultAsync(uri);
         }
 
         public Task MarkAllAsReadAsync(string streamId, int streamTimestamp)
         {
             var uri = string.Format("https://www.inoreader.com/reader/api/0/mark-all-as-read?s={0}&ts={1}",
-                WebUtility.UrlEncode(streamId), streamTimestamp);
+                                    WebUtility.UrlEncode(streamId), streamTimestamp);
             return GetNoResultAsync(uri);
         }
 
@@ -90,19 +97,23 @@ namespace handyNews.API
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
-            var response = await _httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+            var response = await _httpClient.SendAsync(requestMessage)
+                                            .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseString = await response.Content.ReadAsStringAsync()
+                                               .ConfigureAwait(false);
 
-            return JObject.Parse(responseString).ToObject<T>();
+            return JObject.Parse(responseString)
+                          .ToObject<T>();
         }
 
         private async Task GetNoResultAsync(string requestUri)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
-            var response = await _httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+            var response = await _httpClient.SendAsync(requestMessage)
+                                            .ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
         }

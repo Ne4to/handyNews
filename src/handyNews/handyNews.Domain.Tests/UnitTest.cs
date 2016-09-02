@@ -10,7 +10,8 @@ namespace handyNews.Domain.Tests
         public void TestMethod1()
         {
             var localStorageManager = new LocalStorageManager();
-            var t = localStorageManager.LoadSubscriptionsAsync().Result;
+            var t = localStorageManager.LoadSubscriptionsAsync()
+                                       .Result;
         }
     }
 }

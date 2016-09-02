@@ -14,34 +14,42 @@ namespace handyNews.Domain.Services
         private readonly IAuthorizationDataStorage _authorizationDataStorage;
 
         public AuthorizationHandler([NotNull] IAuthorizationDataStorage authorizationDataStorage,
-            [NotNull] IAuthenticationManager authenticationManager)
+                                    [NotNull] IAuthenticationManager authenticationManager)
         {
-            if (authorizationDataStorage == null) throw new ArgumentNullException(nameof(authorizationDataStorage));
-            if (authenticationManager == null) throw new ArgumentNullException(nameof(authenticationManager));
+            if (authorizationDataStorage == null)
+            {
+                throw new ArgumentNullException(nameof(authorizationDataStorage));
+            }
+            if (authenticationManager == null)
+            {
+                throw new ArgumentNullException(nameof(authenticationManager));
+            }
             _authorizationDataStorage = authorizationDataStorage;
             _authenticationManager = authenticationManager;
         }
 
         protected AuthorizationHandler(HttpMessageHandler innerHandler)
-            : base(innerHandler)
-        {
-        }
+            : base(innerHandler) {}
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-            CancellationToken cancellationToken)
+                                                                     CancellationToken cancellationToken)
         {
             if (_authorizationDataStorage.AccessToken == null)
+            {
                 throw new Exception("TODO user is not authenticated");
+            }
 
             if (_authorizationDataStorage.AccessTokenExpireDate <= DateTimeOffset.UtcNow)
             {
-                await _authenticationManager.RefreshTokenAsync().ConfigureAwait(false);
+                await _authenticationManager.RefreshTokenAsync()
+                                            .ConfigureAwait(false);
             }
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",
-                _authorizationDataStorage.AccessToken);
+                                                                          _authorizationDataStorage.AccessToken);
 
-            return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            return await base.SendAsync(request, cancellationToken)
+                             .ConfigureAwait(false);
         }
     }
 }

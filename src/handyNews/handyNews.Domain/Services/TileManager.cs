@@ -28,7 +28,10 @@ namespace handyNews.Domain.Services
 
         public TileManager([NotNull] ITelemetryManager telemetryManager)
         {
-            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+            if (telemetryManager == null)
+            {
+                throw new ArgumentNullException(nameof(telemetryManager));
+            }
             _telemetryManager = telemetryManager;
         }
 
@@ -38,59 +41,65 @@ namespace handyNews.Domain.Services
             {
                 var wideImage = await RenderAsync(new StartTileWide(count), 310, 150);
                 if (wideImage == null)
+                {
                     return;
+                }
                 var wideName = await SaveFileAsync(wideImage, WideFileName, 310U, 150U);
 
                 var squareImage = await RenderAsync(new StartTileSquare(count), 150, 150);
                 if (squareImage == null)
+                {
                     return;
+                }
                 var squareName = await SaveFileAsync(squareImage, SquareFileName, 150U, 150U);
 
                 var squareSmallImage = await RenderAsync(new StartTileSquareSmall(count), 71, 71);
                 if (squareSmallImage == null)
+                {
                     return;
+                }
                 var squareSmallName = await SaveFileAsync(squareSmallImage, SquareSmallFileName, 71U, 71U);
 
 
                 var tile = new TileContent
-                {
-                    Visual = new TileVisual
-                    {
-                        TileWide = new TileBinding
-                        {
-                            Branding = TileBranding.Name,
-                            Content = new TileBindingContentAdaptive
-                            {
-                                BackgroundImage = new TileBackgroundImage
-                                {
-                                    Source = new TileImageSource("ms-appdata:///local/" + wideName)
-                                }
-                            }
-                        },
-                        TileMedium = new TileBinding
-                        {
-                            Branding = TileBranding.Name,
-                            Content = new TileBindingContentAdaptive
-                            {
-                                BackgroundImage = new TileBackgroundImage
-                                {
-                                    Source = new TileImageSource("ms-appdata:///local/" + squareName)
-                                }
-                            }
-                        },
-                        TileSmall = new TileBinding
-                        {
-                            Branding = TileBranding.None,
-                            Content = new TileBindingContentAdaptive
-                            {
-                                BackgroundImage = new TileBackgroundImage
-                                {
-                                    Source = new TileImageSource("ms-appdata:///local/" + squareSmallName)
-                                }
-                            }
-                        }
-                    }
-                };
+                           {
+                               Visual = new TileVisual
+                                        {
+                                            TileWide = new TileBinding
+                                                       {
+                                                           Branding = TileBranding.Name,
+                                                           Content = new TileBindingContentAdaptive
+                                                                     {
+                                                                         BackgroundImage = new TileBackgroundImage
+                                                                                           {
+                                                                                               Source = new TileImageSource("ms-appdata:///local/" + wideName)
+                                                                                           }
+                                                                     }
+                                                       },
+                                            TileMedium = new TileBinding
+                                                         {
+                                                             Branding = TileBranding.Name,
+                                                             Content = new TileBindingContentAdaptive
+                                                                       {
+                                                                           BackgroundImage = new TileBackgroundImage
+                                                                                             {
+                                                                                                 Source = new TileImageSource("ms-appdata:///local/" + squareName)
+                                                                                             }
+                                                                       }
+                                                         },
+                                            TileSmall = new TileBinding
+                                                        {
+                                                            Branding = TileBranding.None,
+                                                            Content = new TileBindingContentAdaptive
+                                                                      {
+                                                                          BackgroundImage = new TileBackgroundImage
+                                                                                            {
+                                                                                                Source = new TileImageSource("ms-appdata:///local/" + squareSmallName)
+                                                                                            }
+                                                                      }
+                                                        }
+                                        }
+                           };
 
                 var doc = tile.GetXml();
                 var tileNotification = new TileNotification(doc);
@@ -107,24 +116,25 @@ namespace handyNews.Domain.Services
         }
 
         private static async Task<string> SaveFileAsync(RenderTargetBitmap image, string fileName, uint imageWidth,
-            uint imageHeight)
+                                                        uint imageHeight)
         {
             var file =
                 await
                     ApplicationData.Current.LocalFolder.CreateFileAsync(fileName,
-                        CreationCollisionOption.ReplaceExisting);
+                                                                        CreationCollisionOption.ReplaceExisting);
             using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
             {
                 var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
                 var pixelsBuffer = await image.GetPixelsAsync();
                 var bytes = pixelsBuffer.ToArray();
 
-                var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
+                var dpi = DisplayInformation.GetForCurrentView()
+                                            .LogicalDpi;
 
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Straight,
-                    (uint) image.PixelWidth, (uint) image.PixelHeight,
-                    dpi, dpi, bytes);
+                                     BitmapAlphaMode.Straight,
+                                     (uint) image.PixelWidth, (uint) image.PixelHeight,
+                                     dpi, dpi, bytes);
 
                 await encoder.FlushAsync();
                 stream.Dispose();
@@ -137,15 +147,21 @@ namespace handyNews.Domain.Services
         {
             var frame = Window.Current.Content as Frame;
             if (frame == null)
+            {
                 return null;
+            }
 
             var page = frame.Content as Page;
             if (page == null)
+            {
                 return null;
+            }
 
             var grid = page.Content as Grid;
             if (grid == null)
+            {
                 return null;
+            }
 
             var canvas = grid.FindName(DrawCanvasName) as Canvas;
             if (canvas == null)
@@ -157,10 +173,14 @@ namespace handyNews.Domain.Services
                 canvas.IsHitTestVisible = false;
 
                 if (grid.ColumnDefinitions.Count > 1)
+                {
                     Grid.SetColumnSpan(canvas, grid.ColumnDefinitions.Count);
+                }
 
                 if (grid.RowDefinitions.Count > 1)
+                {
                     Grid.SetRowSpan(canvas, grid.RowDefinitions.Count);
+                }
 
                 grid.Children.Add(canvas);
             }

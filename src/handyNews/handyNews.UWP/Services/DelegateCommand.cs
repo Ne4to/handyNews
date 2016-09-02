@@ -9,7 +9,10 @@ namespace handyNews.UWP.Services
 
         public DelegateCommand(Action<object> executeAction)
         {
-            if (executeAction == null) throw new ArgumentNullException(nameof(executeAction));
+            if (executeAction == null)
+            {
+                throw new ArgumentNullException(nameof(executeAction));
+            }
             _executeAction = executeAction;
         }
 

@@ -10,22 +10,21 @@ namespace handyNews.UWP.ViewModels.Controls
 {
     public class StreamViewViewModel : BindableBase, IStreamViewViewModel
     {
-        #region Fields
-
-        private readonly ISettingsManager _settingsManager;
-        private readonly IStreamManager _streamManager;
-        private readonly ITelemetryManager _telemetryManager;
-
-        private StreamItemCollection _items;
-
-        #endregion
-
         public StreamViewViewModel(ISettingsManager settingsManager, IStreamManager streamManager,
-            ITelemetryManager telemetryManager)
+                                   ITelemetryManager telemetryManager)
         {
-            if (settingsManager == null) throw new ArgumentNullException(nameof(settingsManager));
-            if (streamManager == null) throw new ArgumentNullException(nameof(streamManager));
-            if (telemetryManager == null) throw new ArgumentNullException(nameof(telemetryManager));
+            if (settingsManager == null)
+            {
+                throw new ArgumentNullException(nameof(settingsManager));
+            }
+            if (streamManager == null)
+            {
+                throw new ArgumentNullException(nameof(streamManager));
+            }
+            if (telemetryManager == null)
+            {
+                throw new ArgumentNullException(nameof(telemetryManager));
+            }
 
             _settingsManager = settingsManager;
             _streamManager = streamManager;
@@ -45,7 +44,7 @@ namespace handyNews.UWP.ViewModels.Controls
         public async void UpdateItems(string streamId)
         {
             var streamItems = new StreamItemCollection(_streamManager, streamId, _settingsManager.ShowNewestFirst,
-                _telemetryManager, false, _settingsManager.PreloadItemCount);
+                                                       _telemetryManager, false, _settingsManager.PreloadItemCount);
             await streamItems.InitAsync();
             Items = streamItems;
         }
@@ -59,5 +58,15 @@ namespace handyNews.UWP.ViewModels.Controls
         {
             UpdateItems(eventData.Item.Id);
         }
+
+        #region Fields
+
+        private readonly ISettingsManager _settingsManager;
+        private readonly IStreamManager _streamManager;
+        private readonly ITelemetryManager _telemetryManager;
+
+        private StreamItemCollection _items;
+
+        #endregion
     }
 }

@@ -11,7 +11,6 @@ using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using handyNews.Domain.Models.Parser;
 using handyNews.Domain.Services.Interfaces;
@@ -57,12 +56,13 @@ namespace handyNews.Domain.Services
             var displayInformation = DisplayInformation.GetForCurrentView();
             _maxImageWidth = ImageManager.GetMaxImageWidth(displayInformation);
             var httpMessageHandler = new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-                AllowAutoRedirect = true
-            };
+                                     {
+                                         AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                                         AllowAutoRedirect = true
+                                     };
             _httpClient = new HttpClient(httpMessageHandler);
-            _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            _dispatcher = CoreWindow.GetForCurrentThread()
+                                    .Dispatcher;
         }
 
         public List<Paragraph> GetParagraphs(string html, out IList<Image> images)
@@ -80,7 +80,10 @@ namespace handyNews.Domain.Services
                 var parser = new HtmlParser();
                 var lexemes = parser.Parse(html);
 
-                var paragraph = new Paragraph { TextAlignment = _appSettings.TextAlignment };
+                var paragraph = new Paragraph
+                                {
+                                    TextAlignment = _appSettings.TextAlignment
+                                };
                 allParagraphs.Add(paragraph);
 
                 for (var lexemeIndex = 0; lexemeIndex < lexemes.Length; lexemeIndex++)
@@ -90,11 +93,15 @@ namespace handyNews.Domain.Services
                     var literalLexeme = lexeme as LiteralLexeme;
                     if (literalLexeme != null)
                     {
-                        paragraph.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
+                        paragraph.Inlines.Add(new Run
+                                              {
+                                                  Text = literalLexeme.Text,
+                                                  FontSize = _appSettings.FontSize
+                                              });
                         continue;
                     }
 
-                    var tagLexeme = (HtmlTagLexeme)lexeme;
+                    var tagLexeme = (HtmlTagLexeme) lexeme;
                     if (tagLexeme.Name.EqualsOrdinalIgnoreCase(HtmlTag.LINE_BREAK))
                     {
                         AddLineBreak(paragraph.Inlines);
@@ -113,7 +120,10 @@ namespace handyNews.Domain.Services
                     {
                         if (tagLexeme.Name.EqualsOrdinalIgnoreCase(HtmlTag.PARAGRAPH))
                         {
-                            paragraph = new Paragraph { TextAlignment = _appSettings.TextAlignment };
+                            paragraph = new Paragraph
+                                        {
+                                            TextAlignment = _appSettings.TextAlignment
+                                        };
                             allParagraphs.Add(paragraph);
                         }
 
@@ -160,15 +170,15 @@ namespace handyNews.Domain.Services
             _allImages.Add(image);
 
             var inlineUiContainer = new InlineUIContainer
-            {
-                Child = image
-            };
+                                    {
+                                        Child = image
+                                    };
             inlines.Add(inlineUiContainer);
             AddLineBreak(inlines);
 
             image.ImageOpened += (sender, args) =>
             {
-                var img = (Image)sender;
+                var img = (Image) sender;
                 var padding = ImageManager.GetImageHorizontalPadding(img);
                 ImageManager.UpdateImageSize(img, _maxImageWidth - padding);
             };
@@ -202,7 +212,7 @@ namespace handyNews.Domain.Services
 
                 var tempFileName = Path.GetRandomFileName();
                 var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(tempFileName,
-                            CreationCollisionOption.GenerateUniqueName);
+                                                                                         CreationCollisionOption.GenerateUniqueName);
 
                 using (var stream = await file.OpenStreamForWriteAsync())
                 {
@@ -215,9 +225,9 @@ namespace handyNews.Domain.Services
         }
 
         private void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex,
-            StringParameters strParams)
+                                 StringParameters strParams)
         {
-            var startL = (HtmlTagLexeme)lexemes[lexemeIndex];
+            var startL = (HtmlTagLexeme) lexemes[lexemeIndex];
 
             if (startL.Name.EqualsOrdinalIgnoreCase(HtmlTag.PARAGRAPH))
             {
@@ -226,7 +236,11 @@ namespace handyNews.Domain.Services
 
             if (startL.Name.EqualsOrdinalIgnoreCase(HtmlTag.LIST_ITEM))
             {
-                inlines.Add(new Run { Text = "• ", FontSize = _appSettings.FontSize });
+                inlines.Add(new Run
+                            {
+                                Text = "• ",
+                                FontSize = _appSettings.FontSize
+                            });
             }
 
             if (startL.Name.EqualsOrdinalIgnoreCase(HtmlTag.DIVISION))
@@ -283,7 +297,11 @@ namespace handyNews.Domain.Services
 
                     if (string.IsNullOrWhiteSpace(strParams.NavigateUri))
                     {
-                        var item = new Run { Text = literalLexeme.Text, FontSize = fontSize };
+                        var item = new Run
+                                   {
+                                       Text = literalLexeme.Text,
+                                       FontSize = fontSize
+                                   };
 
                         if (IsHtmlHeader(strParams) || strParams.Bold)
                         {
@@ -296,9 +314,12 @@ namespace handyNews.Domain.Services
                         }
 
                         // TODO combine these rules
-                        if (inlines.Count > 0 && (inlines[inlines.Count - 1] is Hyperlink || inlines[inlines.Count - 1] is Run))
+                        if ((inlines.Count > 0) && (inlines[inlines.Count - 1] is Hyperlink || inlines[inlines.Count - 1] is Run))
                         {
-                            inlines.Add(new Run { Text = " " });
+                            inlines.Add(new Run
+                                        {
+                                            Text = " "
+                                        });
                         }
 
                         inlines.Add(item);
@@ -306,13 +327,23 @@ namespace handyNews.Domain.Services
                     else
                     {
                         var navigateUri = new Uri(strParams.NavigateUri);
-                        var hyperlink = new Hyperlink { NavigateUri = navigateUri };
-                        hyperlink.Inlines.Add(new Run { Text = literalLexeme.Text, FontSize = _appSettings.FontSize });
+                        var hyperlink = new Hyperlink
+                                        {
+                                            NavigateUri = navigateUri
+                                        };
+                        hyperlink.Inlines.Add(new Run
+                                              {
+                                                  Text = literalLexeme.Text,
+                                                  FontSize = _appSettings.FontSize
+                                              });
 
                         // TODO combine these rules
-                        if (inlines.Count > 0 && inlines[inlines.Count - 1] is Run)
+                        if ((inlines.Count > 0) && inlines[inlines.Count - 1] is Run)
                         {
-                            inlines.Add(new Run { Text = " " });
+                            inlines.Add(new Run
+                                        {
+                                            Text = " "
+                                        });
                         }
 
                         inlines.Add(hyperlink);
@@ -321,7 +352,7 @@ namespace handyNews.Domain.Services
                     continue;
                 }
 
-                var tagLexeme = (HtmlTagLexeme)lexeme;
+                var tagLexeme = (HtmlTagLexeme) lexeme;
                 if (tagLexeme.Name.EqualsOrdinalIgnoreCase(HtmlTag.LINE_BREAK))
                 {
                     AddLineBreak(inlines);
@@ -387,7 +418,7 @@ namespace handyNews.Domain.Services
 
         private void AddLineBreak(InlineCollection inlines)
         {
-            if (inlines.Count == 0 || inlines[inlines.Count - 1] is LineBreak)
+            if ((inlines.Count == 0) || inlines[inlines.Count - 1] is LineBreak)
             {
                 return;
             }
@@ -472,7 +503,7 @@ namespace handyNews.Domain.Services
 
         private int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
         {
-            var startLexeme = (HtmlTagLexeme)lexemes[startLexemeIndex];
+            var startLexeme = (HtmlTagLexeme) lexemes[startLexemeIndex];
             var deep = 1;
 
             for (var index = startLexemeIndex + 1; index < lexemes.Length; index++)
@@ -556,10 +587,10 @@ namespace handyNews.Domain.Services
             _youtubeAllVideos.Add(videoLink);
 
             foreach (var testLink in YoutubeLinks)
-            {
                 if (videoLink.StartsWithOrdinalIgnoreCase(testLink))
                 {
-                    var id = videoLink.Substring(testLink.Length).Replace("/", string.Empty);
+                    var id = videoLink.Substring(testLink.Length)
+                                      .Replace("/", string.Empty);
                     var questionIndex = id.IndexOf('?');
                     if (questionIndex != -1)
                     {
@@ -569,7 +600,6 @@ namespace handyNews.Domain.Services
                     AddYoutubeLink(id, videoLink, inlines);
                     return;
                 }
-            }
         }
 
         private void AddYoutubeLink(string id, string videoLink, InlineCollection inlines)
@@ -579,13 +609,16 @@ namespace handyNews.Domain.Services
             AddImage(inlines, imageUrl, videoLink);
 
             var navigateUri = new Uri(videoLink);
-            var hyperlink = new Hyperlink { NavigateUri = navigateUri };
+            var hyperlink = new Hyperlink
+                            {
+                                NavigateUri = navigateUri
+                            };
             hyperlink.Inlines.Add(new Run
-            {
-                Text = Resources.YoutubeVideoTitle,
-                FontSize = _appSettings.FontSize,
-                FontStyle = FontStyle.Italic
-            });
+                                  {
+                                      Text = Resources.YoutubeVideoTitle,
+                                      FontSize = _appSettings.FontSize,
+                                      FontStyle = FontStyle.Italic
+                                  });
             inlines.Add(hyperlink);
             AddLineBreak(inlines);
         }

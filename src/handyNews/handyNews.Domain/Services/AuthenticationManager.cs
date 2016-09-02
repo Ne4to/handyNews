@@ -18,7 +18,10 @@ namespace handyNews.Domain.Services
 
         public AuthenticationManager(IAuthorizationDataStorage authorizationDataStorage)
         {
-            if (authorizationDataStorage == null) throw new ArgumentNullException(nameof(authorizationDataStorage));
+            if (authorizationDataStorage == null)
+            {
+                throw new ArgumentNullException(nameof(authorizationDataStorage));
+            }
 
             _authorizationDataStorage = authorizationDataStorage;
         }
@@ -29,8 +32,10 @@ namespace handyNews.Domain.Services
         {
             var clientData = await GetClientDataAsync();
 
-            var authorizationCode = await GetAuthorizationCode(clientData).ConfigureAwait(false);
-            var accessTokenData = await GetAccessTokenData(authorizationCode, clientData).ConfigureAwait(false);
+            var authorizationCode = await GetAuthorizationCode(clientData)
+                .ConfigureAwait(false);
+            var accessTokenData = await GetAccessTokenData(authorizationCode, clientData)
+                .ConfigureAwait(false);
 
             SaveAccessToken(accessTokenData);
 
@@ -41,21 +46,24 @@ namespace handyNews.Domain.Services
 
         public async Task RefreshTokenAsync()
         {
-            var clientData = await GetClientDataAsync().ConfigureAwait(false);
+            var clientData = await GetClientDataAsync()
+                .ConfigureAwait(false);
 
             var httpClient = new HttpClient();
             var httpContent = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("client_id", clientData.ClientId),
-                new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
-                new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                new KeyValuePair<string, string>("refresh_token", _authorizationDataStorage.RefreshToken)
-            });
+                                                        {
+                                                            new KeyValuePair<string, string>("client_id", clientData.ClientId),
+                                                            new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
+                                                            new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                                                            new KeyValuePair<string, string>("refresh_token", _authorizationDataStorage.RefreshToken)
+                                                        });
 
             var getAccessTokenResponseMessage =
-                await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent).ConfigureAwait(false);
+                await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent)
+                                .ConfigureAwait(false);
             var accessTokenDataJson =
-                await getAccessTokenResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+                await getAccessTokenResponseMessage.Content.ReadAsStringAsync()
+                                                   .ConfigureAwait(false);
             var accessTokenData = JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
             SaveAccessToken(accessTokenData);
         }
@@ -77,19 +85,20 @@ namespace handyNews.Domain.Services
         private async Task<string> GetAuthorizationCode(ClientData clientData)
         {
             var callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
-            var state = Guid.NewGuid().ToString("N");
+            var state = Guid.NewGuid()
+                            .ToString("N");
             var uri = $"https://www.inoreader.com/oauth2/auth?client_id={clientData.ClientId}&redirect_uri={Uri.EscapeUriString(callbackUri.ToString())}&response_type=code&scope={Uri.EscapeUriString(SCOPES)}&state={state}";
 
             var authenticationResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, new Uri(uri))
-                        .AsTask()
-                        .ConfigureAwait(false);
+                                                                    .AsTask()
+                                                                    .ConfigureAwait(false);
 
             var authorizationCodeResponseDataUri = new Uri(authenticationResult.ResponseData);
             var authorizationCodeResponseData = authorizationCodeResponseDataUri.GetComponents(UriComponents.Query,
-                UriFormat.Unescaped)
-                .Split('&')
-                .Select(str => str.Split('='))
-                .ToDictionary(arr => arr[0], arr => arr[1]);
+                                                                                               UriFormat.Unescaped)
+                                                                                .Split('&')
+                                                                                .Select(str => str.Split('='))
+                                                                                .ToDictionary(arr => arr[0], arr => arr[1]);
 
             if (authorizationCodeResponseData["state"] != state)
             {
@@ -105,21 +114,21 @@ namespace handyNews.Domain.Services
 
             var callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
             var httpContent = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("code", authorizationCode),
-                new KeyValuePair<string, string>("redirect_uri", callbackUri.ToString()),
-                new KeyValuePair<string, string>("client_id", clientData.ClientId),
-                new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
-                new KeyValuePair<string, string>("scope", string.Empty),
-                new KeyValuePair<string, string>("grant_type", "authorization_code")
-            });
+                                                        {
+                                                            new KeyValuePair<string, string>("code", authorizationCode),
+                                                            new KeyValuePair<string, string>("redirect_uri", callbackUri.ToString()),
+                                                            new KeyValuePair<string, string>("client_id", clientData.ClientId),
+                                                            new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
+                                                            new KeyValuePair<string, string>("scope", string.Empty),
+                                                            new KeyValuePair<string, string>("grant_type", "authorization_code")
+                                                        });
 
             var getAccessTokenResponseMessage = await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent)
-                .ConfigureAwait(false);
+                                                                .ConfigureAwait(false);
 
             var accessTokenDataJson = await getAccessTokenResponseMessage.Content
-                .ReadAsStringAsync()
-                .ConfigureAwait(false);
+                                                                         .ReadAsStringAsync()
+                                                                         .ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
         }
@@ -129,8 +138,12 @@ namespace handyNews.Domain.Services
         private async Task<ClientData> GetClientDataAsync()
         {
             var fileUri = new Uri("ms-appx:///Assets/AppSecret.json");
-            var file = await StorageFile.GetFileFromApplicationUriAsync(fileUri).AsTask().ConfigureAwait(false);
-            var fileContent = await FileIO.ReadTextAsync(file).AsTask().ConfigureAwait(false);
+            var file = await StorageFile.GetFileFromApplicationUriAsync(fileUri)
+                                        .AsTask()
+                                        .ConfigureAwait(false);
+            var fileContent = await FileIO.ReadTextAsync(file)
+                                          .AsTask()
+                                          .ConfigureAwait(false);
             return JsonConvert.DeserializeObject<ClientData>(fileContent);
         }
 

@@ -14,7 +14,9 @@ namespace handyNews.UWP.Model
         protected virtual bool SetProperty<T>(ref T storage, T value, string propertyName)
         {
             if (Equals(storage, value))
+            {
                 return false;
+            }
 
             storage = value;
             OnPropertyChanged(propertyName);

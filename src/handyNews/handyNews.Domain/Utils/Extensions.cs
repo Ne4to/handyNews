@@ -12,7 +12,9 @@ namespace handyNews.Domain.Utils
         {
             object obj;
             if (container.Values.TryGetValue(key, out obj))
-                return (T)obj;
+            {
+                return (T) obj;
+            }
 
             return defaultValue;
         }
@@ -21,9 +23,11 @@ namespace handyNews.Domain.Utils
         {
             object o;
             if (!dictionary.TryGetValue(key, out o))
+            {
                 return defaultValue;
+            }
 
-            return (T)o;
+            return (T) o;
         }
 
         public static DateTime GetBeginWeekDate(this DateTime date, DayOfWeek startOfWeek = DayOfWeek.Monday)
@@ -34,24 +38,29 @@ namespace handyNews.Domain.Utils
                 diff += 7;
             }
 
-            return date.AddDays(-1 * diff).Date;
+            return date.AddDays(-1*diff)
+                       .Date;
         }
 
         public static string ToJson(this object obj)
         {
-            return JObject.FromObject(obj).ToString(Formatting.None);
+            return JObject.FromObject(obj)
+                          .ToString(Formatting.None);
         }
 
         public static T FromJson<T>(this string jsonString, bool supressErrors = false)
         {
             try
             {
-                return JObject.Parse(jsonString).ToObject<T>();
+                return JObject.Parse(jsonString)
+                              .ToObject<T>();
             }
             catch (Exception)
             {
                 if (supressErrors)
+                {
                     return default(T);
+                }
 
                 throw;
             }
@@ -65,10 +74,10 @@ namespace handyNews.Domain.Utils
             }
 
             html = html.Replace("&amp;", "&")
-                .Replace("&gt;", ">")
-                .Replace("&lt;", "<")
-                .Replace("\n", string.Empty)
-                .Trim();
+                       .Replace("&gt;", ">")
+                       .Replace("&lt;", "<")
+                       .Replace("\n", string.Empty)
+                       .Trim();
 
             return html;
         }

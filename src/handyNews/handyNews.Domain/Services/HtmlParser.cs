@@ -15,7 +15,7 @@ namespace handyNews.Domain.Services
         static HtmlParser()
         {
             RemoveAdRegex = new Regex("(<center>).*(www.inoreader.com/adv).*(</center>)",
-                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                                      RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         }
 
         public string GetPlainText(string html, int maxLength)
@@ -40,14 +40,18 @@ namespace handyNews.Domain.Services
                 currentLength = builder.Length;
                 builder.Replace("  ", " ");
                 newLength = builder.Length;
-            } while (currentLength != newLength);
+            }
+            while (currentLength != newLength);
 
             if (newLength < maxLength)
             {
-                return builder.ToString().Trim();
+                return builder.ToString()
+                              .Trim();
             }
 
-            return builder.ToString().Substring(0, maxLength).Trim();
+            return builder.ToString()
+                          .Substring(0, maxLength)
+                          .Trim();
         }
 
         public ILexeme[] Parse(string html)
@@ -103,7 +107,7 @@ namespace handyNews.Domain.Services
         private ILexeme[] GetLexemes(List<string> lexemes)
         {
             var q = from l in lexemes
-                let isTag = l[0] == '<' && l[l.Length - 1] == '>'
+                let isTag = (l[0] == '<') && (l[l.Length - 1] == '>')
                 select isTag ? (ILexeme) GetHtmlTag(l) : (ILexeme) new LiteralLexeme(l);
 
             return q.ToArray();
@@ -114,7 +118,7 @@ namespace handyNews.Domain.Services
             var tag = new HtmlTagLexeme();
 
             tag.IsOpen = token[1] != '/';
-            tag.IsClose = token[1] == '/' || token[token.Length - 2] == '/';
+            tag.IsClose = (token[1] == '/') || (token[token.Length - 2] == '/');
 
             var spacePos = token.IndexOf(' ');
             if (spacePos != -1)
@@ -128,7 +132,8 @@ namespace handyNews.Domain.Services
                     var eqPos = token.IndexOf('=', searchAttrStartPos + 1);
                     if (eqPos != -1)
                     {
-                        var attrName = token.Substring(searchAttrStartPos + 1, eqPos - searchAttrStartPos - 1).Trim();
+                        var attrName = token.Substring(searchAttrStartPos + 1, eqPos - searchAttrStartPos - 1)
+                                            .Trim();
                         var quoteSymb = token[eqPos + 1];
 
                         var endQuotePos = token.IndexOf(quoteSymb, eqPos + 2);

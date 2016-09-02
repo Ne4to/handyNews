@@ -22,7 +22,7 @@ namespace handyNews.Domain.Services
         public void Save()
         {
             var container = _rootContainer.CreateContainer(SETTINGS_CONTAINER_NAME,
-                ApplicationDataCreateDisposition.Always);
+                                                           ApplicationDataCreateDisposition.Always);
             container.Values[nameof(AccessToken)] = AccessToken;
             container.Values[nameof(AccessTokenExpireDate)] = AccessTokenExpireDate;
             container.Values[nameof(RefreshToken)] = RefreshToken;
@@ -39,7 +39,9 @@ namespace handyNews.Domain.Services
         {
             ApplicationDataContainer container;
             if (!_rootContainer.Containers.TryGetValue(SETTINGS_CONTAINER_NAME, out container))
+            {
                 return;
+            }
 
             AccessToken = GetValue(container, nameof(AccessToken), default(string));
             AccessTokenExpireDate = GetValue(container, nameof(AccessTokenExpireDate), default(DateTimeOffset?));
@@ -50,7 +52,9 @@ namespace handyNews.Domain.Services
         {
             object obj;
             if (container.Values.TryGetValue(key, out obj))
+            {
                 return (T) obj;
+            }
 
             return defaultValue;
         }
