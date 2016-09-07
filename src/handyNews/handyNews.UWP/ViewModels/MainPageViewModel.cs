@@ -11,6 +11,13 @@ namespace handyNews.UWP.ViewModels
     {
         private readonly IAuthenticationManager _authenticationManager;
 
+        private bool _abc = true;
+        public bool Abc
+        {
+            get { return _abc; }
+            set { SetProperty(ref _abc, value, nameof(Abc)); }
+        }
+
         public MainPageViewModel([NotNull] IAuthenticationManager authenticationManager)
         {
             if (authenticationManager == null)

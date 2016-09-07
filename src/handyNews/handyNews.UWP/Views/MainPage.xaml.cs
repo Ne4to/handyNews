@@ -53,6 +53,7 @@ namespace handyNews.UWP.Views
         private void Manager_BackRequested(object sender, BackRequestedEventArgs e)
         {
             Tree.ViewModel.ShowRoot();
+            ViewModel.Abc = !ViewModel.Abc;
         }
     }
 }

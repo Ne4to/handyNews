@@ -6,17 +6,52 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:handyNews.UWP.Views.Controls"
-    mc:Ignorable="d" Loaded="Page_Loaded">
+    xmlns:logicalTriggers="using:AdaptiveTriggerLibrary.Triggers.LogicalTriggers"
+    xmlns:userInterfaceTriggers="using:AdaptiveTriggerLibrary.Triggers.UserInterfaceTriggers"
+    xmlns:stateTriggers="using:handyNews.UWP.StateTriggers"
+    mc:Ignorable="d"
+    Loaded="Page_Loaded">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <RelativePanel>
-            <controls:SubscriptionsTree x:Name="Tree" Width="320"
+            <controls:SubscriptionsTree x:Name="Tree"
                                         RelativePanel.AlignTopWithPanel="True"
-                                        RelativePanel.AlignBottomWithPanel="True" />
+                                        RelativePanel.AlignBottomWithPanel="True"
+                                        RelativePanel.AlignLeftWithPanel="True"
+                                        RelativePanel.AlignRightWithPanel="True" />
+
             <controls:StreamView x:Name="ItemsView"
+                                 Visibility="Collapsed"
                                  RelativePanel.RightOf="Tree"
                                  RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True"
                                  RelativePanel.AlignBottomWithPanel="True" />
         </RelativePanel>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <logicalTriggers:MultiTrigger>
+                            <logicalTriggers:MultiTrigger.Triggers>
+                                <userInterfaceTriggers:WindowWidthTrigger Condition="640" />
+                                <stateTriggers:ConditionTrigger IsConditionMet="{x:Bind ViewModel.Abc, Mode=OneWay}" />
+                            </logicalTriggers:MultiTrigger.Triggers>
+                        </logicalTriggers:MultiTrigger>
+                        <!-- https://msdn.microsoft.com/en-us/windows/uwp/layout/screen-sizes-and-breakpoints-for-responsive-design?f=255&MSPPError=-2147217396-->
+                    </VisualState.StateTriggers>
+
+                    <VisualState.Setters>
+                        <Setter Target="Tree.Width"
+                                Value="320" />
+
+                        <Setter Target="Tree.(RelativePanel.AlignRightWithPanel)"
+                                Value="False" />
+
+                        <Setter Target="ItemsView.Visibility"
+                                Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

@@ -56,12 +56,13 @@
     </UserControl.Resources>
 
     <Grid>
-        <ListView
-            x:Name="TreeItemsListView"
-            ItemsSource="{x:Bind ViewModel.TreeItems, Mode=OneWay}"
-            ItemTemplate="{StaticResource ItemDataTemplate}"
-            IsItemClickEnabled="True"
-            ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+        <ListView x:Name="TreeItemsListView"
+                  HorizontalAlignment="Stretch"
+                  ItemsSource="{x:Bind ViewModel.TreeItems, Mode=OneWay}"
+                  ItemTemplate="{StaticResource ItemDataTemplate}"
+                  IsItemClickEnabled="True"
+                  ContinuumNavigationTransitionInfo.ExitElementContainer="True">
+            
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

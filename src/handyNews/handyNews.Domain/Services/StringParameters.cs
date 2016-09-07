@@ -11,5 +11,6 @@ namespace handyNews.Domain.Services
         public bool H5 { get; set; }
         public bool H6 { get; set; }
         public string NavigateUri { get; set; }
+        public bool SaveFormat { get; set; }
     }
 }

@@ -77,11 +77,15 @@
                                    Text="{Binding Title}" 
                                    Style="{StaticResource SubheaderTextBlockStyle}" />
 
-                        <RichTextBlock IsTextSelectionEnabled="False" RelativePanel.Below="ItemHeader">
+                        <RichTextBlock x:Name="Rich" IsTextSelectionEnabled="False" RelativePanel.Below="ItemHeader">
                             <interactivity:Interaction.Behaviors>
                                 <behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding Content}" />
                             </interactivity:Interaction.Behaviors>
                         </RichTextBlock>
+
+                        <!--<WebView RelativePanel.Below="ItemHeader" Source="{Binding WebUri}">
+                            
+                        </WebView>-->
                     </RelativePanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

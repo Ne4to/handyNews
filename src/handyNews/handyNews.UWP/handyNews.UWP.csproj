@@ -121,6 +121,7 @@
     <Compile Include="ViewModels\Controls\SubscriptionsTreeViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\PageTokens.cs" />
+    <Compile Include="StateTriggers\ConditionTrigger.cs" />
     <Compile Include="Views\Controls\StreamView.xaml.cs">
       <DependentUpon>StreamView.xaml</DependentUpon>
     </Compile>

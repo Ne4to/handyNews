@@ -107,18 +107,20 @@ namespace handyNews.Domain.Services
         private ILexeme[] GetLexemes(List<string> lexemes)
         {
             var q = from l in lexemes
-                let isTag = (l[0] == '<') && (l[l.Length - 1] == '>')
-                select isTag ? (ILexeme) GetHtmlTag(l) : (ILexeme) new LiteralLexeme(l);
+                    let isTag = (l[0] == '<') && (l[l.Length - 1] == '>')
+                    select isTag ? (ILexeme)GetHtmlTag(l) : (ILexeme)new LiteralLexeme(l);
 
             return q.ToArray();
         }
 
         private HtmlTagLexeme GetHtmlTag(string token)
         {
-            var tag = new HtmlTagLexeme();
+            var tag = new HtmlTagLexeme
+            {
+                IsOpen = token[1] != '/',
+                IsClose = (token[1] == '/') || (token[token.Length - 2] == '/')
+            };
 
-            tag.IsOpen = token[1] != '/';
-            tag.IsClose = (token[1] == '/') || (token[token.Length - 2] == '/');
 
             var spacePos = token.IndexOf(' ');
             if (spacePos != -1)

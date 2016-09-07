@@ -4,11 +4,11 @@ namespace handyNews.Domain.Models.Parser
 {
     public class LiteralLexeme : ILexeme
     {
+        public string Text { get; }
+
         public LiteralLexeme(string text)
         {
-            Text = text.ConvertHtmlToText();
+            Text = text;
         }
-
-        public string Text { get; }
     }
 }

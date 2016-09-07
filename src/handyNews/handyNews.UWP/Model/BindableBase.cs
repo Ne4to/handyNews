@@ -6,7 +6,7 @@ namespace handyNews.UWP.Model
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        protected void OnPropertyChanged(string propertyName = null)
+        protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
