@@ -7,7 +7,7 @@
     mc:Ignorable="d" Width="150" Height="150">
 
     <Grid Background="Transparent">
-        <Image ImageOpened="ImageBrush_OnImageOpened" Source="ms-appx:///Assets/Logo.scale-240.png" Width="150"
+        <Image ImageOpened="ImageBrush_OnImageOpened" Source="ms-appx:///Assets/MedTile.png" Width="150"
                Height="150" />
 
         <Grid Background="Black" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Top" Height="Auto"

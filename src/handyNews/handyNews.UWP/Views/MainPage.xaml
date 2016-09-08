@@ -26,7 +26,7 @@
                                  RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True"
                                  RelativePanel.AlignBottomWithPanel="True" />
         </RelativePanel>
-
+        
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>

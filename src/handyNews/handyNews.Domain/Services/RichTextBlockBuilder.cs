@@ -210,7 +210,7 @@ namespace handyNews.Domain.Services
             else
             {
                 // TODO add thumbnail
-                image.Source = new BitmapImage(new Uri("ms-appx:///Assets/Offline.png"));
+                image.Source = new BitmapImage(new Uri("ms-appx:///Assets/Loading.png"));
 
                 var response = await _httpClient.GetAsync(src);
                 if (!response.IsSuccessStatusCode)
