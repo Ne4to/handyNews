@@ -9,6 +9,9 @@ namespace handyNews.Domain.Services
 {
     public class ImageManager
     {
+        private readonly Dictionary<RichTextBlock, IList<Image>> _allBlocks =
+            new Dictionary<RichTextBlock, IList<Image>>();
+
         // 36 = 6 (unread rectangle) + 5*2 (margin 5,0) + 20 (star control)
         public const double StremPageImageHorizontalPadding = 36D;
         // 10 = 5*2 (margin 5,0)
@@ -17,13 +20,10 @@ namespace handyNews.Domain.Services
         public static readonly DependencyProperty ImageHorizontalPaddingProperty = DependencyProperty.RegisterAttached(
             "ImageHorizontalPadding", typeof(double), typeof(ImageManager), new PropertyMetadata(default(double)));
 
-        private readonly Dictionary<RichTextBlock, IList<Image>> _allBlocks =
-            new Dictionary<RichTextBlock, IList<Image>>();
-
         public ImageManager()
         {
             DisplayInformation.GetForCurrentView()
-                              .OrientationChanged += DisplayInformation_OrientationChanged;
+                .OrientationChanged += DisplayInformation_OrientationChanged;
         }
 
         public static void SetImageHorizontalPadding(DependencyObject element, double value)

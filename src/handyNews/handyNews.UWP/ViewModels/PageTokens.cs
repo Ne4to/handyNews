@@ -1,4 +1,6 @@
 ﻿namespace handyNews.UWP.ViewModels
 {
-    public static class PageTokens {}
+    public static class PageTokens
+    {
+    }
 }

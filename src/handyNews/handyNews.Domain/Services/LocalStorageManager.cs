@@ -88,8 +88,6 @@ namespace handyNews.Domain.Services
             connection.Execute($@"PRAGMA main.user_version = {version};");
         }
 
-        #region Saved stream item
-
         public void Save([NotNull] SavedStreamItem item)
         {
             if (item == null)
@@ -168,10 +166,6 @@ namespace handyNews.Domain.Services
             }
         }
 
-        #endregion
-
-        #region Tag actions
-
         public void AddTagAction(string itemId, string tag, TagActionKind kind)
         {
             using (var connection = GetConnection())
@@ -226,35 +220,32 @@ namespace handyNews.Domain.Services
             }
         }
 
-        #endregion
-
-        #region Subscriptions
-
-        public Task SaveSubscriptionsAsync(List<SubscriptionItemBase> items)
+        public Task SaveSubscriptionsAsync(List<Feed> items)
         {
-            var cats = items.OfType<CategoryItem>()
-                            .ToArray();
-            var subItems = items.OfType<SubscriptionItem>()
-                                .Union(cats.SelectMany(c => c.Subscriptions))
-                                .ToArray();
-            var catItemsLinks = (from c in cats
-                from s in c.Subscriptions
-                select new Tuple<string, string>(c.Id, s.Id)).ToArray();
+            throw new NotImplementedException();
+            //    var cats = items.OfType<CategoryItem>()
+            //                    .ToArray();
+            //    var subItems = items.OfType<SubscriptionItem>()
+            //                        .Union(cats.SelectMany(c => c.Subscriptions))
+            //                        .ToArray();
+            //    var catItemsLinks = (from c in cats
+            //        from s in c.Subscriptions
+            //        select new Tuple<string, string>(c.Id, s.Id)).ToArray();
 
-            return Task.Run(() =>
-                            {
-                                using (var connection = GetConnection())
-                                {
-                                    connection.BeginTransaction();
+            //    return Task.Run(() =>
+            //                    {
+            //                        using (var connection = GetConnection())
+            //                        {
+            //                            connection.BeginTransaction();
 
-                                    ClearSubscriptions(connection);
-                                    //SaveSubscriptionCategories(cats, connection);
-                                    SaveSubscriptionItems(subItems, connection);
-                                    //SaveSubscriptionLinks(catItemsLinks, connection);
+            //                            ClearSubscriptions(connection);
+            //                            //SaveSubscriptionCategories(cats, connection);
+            //                            SaveSubscriptionItems(subItems, connection);
+            //                            //SaveSubscriptionLinks(catItemsLinks, connection);
 
-                                    connection.Commit();
-                                }
-                            });
+            //                            connection.Commit();
+            //                        }
+            //                    });
         }
 
         private void ClearSubscriptions(SQLiteConnection connection)
@@ -264,7 +255,7 @@ namespace handyNews.Domain.Services
             connection.Execute("DELETE FROM SUB_ITEM;");
         }
 
-        private void SaveSubscriptionCategories(CategoryItem[] cats, SQLiteConnection connection)
+        private void SaveSubscriptionCategories(Feed[] cats, SQLiteConnection connection)
         {
             if (cats.Length == 0)
             {
@@ -280,7 +271,7 @@ namespace handyNews.Domain.Services
             //        statement.Bind("@SORT_ID", categoryItem.SortId);
             //        statement.Bind("@TITLE", categoryItem.Title);
             //        statement.Bind("@UNREAD_COUNT", categoryItem.UnreadCount);
-            //        statement.Bind("@IS_MAX_COUNT", categoryItem.IsMaxUnread ? 1 : 0);
+            //        statement.Bind("@IS_MAX_COUNT", categoryItem.ApproxUnreadCount ? 1 : 0);
 
             //        statement.Step();
 
@@ -291,7 +282,7 @@ namespace handyNews.Domain.Services
             //}
         }
 
-        private void SaveSubscriptionItems(SubscriptionItem[] subItems, SQLiteConnection connection)
+        private void SaveSubscriptionItems(Feed[] subItems, SQLiteConnection connection)
         {
             if (subItems.Length == 0)
             {
@@ -319,7 +310,7 @@ namespace handyNews.Domain.Services
                 statement.Bind("@HTML_URL", item.HtmlUrl);
                 statement.Bind("@ICON_URL", item.IconUrl);
                 statement.Bind("@FIRST_ITEM_MSEC", item.FirstItemMsec);
-                statement.Bind("@IS_MAX_COUNT", item.IsMaxUnread ? 1 : 0);
+                statement.Bind("@IS_MAX_COUNT", item.ApproxUnreadCount ? 1 : 0);
 
                 statement.ExecuteNonQuery();
                 //statement.Step();
@@ -356,78 +347,80 @@ namespace handyNews.Domain.Services
             //}
         }
 
-        public Task<List<SubscriptionItemBase>> LoadSubscriptionsAsync()
+        public Task<List<Feed>> LoadSubscriptionsAsync()
         {
-            return Task.Run(() =>
-                            {
-                                List<CategoryItem> cats;
-                                List<SubscriptionItem> items;
-                                List<SubCatSubItemTableRow> links;
+            throw new NotImplementedException();
 
-                                using (var connection = GetConnection())
-                                {
-                                    cats = LoadSubscriptionCategories(connection);
-                                    items = LoadSubscriptionItems(connection);
-                                    links = LoadSubscriptionLinks(connection);
-                                }
+            //return Task.Run(() =>
+            //                {
+            //                    List<CategoryItem> cats;
+            //                    List<SubscriptionItem> items;
+            //                    List<SubCatSubItemTableRow> links;
 
-                                var result = new List<SubscriptionItemBase>();
+            //                    using (var connection = GetConnection())
+            //                    {
+            //                        cats = LoadSubscriptionCategories(connection);
+            //                        items = LoadSubscriptionItems(connection);
+            //                        links = LoadSubscriptionLinks(connection);
+            //                    }
 
-                                foreach (var categoryItem in cats)
-                                    categoryItem.Subscriptions = new List<SubscriptionItem>();
-                                result.AddRange(cats.OrderBy(c => c.Title));
+            //                    var result = new List<Feed>();
 
-                                var linkDict = links.GroupBy(l => l.ItemId, l => l.CatId)
-                                                    .ToDictionary(g => g.Key, g => g.ToArray());
+            //                    foreach (var categoryItem in cats)
+            //                        categoryItem.Subscriptions = new List<SubscriptionItem>();
+            //                    result.AddRange(cats.OrderBy(c => c.Title));
 
-                                foreach (var subscriptionItem in items.OrderBy(s => s.Title))
-                                {
-                                    string[] l;
+            //                    var linkDict = links.GroupBy(l => l.ItemId, l => l.CatId)
+            //                                        .ToDictionary(g => g.Key, g => g.ToArray());
 
-                                    if (!linkDict.TryGetValue(subscriptionItem.Id, out l) || (l.Length == 0))
-                                    {
-                                        if (subscriptionItem.Id == SpecialTags.Read)
-                                        {
-                                            result.Insert(0, subscriptionItem);
-                                        }
-                                        else
-                                        {
-                                            result.Add(subscriptionItem);
-                                        }
+            //                    foreach (var subscriptionItem in items.OrderBy(s => s.Title))
+            //                    {
+            //                        string[] l;
 
-                                        continue;
-                                    }
+            //                        if (!linkDict.TryGetValue(subscriptionItem.Id, out l) || (l.Length == 0))
+            //                        {
+            //                            if (subscriptionItem.Id == SpecialTags.Read)
+            //                            {
+            //                                result.Insert(0, subscriptionItem);
+            //                            }
+            //                            else
+            //                            {
+            //                                result.Add(subscriptionItem);
+            //                            }
 
-                                    foreach (var c in cats.Where(c => l.Contains(c.Id)))
-                                        if (subscriptionItem.Id == c.Id)
-                                        {
-                                            c.Subscriptions.Insert(0, subscriptionItem);
-                                        }
-                                        else
-                                        {
-                                            c.Subscriptions.Add(subscriptionItem);
-                                        }
-                                }
+            //                            continue;
+            //                        }
 
-                                return result;
-                            });
+            //                        foreach (var c in cats.Where(c => l.Contains(c.Id)))
+            //                            if (subscriptionItem.Id == c.Id)
+            //                            {
+            //                                c.Subscriptions.Insert(0, subscriptionItem);
+            //                            }
+            //                            else
+            //                            {
+            //                                c.Subscriptions.Add(subscriptionItem);
+            //                            }
+            //                    }
+
+            //                    return result;
+            //                });
         }
 
-        private List<CategoryItem> LoadSubscriptionCategories(SQLiteConnection connection)
-        {
-            return connection
-                .Table<SubCatTableRow>()
-                .Select(t => t.ToModel())
-                .ToList();
-        }
+        //private List<CategoryItem> LoadSubscriptionCategories(SQLiteConnection connection)
+        //{
+        //    return connection
+        //        .Table<SubCatTableRow>()
+        //        .Select(t => t.ToModel())
+        //        .ToList();
+        //}
 
-        private List<SubscriptionItem> LoadSubscriptionItems(SQLiteConnection connection)
-        {
-            return connection
-                .Table<SubItemTableRow>()
-                .Select(t => t.ToModel())
-                .ToList();
-        }
+        //private List<SubscriptionItem> LoadSubscriptionItems(SQLiteConnection connection)
+        //{
+        //    return connection
+        //        .Table<SubItemTableRow>()
+        //        .Select(t => t.ToModel())
+        //        .ToList();
+        //}
 
         private List<SubCatSubItemTableRow> LoadSubscriptionLinks(SQLiteConnection connection)
         {
@@ -435,10 +428,6 @@ namespace handyNews.Domain.Services
                 .Table<SubCatSubItemTableRow>()
                 .ToList();
         }
-
-        #endregion
-
-        #region Stream collection
 
         public Task SaveStreamCollectionAsync(StreamItemCollectionState collection)
         {
@@ -559,7 +548,6 @@ namespace handyNews.Domain.Services
         private StreamItem[] LoadStreamCollectionItems(SQLiteConnection connection, string streamId)
         {
             var items = new List<StreamItem>();
-            items.Add(new HeaderSpaceStreamItem());
 
             throw new NotImplementedException();
 
@@ -586,7 +574,6 @@ namespace handyNews.Domain.Services
             //    }
             //}
 
-            items.Add(new EmptySpaceStreamItem());
 
             return items.ToArray();
         }
@@ -619,12 +606,12 @@ namespace handyNews.Domain.Services
 
             var folder = ApplicationData.Current.TemporaryFolder;
             var files = await folder.GetFilesAsync()
-                                    .AsTask()
-                                    .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
             foreach (var storageFile in files)
                 tempSize += (await storageFile.GetBasicPropertiesAsync()
-                                              .AsTask()
-                                              .ConfigureAwait(false)).Size;
+                    .AsTask()
+                    .ConfigureAwait(false)).Size;
 
             return tempSize;
         }
@@ -646,12 +633,12 @@ namespace handyNews.Domain.Services
         {
             var folder = ApplicationData.Current.TemporaryFolder;
             var files = await folder.GetFilesAsync()
-                                    .AsTask()
-                                    .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
             foreach (var storageFile in files)
                 await storageFile.DeleteAsync()
-                                 .AsTask()
-                                 .ConfigureAwait(false);
+                    .AsTask()
+                    .ConfigureAwait(false);
         }
 
         public Task SetCachedItemAsReadAsync(string id, bool newValue)
@@ -693,8 +680,6 @@ namespace handyNews.Domain.Services
                 //}
             }
         }
-
-        #endregion
     }
 
     public class SavedStreamItem

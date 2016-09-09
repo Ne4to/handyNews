@@ -19,12 +19,11 @@ namespace handyNews.Domain.Services
 {
     public class TileManager : ITileManager
     {
+        private readonly ITelemetryManager _telemetryManager;
         private const string DRAW_CANVAS_NAME = "DrawCanvas";
         private const string WIDE_FILE_NAME = "WideTile.png";
         private const string SQUARE_FILE_NAME = "SquareTile.png";
         private const string SQUARE_SMALL_FILE_NAME = "SquareSmallTile.png";
-
-        private readonly ITelemetryManager _telemetryManager;
 
         public TileManager([NotNull] ITelemetryManager telemetryManager)
         {

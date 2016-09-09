@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8C1035DE-BC2D-4704-AFBE-23DF0C739FE6}</ProjectGuid>
+    <ProjectGuid>{B1C3CBD1-C595-4CE3-8C13-68A6A514E4F9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>handyNews.API</RootNamespace>
-    <AssemblyName>handyNews.API</AssemblyName>
+    <RootNamespace>handyNews.Inoreader</RootNamespace>
+    <AssemblyName>handyNews.Inoreader</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
@@ -107,16 +107,26 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiClient.cs" />
+    <Compile Include="InoreaderClient.cs" />
+    <Compile Include="AuthenticationManager.cs" />
     <Compile Include="Exceptions\ApiException.cs" />
     <Compile Include="Exceptions\AuthorizationApiException.cs" />
+    <Compile Include="FeedManager.cs" />
     <Compile Include="Models\StreamResponse.cs" />
     <Compile Include="Models\SubscriptionsResponse.cs" />
     <Compile Include="Models\TagsResponse.cs" />
     <Compile Include="Models\UnreadCountResponse.cs" />
     <Compile Include="Models\UserInfoResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Properties\handyNews.API.rd.xml" />
+    <Compile Include="StreamManager.cs" />
+    <Compile Include="TagsManager.cs" />
+    <EmbeddedResource Include="Properties\handyNews.Inoreader.rd.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\handyNews.Domain\handyNews.Domain.csproj">
+      <Project>{4689b57e-be03-4104-874e-2ee5c0d58a6f}</Project>
+      <Name>handyNews.Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

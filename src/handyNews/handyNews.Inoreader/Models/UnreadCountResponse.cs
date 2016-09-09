@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace handyNews.API.Models
+namespace handyNews.Inoreader.Models
 {
     public class UnreadCountResponse
     {

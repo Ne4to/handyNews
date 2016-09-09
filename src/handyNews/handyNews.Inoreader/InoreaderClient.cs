@@ -3,16 +3,16 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using handyNews.API.Models;
+using handyNews.Inoreader.Models;
 using Newtonsoft.Json.Linq;
 
-namespace handyNews.API
+namespace handyNews.Inoreader
 {
-    public class ApiClient
+    public class InoreaderClient
     {
         private readonly HttpClient _httpClient;
 
-        public ApiClient(DelegatingHandler authorizationHandler)
+        public InoreaderClient(DelegatingHandler authorizationHandler)
         {
             if (authorizationHandler == null)
             {
@@ -20,16 +20,16 @@ namespace handyNews.API
             }
 
             var httpClientHandler = new HttpClientHandler
-                                    {
-                                        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                                    };
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
             authorizationHandler.InnerHandler = httpClientHandler;
 
             _httpClient = new HttpClient(authorizationHandler);
             _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
-                                                             {
-                                                                 NoCache = true
-                                                             };
+            {
+                NoCache = true
+            };
         }
 
         public Task<UserInfoResponse> GetUserInfoAsync()
@@ -53,7 +53,7 @@ namespace handyNews.API
         }
 
         public Task<StreamResponse> GetStreamAsync(string id, bool showNewestFirst = true, int count = 20,
-                                                   string continuation = null, bool includeRead = false)
+            string continuation = null, bool includeRead = false)
         {
             var uri = string.Format(
                 "https://www.inoreader.com/reader/api/0/stream/contents/{0}?n={1}&output=json&r={2}",
@@ -75,21 +75,21 @@ namespace handyNews.API
         public Task AddTagAsync(string tag, string itemId)
         {
             var uri = string.Format("https://www.inoreader.com/reader/api/0/edit-tag?a={0}&i={1}",
-                                    WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
+                WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
             return GetNoResultAsync(uri);
         }
 
         public Task RemoveTagAsync(string tag, string itemId)
         {
             var uri = string.Format("https://www.inoreader.com/reader/api/0/edit-tag?r={0}&i={1}",
-                                    WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
+                WebUtility.UrlEncode(tag), WebUtility.UrlEncode(itemId));
             return GetNoResultAsync(uri);
         }
 
         public Task MarkAllAsReadAsync(string streamId, int streamTimestamp)
         {
             var uri = string.Format("https://www.inoreader.com/reader/api/0/mark-all-as-read?s={0}&ts={1}",
-                                    WebUtility.UrlEncode(streamId), streamTimestamp);
+                WebUtility.UrlEncode(streamId), streamTimestamp);
             return GetNoResultAsync(uri);
         }
 
@@ -98,14 +98,14 @@ namespace handyNews.API
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
             var response = await _httpClient.SendAsync(requestMessage)
-                                            .ConfigureAwait(false);
+                .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
             var responseString = await response.Content.ReadAsStringAsync()
-                                               .ConfigureAwait(false);
+                .ConfigureAwait(false);
 
             return JObject.Parse(responseString)
-                          .ToObject<T>();
+                .ToObject<T>();
         }
 
         private async Task GetNoResultAsync(string requestUri)
@@ -113,7 +113,7 @@ namespace handyNews.API
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
             var response = await _httpClient.SendAsync(requestMessage)
-                                            .ConfigureAwait(false);
+                .ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
         }

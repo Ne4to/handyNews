@@ -6,21 +6,15 @@ namespace handyNews.Domain.Models
     [DataContract]
     public class StreamItem : BindableBaseEx
     {
-        #region Fields
-
-        [DataMember] private bool _unread = true;
+        [DataMember] private bool _isSelected;
 
         [DataMember] private bool _needSetReadExplicitly;
 
-        [DataMember] private bool _isSelected;
+        [DataMember] private bool _saved;
 
         [DataMember] private bool _starred;
 
-        [DataMember] private bool _saved;
-
-        #endregion
-
-        #region Properties
+        [DataMember] private bool _unread = true;
 
         [DataMember]
         public string Id { get; set; }
@@ -66,7 +60,5 @@ namespace handyNews.Domain.Models
             get { return _saved; }
             set { SetProperty(ref _saved, value, nameof(Saved)); }
         }
-
-        #endregion
     }
 }

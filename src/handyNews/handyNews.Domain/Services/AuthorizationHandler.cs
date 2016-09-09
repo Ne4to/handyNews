@@ -14,7 +14,7 @@ namespace handyNews.Domain.Services
         private readonly IAuthorizationDataStorage _authorizationDataStorage;
 
         public AuthorizationHandler([NotNull] IAuthorizationDataStorage authorizationDataStorage,
-                                    [NotNull] IAuthenticationManager authenticationManager)
+            [NotNull] IAuthenticationManager authenticationManager)
         {
             if (authorizationDataStorage == null)
             {
@@ -29,10 +29,12 @@ namespace handyNews.Domain.Services
         }
 
         protected AuthorizationHandler(HttpMessageHandler innerHandler)
-            : base(innerHandler) {}
+            : base(innerHandler)
+        {
+        }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-                                                                     CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             if (_authorizationDataStorage.AccessToken == null)
             {
@@ -42,14 +44,14 @@ namespace handyNews.Domain.Services
             if (_authorizationDataStorage.AccessTokenExpireDate <= DateTimeOffset.UtcNow)
             {
                 await _authenticationManager.RefreshTokenAsync()
-                                            .ConfigureAwait(false);
+                    .ConfigureAwait(false);
             }
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",
-                                                                          _authorizationDataStorage.AccessToken);
+                _authorizationDataStorage.AccessToken);
 
             return await base.SendAsync(request, cancellationToken)
-                             .ConfigureAwait(false);
+                .ConfigureAwait(false);
         }
     }
 }

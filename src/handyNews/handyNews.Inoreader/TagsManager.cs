@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using handyNews.API;
 using handyNews.Domain.Models;
+using handyNews.Domain.Services;
 using handyNews.Domain.Services.Interfaces;
 using JetBrains.Annotations;
 
-namespace handyNews.Domain.Services
+namespace handyNews.Inoreader
 {
     public class TagsManager : ITagsManager
     {
-        private const int TrueValue = 1;
-        private const int FalseValue = 0;
-
-        private readonly ApiClient _apiClient;
+        private readonly InoreaderClient _inoreaderClient;
         private readonly LocalStorageManager _localStorageManager;
         private readonly ITelemetryManager _telemetryManager;
 
         private int _currentBusy = FalseValue;
+        private const int TrueValue = 1;
+        private const int FalseValue = 0;
 
-        public TagsManager([NotNull] ApiClient apiClient,
-                           [NotNull] ITelemetryManager telemetryManager,
-                           [NotNull] INetworkManager networkManager,
-                           [NotNull] LocalStorageManager localStorageManager)
+        public TagsManager([NotNull] InoreaderClient inoreaderClient,
+            [NotNull] ITelemetryManager telemetryManager,
+            [NotNull] INetworkManager networkManager,
+            [NotNull] LocalStorageManager localStorageManager)
         {
-            if (apiClient == null)
+            if (inoreaderClient == null)
             {
-                throw new ArgumentNullException(nameof(apiClient));
+                throw new ArgumentNullException(nameof(inoreaderClient));
             }
             if (telemetryManager == null)
             {
@@ -41,7 +40,7 @@ namespace handyNews.Domain.Services
                 throw new ArgumentNullException(nameof(localStorageManager));
             }
 
-            _apiClient = apiClient;
+            _inoreaderClient = inoreaderClient;
             _telemetryManager = telemetryManager;
             _localStorageManager = localStorageManager;
 
@@ -103,7 +102,7 @@ namespace handyNews.Domain.Services
         private async void MarkAsRead(string id)
         {
             await _localStorageManager.SetCachedItemAsReadAsync(id, true)
-                                      .ConfigureAwait(false);
+                .ConfigureAwait(false);
             await AddTagInternalAsync(id, SpecialTags.Read)
                 .ConfigureAwait(false);
         }
@@ -111,7 +110,7 @@ namespace handyNews.Domain.Services
         private async void MarkAsUnreadTagAction(string id)
         {
             await _localStorageManager.SetCachedItemAsReadAsync(id, false)
-                                      .ConfigureAwait(false);
+                .ConfigureAwait(false);
             await RemoveTagInternalAsync(id, SpecialTags.Read)
                 .ConfigureAwait(false);
         }
@@ -119,7 +118,7 @@ namespace handyNews.Domain.Services
         private async void AddToStarred(string id)
         {
             await _localStorageManager.SetCachedItemAsStarredAsync(id, true)
-                                      .ConfigureAwait(false);
+                .ConfigureAwait(false);
             await AddTagInternalAsync(id, SpecialTags.Starred)
                 .ConfigureAwait(false);
         }
@@ -127,7 +126,7 @@ namespace handyNews.Domain.Services
         private async void RemoveFromStarred(string id)
         {
             await _localStorageManager.SetCachedItemAsStarredAsync(id, false)
-                                      .ConfigureAwait(false);
+                .ConfigureAwait(false);
             await RemoveTagInternalAsync(id, SpecialTags.Starred)
                 .ConfigureAwait(false);
         }
@@ -136,8 +135,8 @@ namespace handyNews.Domain.Services
         {
             try
             {
-                await _apiClient.AddTagAsync(tag, id)
-                                .ConfigureAwait(false);
+                await _inoreaderClient.AddTagAsync(tag, id)
+                    .ConfigureAwait(false);
                 return;
             }
             catch (Exception ex)
@@ -159,8 +158,8 @@ namespace handyNews.Domain.Services
         {
             try
             {
-                await _apiClient.RemoveTagAsync(tag, id)
-                                .ConfigureAwait(false);
+                await _inoreaderClient.RemoveTagAsync(tag, id)
+                    .ConfigureAwait(false);
                 return;
             }
             catch (Exception ex)
@@ -198,13 +197,13 @@ namespace handyNews.Domain.Services
                     switch (action.Kind)
                     {
                         case TagActionKind.Add:
-                            await _apiClient.AddTagAsync(action.Tag, action.ItemId)
-                                            .ConfigureAwait(false);
+                            await _inoreaderClient.AddTagAsync(action.Tag, action.ItemId)
+                                .ConfigureAwait(false);
                             break;
 
                         case TagActionKind.Remove:
-                            await _apiClient.RemoveTagAsync(action.Tag, action.ItemId)
-                                            .ConfigureAwait(false);
+                            await _inoreaderClient.RemoveTagAsync(action.Tag, action.ItemId)
+                                .ConfigureAwait(false);
                             break;
                     }
 

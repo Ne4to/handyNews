@@ -11,11 +11,12 @@ namespace handyNews.UWP.ViewModels
     {
         private readonly IAuthenticationManager _authenticationManager;
 
-        private bool _abc = true;
-        public bool Abc
+        private bool _showStreamView;
+
+        public bool ShowStreamView
         {
-            get { return _abc; }
-            set { SetProperty(ref _abc, value, nameof(Abc)); }
+            get { return _showStreamView; }
+            set { SetProperty(ref _showStreamView, value, nameof(ShowStreamView)); }
         }
 
         public MainPageViewModel([NotNull] IAuthenticationManager authenticationManager)
@@ -25,6 +26,8 @@ namespace handyNews.UWP.ViewModels
                 throw new ArgumentNullException(nameof(authenticationManager));
             }
             _authenticationManager = authenticationManager;
+
+            this.Subscribe<ShowSubscriptionStreamEvent>(OnShowSubscriptionStreamEvent);
         }
 
         public async void OnNavigatedTo()
@@ -35,6 +38,11 @@ namespace handyNews.UWP.ViewModels
             }
 
             this.Publish(new RefreshTreeEvent());
+        }
+
+        private void OnShowSubscriptionStreamEvent(ShowSubscriptionStreamEvent data)
+        {
+            ShowStreamView = true;
         }
     }
 }

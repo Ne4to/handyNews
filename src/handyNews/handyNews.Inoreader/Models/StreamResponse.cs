@@ -1,4 +1,4 @@
-﻿namespace handyNews.API.Models
+﻿namespace handyNews.Inoreader.Models
 {
     public class StreamResponse
     {

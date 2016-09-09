@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using handyNews.API.Exceptions;
 
 namespace handyNews.Domain.Services.Interfaces
 {

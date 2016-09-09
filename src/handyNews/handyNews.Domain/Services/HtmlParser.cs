@@ -15,7 +15,7 @@ namespace handyNews.Domain.Services
         static HtmlParser()
         {
             RemoveAdRegex = new Regex("(<center>).*(www.inoreader.com/adv).*(</center>)",
-                                      RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         }
 
         public string GetPlainText(string html, int maxLength)
@@ -46,12 +46,12 @@ namespace handyNews.Domain.Services
             if (newLength < maxLength)
             {
                 return builder.ToString()
-                              .Trim();
+                    .Trim();
             }
 
             return builder.ToString()
-                          .Substring(0, maxLength)
-                          .Trim();
+                .Substring(0, maxLength)
+                .Trim();
         }
 
         public ILexeme[] Parse(string html)
@@ -107,8 +107,8 @@ namespace handyNews.Domain.Services
         private ILexeme[] GetLexemes(List<string> lexemes)
         {
             var q = from l in lexemes
-                    let isTag = (l[0] == '<') && (l[l.Length - 1] == '>')
-                    select isTag ? (ILexeme)GetHtmlTag(l) : (ILexeme)new LiteralLexeme(l);
+                let isTag = (l[0] == '<') && (l[l.Length - 1] == '>')
+                select isTag ? (ILexeme) GetHtmlTag(l) : (ILexeme) new LiteralLexeme(l);
 
             return q.ToArray();
         }
@@ -135,7 +135,7 @@ namespace handyNews.Domain.Services
                     if (eqPos != -1)
                     {
                         var attrName = token.Substring(searchAttrStartPos + 1, eqPos - searchAttrStartPos - 1)
-                                            .Trim();
+                            .Trim();
                         var quoteSymb = token[eqPos + 1];
 
                         var endQuotePos = token.IndexOf(quoteSymb, eqPos + 2);

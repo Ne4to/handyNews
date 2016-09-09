@@ -11,11 +11,6 @@ namespace handyNews.UWP.Views.Controls
     {
         private IStreamViewViewModel _viewModel;
 
-        public StreamView()
-        {
-            InitializeComponent();
-        }
-
         public IStreamViewViewModel ViewModel
         {
             get
@@ -27,6 +22,11 @@ namespace handyNews.UWP.Views.Controls
 
                 return _viewModel;
             }
+        }
+
+        public StreamView()
+        {
+            InitializeComponent();
         }
 
         private void StreamView_OnLoaded(object sender, RoutedEventArgs e)

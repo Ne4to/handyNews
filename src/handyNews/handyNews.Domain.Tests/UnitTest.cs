@@ -11,7 +11,7 @@ namespace handyNews.Domain.Tests
         {
             var localStorageManager = new LocalStorageManager();
             var t = localStorageManager.LoadSubscriptionsAsync()
-                                       .Result;
+                .Result;
         }
     }
 }

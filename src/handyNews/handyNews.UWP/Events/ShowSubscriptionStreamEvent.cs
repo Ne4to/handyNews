@@ -5,9 +5,9 @@ namespace handyNews.UWP.Events
 {
     public class ShowSubscriptionStreamEvent : EventArgs
     {
-        public SubscriptionItem Item { get; private set; }
+        public Feed Item { get; private set; }
 
-        public ShowSubscriptionStreamEvent(SubscriptionItem item)
+        public ShowSubscriptionStreamEvent(Feed item)
         {
             if (item == null)
             {

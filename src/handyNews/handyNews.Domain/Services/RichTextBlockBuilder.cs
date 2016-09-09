@@ -7,12 +7,10 @@ using Windows.ApplicationModel;
 using Windows.Graphics.Display;
 using Windows.Storage;
 using Windows.System;
-using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using handyNews.Domain.Models.Parser;
 using handyNews.Domain.Services.Interfaces;
@@ -26,6 +24,14 @@ namespace handyNews.Domain.Services
 {
     public class RichTextBlockBuilder
     {
+        private readonly List<Image> _allImages = new List<Image>();
+        private readonly ISettingsManager _appSettings;
+        private readonly CoreDispatcher _dispatcher;
+        private readonly HttpClient _httpClient;
+        private readonly double _maxImageWidth;
+        private readonly ITelemetryManager _telemetry;
+
+        private readonly List<string> _youtubeAllVideos = new List<string>();
         private const string YOUTUBE_PREVIEW_FORMAT = "http://img.youtube.com/vi/{0}/0.jpg";
 
         private static readonly string[] YoutubeLinks =
@@ -35,15 +41,6 @@ namespace handyNews.Domain.Services
             "http://youtube.com/embed/",
             "https://youtube.com/embed/"
         };
-
-        private readonly List<Image> _allImages = new List<Image>();
-        private readonly ISettingsManager _appSettings;
-        private readonly CoreDispatcher _dispatcher;
-        private readonly HttpClient _httpClient;
-        private readonly double _maxImageWidth;
-        private readonly ITelemetryManager _telemetry;
-
-        private readonly List<string> _youtubeAllVideos = new List<string>();
 
         public RichTextBlockBuilder()
         {
@@ -64,7 +61,7 @@ namespace handyNews.Domain.Services
             };
             _httpClient = new HttpClient(httpMessageHandler);
             _dispatcher = CoreWindow.GetForCurrentThread()
-                                    .Dispatcher;
+                .Dispatcher;
         }
 
         public List<Paragraph> GetParagraphs(string html, out IList<Image> images)
@@ -103,7 +100,7 @@ namespace handyNews.Domain.Services
                         continue;
                     }
 
-                    var tagLexeme = (HtmlTagLexeme)lexeme;
+                    var tagLexeme = (HtmlTagLexeme) lexeme;
                     if (tagLexeme.Name.EqualsOrdinalIgnoreCase(HtmlTag.LINE_BREAK))
                     {
                         AddLineBreak(paragraph.Inlines);
@@ -186,7 +183,7 @@ namespace handyNews.Domain.Services
 
             image.ImageOpened += (sender, args) =>
             {
-                var img = (Image)sender;
+                var img = (Image) sender;
                 var padding = ImageManager.GetImageHorizontalPadding(img);
                 ImageManager.UpdateImageSize(img, _maxImageWidth - padding);
             };
@@ -220,7 +217,7 @@ namespace handyNews.Domain.Services
 
                 var tempFileName = Path.GetRandomFileName();
                 var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(tempFileName,
-                                                                                         CreationCollisionOption.GenerateUniqueName);
+                    CreationCollisionOption.GenerateUniqueName);
 
                 using (var stream = await file.OpenStreamForWriteAsync())
                 {
@@ -233,9 +230,9 @@ namespace handyNews.Domain.Services
         }
 
         private void AddBeginEnd(InlineCollection inlines, ILexeme[] lexemes, int lexemeIndex, int closeIndex,
-                                 StringParameters strParams)
+            StringParameters strParams)
         {
-            var startL = (HtmlTagLexeme)lexemes[lexemeIndex];
+            var startL = (HtmlTagLexeme) lexemes[lexemeIndex];
 
             if (startL.Name.EqualsOrdinalIgnoreCase(HtmlTag.PARAGRAPH))
             {
@@ -309,9 +306,7 @@ namespace handyNews.Domain.Services
                     if (strParams.SaveFormat)
                     {
                         foreach (var inline in GetPreformattedInlines(literalLexeme.Text))
-                        {
                             inlines.Add(inline);
-                        }
                         continue;
                     }
 
@@ -374,7 +369,7 @@ namespace handyNews.Domain.Services
                     continue;
                 }
 
-                var tagLexeme = (HtmlTagLexeme)lexeme;
+                var tagLexeme = (HtmlTagLexeme) lexeme;
                 if (tagLexeme.Name.EqualsOrdinalIgnoreCase(HtmlTag.LINE_BREAK))
                 {
                     AddLineBreak(inlines);
@@ -445,10 +440,16 @@ namespace handyNews.Domain.Services
 
         private IEnumerable<Inline> GetPreformattedInlines(string text)
         {
-            var parts = text.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = text.Split(new[]
+            {
+                "\n"
+            }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var part in parts)
             {
-                yield return new Run { Text = part };
+                yield return new Run
+                {
+                    Text = part
+                };
                 yield return new LineBreak();
             }
         }
@@ -531,16 +532,16 @@ namespace handyNews.Domain.Services
         private bool IsHtmlHeader(StringParameters strParams)
         {
             return strParams.H1
-                   || strParams.H2
-                   || strParams.H3
-                   || strParams.H4
-                   || strParams.H5
-                   || strParams.H6;
+                || strParams.H2
+                || strParams.H3
+                || strParams.H4
+                || strParams.H5
+                || strParams.H6;
         }
 
         private int GetCloseIndex(int startLexemeIndex, ILexeme[] lexemes)
         {
-            var startLexeme = (HtmlTagLexeme)lexemes[startLexemeIndex];
+            var startLexeme = (HtmlTagLexeme) lexemes[startLexemeIndex];
             var deep = 1;
 
             for (var index = startLexemeIndex + 1; index < lexemes.Length; index++)
@@ -627,7 +628,7 @@ namespace handyNews.Domain.Services
                 if (videoLink.StartsWithOrdinalIgnoreCase(testLink))
                 {
                     var id = videoLink.Substring(testLink.Length)
-                                      .Replace("/", string.Empty);
+                        .Replace("/", string.Empty);
                     var questionIndex = id.IndexOf('?');
                     if (questionIndex != -1)
                     {

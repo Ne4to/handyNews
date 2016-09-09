@@ -10,15 +10,15 @@ namespace handyNews.Domain.Views.Controls
     {
         private readonly TaskCompletionSource<int> _taskCompletionSource = new TaskCompletionSource<int>();
 
+        public Task LoadComplete
+        {
+            get { return _taskCompletionSource.Task; }
+        }
+
         public StartTileSquare(long count)
         {
             InitializeComponent();
             CounterText.Text = count.ToString();
-        }
-
-        public Task LoadComplete
-        {
-            get { return _taskCompletionSource.Task; }
         }
 
         private void ImageBrush_OnImageOpened(object sender, RoutedEventArgs e)

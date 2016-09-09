@@ -115,9 +115,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\BindableBaseEx.cs" />
-    <Compile Include="Models\CategoryItem.cs" />
-    <Compile Include="Models\EmptySpaceStreamItem.cs" />
-    <Compile Include="Models\HeaderSpaceStreamItem.cs" />
     <Compile Include="Models\Parser\HtmlTagLexeme.cs" />
     <Compile Include="Models\Parser\ILexeme.cs" />
     <Compile Include="Models\Parser\LiteralLexeme.cs" />
@@ -132,24 +129,21 @@
     <Compile Include="Models\States\StreamItemCollectionState.cs" />
     <Compile Include="Models\StreamItem.cs" />
     <Compile Include="Models\StreamItemCollection.cs" />
-    <Compile Include="Models\SubscriptionItem.cs" />
-    <Compile Include="Models\SubscriptionItemBase.cs" />
+    <Compile Include="Models\Feed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AuthorizationHandler.cs" />
     <Compile Include="Services\HtmlParser.cs" />
     <Compile Include="Services\HtmlTag.cs" />
     <Compile Include="Services\ImageManager.cs" />
-    <Compile Include="Services\Interfaces\INavigationService.cs" />
     <Compile Include="Services\Interfaces\INetworkManager.cs" />
     <Compile Include="Services\Interfaces\IAuthorizationDataStorage.cs" />
     <Compile Include="Services\Interfaces\ISettingsManager.cs" />
     <Compile Include="Services\Interfaces\IAuthenticationManager.cs" />
     <Compile Include="Services\Interfaces\IStreamManager.cs" />
-    <Compile Include="Services\Interfaces\ISubscriptionsManager.cs" />
+    <Compile Include="Services\Interfaces\IFeedManager.cs" />
     <Compile Include="Services\Interfaces\ITagsManager.cs" />
     <Compile Include="Services\Interfaces\ITelemetryManager.cs" />
     <Compile Include="Services\Interfaces\ITileManager.cs" />
-    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Services\LocalStorageManager.cs" />
     <Compile Include="Services\NetworkManager.cs" />
     <Compile Include="Services\RichTextBlockBuilder.cs" />
@@ -158,11 +152,7 @@
     <Compile Include="Services\ScrollViewerState.cs" />
     <Compile Include="Services\AuthorizationDataStorage.cs" />
     <Compile Include="Services\SettingsManager.cs" />
-    <Compile Include="Services\AuthenticationManager.cs" />
-    <Compile Include="Services\StreamManager.cs" />
     <Compile Include="Services\StringParameters.cs" />
-    <Compile Include="Services\SubscriptionsManager.cs" />
-    <Compile Include="Services\TagsManager.cs" />
     <Compile Include="Services\TileManager.cs" />
     <Compile Include="Services\VisualTreeUtilities.cs" />
     <Compile Include="Strings\en-US\Resources1.cs">
@@ -197,12 +187,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\handyNews.API\handyNews.API.csproj">
-      <Project>{8c1035de-bc2d-4704-afbe-23df0c739fe6}</Project>
-      <Name>handyNews.API</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">

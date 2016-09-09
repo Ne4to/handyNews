@@ -9,8 +9,6 @@ namespace handyNews.Domain.Services
 {
     public class ScrollViewerState
     {
-        private const double Tolerance = 0.05D;
-
         private readonly FrameworkElement _element;
         private double _horizontalOffset;
         private bool _horizontalSet;
@@ -23,6 +21,7 @@ namespace handyNews.Domain.Services
         private ScrollViewer _scrollViewer;
         private double _verticalOffset;
         private bool _verticalSet;
+        private const double Tolerance = 0.05D;
 
         public ScrollViewerState([NotNull] FrameworkElement element)
         {
@@ -88,8 +87,8 @@ namespace handyNews.Domain.Services
             }
 
             var canSetHorizontalOffset = (_scrollViewer.ScrollableWidth > 0D)
-                                         && (_scrollableWidth > 0D)
-                                         && (Math.Abs(1D - _scrollViewer.ScrollableWidth/_scrollableWidth) < Tolerance);
+                && (_scrollableWidth > 0D)
+                && (Math.Abs(1D - _scrollViewer.ScrollableWidth/_scrollableWidth) < Tolerance);
 
             if (canSetHorizontalOffset && !_horizontalSet)
             {
@@ -98,8 +97,8 @@ namespace handyNews.Domain.Services
             }
 
             var canSetVerticalOffset = (_scrollViewer.ScrollableHeight > 0D)
-                                       && (_scrollableHeight > 0D)
-                                       && (Math.Abs(1D - _scrollViewer.ScrollableHeight/_scrollableHeight) < Tolerance);
+                && (_scrollableHeight > 0D)
+                && (Math.Abs(1D - _scrollViewer.ScrollableHeight/_scrollableHeight) < Tolerance);
 
             if (canSetVerticalOffset && !_verticalSet)
             {

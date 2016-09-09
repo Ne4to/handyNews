@@ -10,8 +10,20 @@ namespace handyNews.UWP.ViewModels.Controls
 {
     public class StreamViewViewModel : BindableBase, IStreamViewViewModel
     {
+        private readonly ISettingsManager _settingsManager;
+        private readonly IStreamManager _streamManager;
+        private readonly ITelemetryManager _telemetryManager;
+
+        private StreamItemCollection _items;
+
+        public StreamItemCollection Items
+        {
+            get { return _items; }
+            private set { SetProperty(ref _items, value, nameof(Items)); }
+        }
+
         public StreamViewViewModel(ISettingsManager settingsManager, IStreamManager streamManager,
-                                   ITelemetryManager telemetryManager)
+            ITelemetryManager telemetryManager)
         {
             if (settingsManager == null)
             {
@@ -31,20 +43,10 @@ namespace handyNews.UWP.ViewModels.Controls
             _telemetryManager = telemetryManager;
         }
 
-        #region Properties
-
-        public StreamItemCollection Items
-        {
-            get { return _items; }
-            private set { SetProperty(ref _items, value, nameof(Items)); }
-        }
-
-        #endregion
-
         public async void UpdateItems(string streamId)
         {
             var streamItems = new StreamItemCollection(_streamManager, streamId, _settingsManager.ShowNewestFirst,
-                                                       _telemetryManager, false, _settingsManager.PreloadItemCount);
+                _telemetryManager, false, _settingsManager.PreloadItemCount);
             await streamItems.InitAsync();
             Items = streamItems;
         }
@@ -58,15 +60,5 @@ namespace handyNews.UWP.ViewModels.Controls
         {
             UpdateItems(eventData.Item.Id);
         }
-
-        #region Fields
-
-        private readonly ISettingsManager _settingsManager;
-        private readonly IStreamManager _streamManager;
-        private readonly ITelemetryManager _telemetryManager;
-
-        private StreamItemCollection _items;
-
-        #endregion
     }
 }

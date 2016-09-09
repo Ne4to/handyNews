@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using Windows.UI.Xaml.Controls;
-using handyNews.API.Exceptions;
 using handyNews.Domain.Models;
 using handyNews.Domain.Services.Interfaces;
 using handyNews.Domain.Utils;
@@ -16,24 +15,42 @@ using PubSub;
 
 namespace handyNews.UWP.ViewModels.Controls
 {
-    public class SubscriptionsTreeViewModel : BindableBase, ISubscriptionsTreeViewModel
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class FeedTreeViewModel : BindableBase, IFeedTreeViewModel
     {
-        public SubscriptionsTreeViewModel([NotNull] ISubscriptionsManager subscriptionsManager,
-                                          [NotNull] INavigationService navigationService)
+        private readonly IFeedManager _feedManager;
+        private string _categoryId;
+
+        private bool _isBusy;
+
+        private bool _isRoot = true;
+
+        private ICommand _itemClickCommand;
+        private IReadOnlyCollection<Feed> _rootItems;
+        private IReadOnlyCollection<Feed> _treeItems;
+        public ICommand ItemClickCommand => _itemClickCommand ?? (_itemClickCommand = new DelegateCommand(OnItemClick));
+
+        public bool IsBusy
         {
-            if (subscriptionsManager == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionsManager));
-            }
-            if (navigationService == null)
-            {
-                throw new ArgumentNullException(nameof(navigationService));
-            }
-            _subscriptionsManager = subscriptionsManager;
-            _navigationService = navigationService;
+            get { return _isBusy; }
+            private set { SetProperty(ref _isBusy, value, nameof(IsBusy)); }
         }
 
-        public ICommand ItemClickCommand => _itemClickCommand ?? (_itemClickCommand = new DelegateCommand(OnItemClick));
+        public IReadOnlyCollection<Feed> TreeItems
+        {
+            get { return _treeItems; }
+            private set { SetProperty(ref _treeItems, value, nameof(TreeItems)); }
+        }
+
+        public FeedTreeViewModel([NotNull] IFeedManager feedManager)
+        {
+            if (feedManager == null)
+            {
+                throw new ArgumentNullException(nameof(feedManager));
+            }
+
+            _feedManager = feedManager;
+        }
 
         public void OnNavigatedTo()
         {
@@ -42,7 +59,7 @@ namespace handyNews.UWP.ViewModels.Controls
 
         public async void LoadSubscriptionsAsync()
         {
-            List<SubscriptionItemBase> subscriptionItems = null;
+            IReadOnlyCollection<Feed> subscriptionItems = null;
 
             IsBusy = true;
 
@@ -51,7 +68,7 @@ namespace handyNews.UWP.ViewModels.Controls
             {
                 //IsOffline = false;
 
-                subscriptionItems = await _subscriptionsManager.LoadSubscriptionsAsync();
+                subscriptionItems = await _feedManager.GetFeedsAsync();
 
                 //var readAllItem = subscriptionItems.FirstOrDefault(t => t.Id == SpecialTags.Read);
                 //if (readAllItem != null)
@@ -61,18 +78,18 @@ namespace handyNews.UWP.ViewModels.Controls
 
                 // await _localStorageManager.SaveSubscriptionsAsync(subscriptionItems);
             }
-            catch (AuthenticationApiException)
-            {
-                //_navigationService.Navigate(PageTo);
-                //_signInManager.SignOut();
-                //_navigationService.Navigate(PageTokens.SignIn, null);
+            //catch (AuthenticationApiException)
+            //{
+            //    //_navigationService.Navigate(PageTo);
+            //    //_signInManager.SignOut();
+            //    //_navigationService.Navigate(PageTokens.SignIn, null);
 
-                throw;
-                //SignInDialog dialog = new SignInDialog();
-                //await dialog.ShowAsync();
+            //    throw;
+            //    //SignInDialog dialog = new SignInDialog();
+            //    //await dialog.ShowAsync();
 
-                return;
-            }
+            //    return;
+            //}
             catch (Exception ex)
             {
                 //error = ex;
@@ -88,7 +105,7 @@ namespace handyNews.UWP.ViewModels.Controls
             //    IsOffline = true;
 
             //    IsBusy = true;
-            //    subscriptionItems = await _localStorageManager.LoadSubscriptionsAsync();
+            //    subscriptionItems = await _localStorageManager.GetFeedsAsync();
             //    IsBusy = false;
             //}
 
@@ -96,15 +113,15 @@ namespace handyNews.UWP.ViewModels.Controls
             {
                 _rootItems = subscriptionItems;
 
-                var cat = subscriptionItems.OfType<CategoryItem>()
-                                           .FirstOrDefault(
-                                               c => !_isRoot && c.Id.EqualsOrdinalIgnoreCase(_categoryId));
+                var cat = subscriptionItems
+                    .FirstOrDefault(
+                        c => !_isRoot && c.Id.EqualsOrdinalIgnoreCase(_categoryId));
 
                 if (cat != null)
                 {
                     //SubscriptionsHeader = cat.Title;
                     _isRoot = false;
-                    TreeItems = new List<SubscriptionItemBase>(cat.Subscriptions);
+                    TreeItems = new List<Feed>(cat.Children);
                 }
                 else
                 {
@@ -141,54 +158,18 @@ namespace handyNews.UWP.ViewModels.Controls
         {
             var clickEventArgs = (ItemClickEventArgs) args;
 
-            var categoryItem = clickEventArgs.ClickedItem as CategoryItem;
-            if (categoryItem != null)
+            var categoryItem = (Feed) clickEventArgs.ClickedItem;
+            if (categoryItem.Children?.Any() ?? false)
             {
                 //SubscriptionsHeader = categoryItem.Title;
-                TreeItems = new List<SubscriptionItemBase>(categoryItem.Subscriptions);
+                TreeItems = new List<Feed>(categoryItem.Children);
                 _isRoot = false;
                 _categoryId = categoryItem.Id;
             }
             else
             {
-                var subscriptionItem = clickEventArgs.ClickedItem as SubscriptionItem;
-                if (subscriptionItem != null)
-                {
-                    this.Publish(new ShowSubscriptionStreamEvent(subscriptionItem));
-                }
+                this.Publish(new ShowSubscriptionStreamEvent(categoryItem));
             }
         }
-
-        #region Fields
-
-        private readonly ISubscriptionsManager _subscriptionsManager;
-        private readonly INavigationService _navigationService;
-
-        private bool _isRoot = true;
-        private List<SubscriptionItemBase> _rootItems;
-        private string _categoryId;
-
-        private ICommand _itemClickCommand;
-
-        private bool _isBusy;
-        private List<SubscriptionItemBase> _treeItems;
-
-        #endregion
-
-        #region Properties
-
-        public bool IsBusy
-        {
-            get { return _isBusy; }
-            set { SetProperty(ref _isBusy, value, nameof(IsBusy)); }
-        }
-
-        public List<SubscriptionItemBase> TreeItems
-        {
-            get { return _treeItems; }
-            private set { SetProperty(ref _treeItems, value, nameof(TreeItems)); }
-        }
-
-        #endregion
     }
 }

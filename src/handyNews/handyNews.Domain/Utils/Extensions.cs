@@ -39,13 +39,13 @@ namespace handyNews.Domain.Utils
             }
 
             return date.AddDays(-1*diff)
-                       .Date;
+                .Date;
         }
 
         public static string ToJson(this object obj)
         {
             return JObject.FromObject(obj)
-                          .ToString(Formatting.None);
+                .ToString(Formatting.None);
         }
 
         public static T FromJson<T>(this string jsonString, bool supressErrors = false)
@@ -53,7 +53,7 @@ namespace handyNews.Domain.Utils
             try
             {
                 return JObject.Parse(jsonString)
-                              .ToObject<T>();
+                    .ToObject<T>();
             }
             catch (Exception)
             {
@@ -74,10 +74,10 @@ namespace handyNews.Domain.Utils
             }
 
             html = html.Replace("&amp;", "&")
-                       .Replace("&gt;", ">")
-                       .Replace("&lt;", "<")
-                       .Replace("\n", string.Empty)
-                       .Trim();
+                .Replace("&gt;", ">")
+                .Replace("&lt;", "<")
+                .Replace("\n", string.Empty)
+                .Trim();
 
             return html;
         }

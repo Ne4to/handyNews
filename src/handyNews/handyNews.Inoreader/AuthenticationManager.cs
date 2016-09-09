@@ -8,13 +8,14 @@ using Windows.Storage;
 using handyNews.Domain.Services.Interfaces;
 using Newtonsoft.Json;
 
-namespace handyNews.Domain.Services
+namespace handyNews.Inoreader
 {
     public class AuthenticationManager : IAuthenticationManager
     {
+        private readonly IAuthorizationDataStorage _authorizationDataStorage;
         private const string SCOPES = "read write";
 
-        private readonly IAuthorizationDataStorage _authorizationDataStorage;
+        public bool IsUserAuthenticated => !string.IsNullOrEmpty(_authorizationDataStorage.AccessToken);
 
         public AuthenticationManager(IAuthorizationDataStorage authorizationDataStorage)
         {
@@ -25,8 +26,6 @@ namespace handyNews.Domain.Services
 
             _authorizationDataStorage = authorizationDataStorage;
         }
-
-        public bool IsUserAuthenticated => !string.IsNullOrEmpty(_authorizationDataStorage.AccessToken);
 
         public async Task<bool> SignInAsync()
         {
@@ -51,19 +50,19 @@ namespace handyNews.Domain.Services
 
             var httpClient = new HttpClient();
             var httpContent = new FormUrlEncodedContent(new[]
-                                                        {
-                                                            new KeyValuePair<string, string>("client_id", clientData.ClientId),
-                                                            new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
-                                                            new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                                                            new KeyValuePair<string, string>("refresh_token", _authorizationDataStorage.RefreshToken)
-                                                        });
+            {
+                new KeyValuePair<string, string>("client_id", clientData.ClientId),
+                new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
+                new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                new KeyValuePair<string, string>("refresh_token", _authorizationDataStorage.RefreshToken)
+            });
 
             var getAccessTokenResponseMessage =
                 await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent)
-                                .ConfigureAwait(false);
+                    .ConfigureAwait(false);
             var accessTokenDataJson =
                 await getAccessTokenResponseMessage.Content.ReadAsStringAsync()
-                                                   .ConfigureAwait(false);
+                    .ConfigureAwait(false);
             var accessTokenData = JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
             SaveAccessToken(accessTokenData);
         }
@@ -86,19 +85,19 @@ namespace handyNews.Domain.Services
         {
             var callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
             var state = Guid.NewGuid()
-                            .ToString("N");
+                .ToString("N");
             var uri = $"https://www.inoreader.com/oauth2/auth?client_id={clientData.ClientId}&redirect_uri={Uri.EscapeUriString(callbackUri.ToString())}&response_type=code&scope={Uri.EscapeUriString(SCOPES)}&state={state}";
 
             var authenticationResult = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, new Uri(uri))
-                                                                    .AsTask()
-                                                                    .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
 
             var authorizationCodeResponseDataUri = new Uri(authenticationResult.ResponseData);
             var authorizationCodeResponseData = authorizationCodeResponseDataUri.GetComponents(UriComponents.Query,
-                                                                                               UriFormat.Unescaped)
-                                                                                .Split('&')
-                                                                                .Select(str => str.Split('='))
-                                                                                .ToDictionary(arr => arr[0], arr => arr[1]);
+                    UriFormat.Unescaped)
+                .Split('&')
+                .Select(str => str.Split('='))
+                .ToDictionary(arr => arr[0], arr => arr[1]);
 
             if (authorizationCodeResponseData["state"] != state)
             {
@@ -114,21 +113,21 @@ namespace handyNews.Domain.Services
 
             var callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
             var httpContent = new FormUrlEncodedContent(new[]
-                                                        {
-                                                            new KeyValuePair<string, string>("code", authorizationCode),
-                                                            new KeyValuePair<string, string>("redirect_uri", callbackUri.ToString()),
-                                                            new KeyValuePair<string, string>("client_id", clientData.ClientId),
-                                                            new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
-                                                            new KeyValuePair<string, string>("scope", string.Empty),
-                                                            new KeyValuePair<string, string>("grant_type", "authorization_code")
-                                                        });
+            {
+                new KeyValuePair<string, string>("code", authorizationCode),
+                new KeyValuePair<string, string>("redirect_uri", callbackUri.ToString()),
+                new KeyValuePair<string, string>("client_id", clientData.ClientId),
+                new KeyValuePair<string, string>("client_secret", clientData.ClientSecret),
+                new KeyValuePair<string, string>("scope", string.Empty),
+                new KeyValuePair<string, string>("grant_type", "authorization_code")
+            });
 
             var getAccessTokenResponseMessage = await httpClient.PostAsync("https://www.inoreader.com/oauth2/token", httpContent)
-                                                                .ConfigureAwait(false);
+                .ConfigureAwait(false);
 
             var accessTokenDataJson = await getAccessTokenResponseMessage.Content
-                                                                         .ReadAsStringAsync()
-                                                                         .ConfigureAwait(false);
+                .ReadAsStringAsync()
+                .ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<AccessTokenData>(accessTokenDataJson);
         }
@@ -139,11 +138,11 @@ namespace handyNews.Domain.Services
         {
             var fileUri = new Uri("ms-appx:///Assets/AppSecret.json");
             var file = await StorageFile.GetFileFromApplicationUriAsync(fileUri)
-                                        .AsTask()
-                                        .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
             var fileContent = await FileIO.ReadTextAsync(file)
-                                          .AsTask()
-                                          .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
             return JsonConvert.DeserializeObject<ClientData>(fileContent);
         }
 

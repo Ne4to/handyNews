@@ -4,8 +4,8 @@ using handyNews.Domain.Models;
 
 namespace handyNews.Domain.Services.Interfaces
 {
-    public interface ISubscriptionsManager
+    public interface IFeedManager
     {
-        Task<List<SubscriptionItemBase>> LoadSubscriptionsAsync();
+        Task<IReadOnlyCollection<Feed>> GetFeedsAsync();
     }
 }

@@ -21,7 +21,7 @@
         public const string LoadStreamFromCache = "Cache.LoadStream";
     }
 
-    internal static class TemetryMetrics
+    public static class TemetryMetrics
     {
         public const string SignInResponseTime = "SignIn ResponseTime";
         public const string GetStreamResponseTime = "GetStream ResponseTime";

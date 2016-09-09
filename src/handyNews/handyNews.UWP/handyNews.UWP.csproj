@@ -114,19 +114,19 @@
     <Compile Include="Services\AutofacModule.cs" />
     <Compile Include="Services\DelegateCommand.cs" />
     <Compile Include="TelemetryEvents.cs" />
-    <Compile Include="ViewModels\Controls\Interfaces\ISubscriptionsTreeViewModel.cs" />
+    <Compile Include="ViewModels\Controls\Interfaces\IFeedTreeViewModel.cs" />
     <Compile Include="ViewModels\Controls\Interfaces\IStreamViewViewModel.cs" />
     <Compile Include="Events\ShowSubscriptionStreamEvent.cs" />
     <Compile Include="ViewModels\Controls\StreamViewViewModel.cs" />
-    <Compile Include="ViewModels\Controls\SubscriptionsTreeViewModel.cs" />
+    <Compile Include="ViewModels\Controls\FeedTreeViewModel.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
     <Compile Include="ViewModels\PageTokens.cs" />
     <Compile Include="StateTriggers\ConditionTrigger.cs" />
     <Compile Include="Views\Controls\StreamView.xaml.cs">
       <DependentUpon>StreamView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\SubscriptionsTree.xaml.cs">
-      <DependentUpon>SubscriptionsTree.xaml</DependentUpon>
+    <Compile Include="Views\Controls\FeedTree.xaml.cs">
+      <DependentUpon>FeedTree.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -179,7 +179,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\SubscriptionsTree.xaml">
+    <Page Include="Views\Controls\FeedTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -200,13 +200,13 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\handyNews.API\handyNews.API.csproj">
-      <Project>{8c1035de-bc2d-4704-afbe-23df0c739fe6}</Project>
-      <Name>handyNews.API</Name>
-    </ProjectReference>
     <ProjectReference Include="..\handyNews.Domain\handyNews.Domain.csproj">
       <Project>{4689b57e-be03-4104-874e-2ee5c0d58a6f}</Project>
       <Name>handyNews.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\handyNews.Inoreader\handyNews.Inoreader.csproj">
+      <Project>{b1c3cbd1-c595-4ce3-8c13-68a6a514e4f9}</Project>
+      <Name>handyNews.Inoreader</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

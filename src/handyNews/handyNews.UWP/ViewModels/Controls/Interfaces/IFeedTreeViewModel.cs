@@ -5,12 +5,11 @@ using handyNews.Domain.Models;
 
 namespace handyNews.UWP.ViewModels.Controls.Interfaces
 {
-    public interface ISubscriptionsTreeViewModel : INotifyPropertyChanged
+    public interface IFeedTreeViewModel : INotifyPropertyChanged
     {
-        bool IsBusy { get; set; }
+        bool IsBusy { get; }
         ICommand ItemClickCommand { get; }
-        List<SubscriptionItemBase> TreeItems { get; }
-        void LoadSubscriptionsAsync();
+        IReadOnlyCollection<Feed> TreeItems { get; }
         void ShowRoot();
         void OnNavigatedTo();
     }

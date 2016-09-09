@@ -1,4 +1,5 @@
-﻿using Windows.UI.Core;
+﻿using Windows.ApplicationModel;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using handyNews.UWP.ViewModels;
@@ -10,15 +11,15 @@ namespace handyNews.UWP.Views
     {
         private MainPageViewModel _viewModel;
 
-        public MainPage()
-        {
-            InitializeComponent();
-        }
-
         public MainPageViewModel ViewModel
         {
             get
             {
+                if (DesignMode.DesignModeEnabled)
+                {
+                    return null;
+                }
+
                 if (_viewModel == null)
                 {
                     _viewModel = ServiceLocator.Current.GetInstance<MainPageViewModel>();
@@ -26,6 +27,11 @@ namespace handyNews.UWP.Views
 
                 return _viewModel;
             }
+        }
+
+        public MainPage()
+        {
+            InitializeComponent();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -53,7 +59,10 @@ namespace handyNews.UWP.Views
         private void Manager_BackRequested(object sender, BackRequestedEventArgs e)
         {
             Tree.ViewModel.ShowRoot();
-            ViewModel.Abc = !ViewModel.Abc;
+            if (ViewModel.ShowStreamView)
+            {
+                ViewModel.ShowStreamView = false;
+            }
         }
     }
 }

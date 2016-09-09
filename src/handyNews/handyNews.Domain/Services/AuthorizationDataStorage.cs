@@ -6,23 +6,22 @@ namespace handyNews.Domain.Services
 {
     public class AuthorizationDataStorage : IAuthorizationDataStorage
     {
+        private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.RoamingSettings;
         private const string SETTINGS_CONTAINER_NAME = "handyNews.AccessToken";
 
-        private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.RoamingSettings;
+        public string AccessToken { get; set; }
+        public DateTimeOffset? AccessTokenExpireDate { get; set; }
+        public string RefreshToken { get; set; }
 
         public AuthorizationDataStorage()
         {
             Load();
         }
 
-        public string AccessToken { get; set; }
-        public DateTimeOffset? AccessTokenExpireDate { get; set; }
-        public string RefreshToken { get; set; }
-
         public void Save()
         {
             var container = _rootContainer.CreateContainer(SETTINGS_CONTAINER_NAME,
-                                                           ApplicationDataCreateDisposition.Always);
+                ApplicationDataCreateDisposition.Always);
             container.Values[nameof(AccessToken)] = AccessToken;
             container.Values[nameof(AccessTokenExpireDate)] = AccessTokenExpireDate;
             container.Values[nameof(RefreshToken)] = RefreshToken;

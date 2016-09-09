@@ -3,9 +3,9 @@ using System.Reflection;
 using Autofac;
 using Autofac.Core;
 using Autofac.Extras.CommonServiceLocator;
-using handyNews.API;
 using handyNews.Domain.Services;
 using handyNews.Domain.Services.Interfaces;
+using handyNews.Inoreader;
 using handyNews.UWP.ViewModels;
 using handyNews.UWP.ViewModels.Controls;
 using handyNews.UWP.ViewModels.Controls.Interfaces;
@@ -21,50 +21,47 @@ namespace handyNews.UWP.Services
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(new ApplicationInsightsTelemetryManager(new TelemetryClient()))
-                   .As<ITelemetryManager>()
-                   .SingleInstance();
+                .As<ITelemetryManager>()
+                .SingleInstance();
 
             builder.RegisterType<AuthorizationDataStorage>()
-                   .As<IAuthorizationDataStorage>()
-                   .SingleInstance();
+                .As<IAuthorizationDataStorage>()
+                .SingleInstance();
 
             builder.RegisterType<AuthenticationManager>()
-                   .As<IAuthenticationManager>()
-                   .SingleInstance();
+                .As<IAuthenticationManager>()
+                .SingleInstance();
 
             builder.RegisterType<AuthorizationHandler>()
-                   .SingleInstance();
+                .SingleInstance();
 
-            builder.RegisterType<ApiClient>()
-                   .As<ApiClient>()
-                   .WithParameter(new ResolvedParameter(ApiClientParameterPredicate, ApiClientParameterAccessor))
-                   .SingleInstance();
+            builder.RegisterType<InoreaderClient>()
+                .As<InoreaderClient>()
+                .WithParameter(new ResolvedParameter(InoreaderClientParameterPredicate, InoreaderClientParameterAccessor))
+                .SingleInstance();
 
             builder.RegisterType<SettingsManager>()
-                   .As<ISettingsManager>();
+                .As<ISettingsManager>();
 
-            builder.RegisterType<SubscriptionsManager>()
-                   .As<ISubscriptionsManager>();
+            builder.RegisterType<FeedManager>()
+                .As<IFeedManager>();
 
             builder.RegisterType<StreamManager>()
-                   .As<IStreamManager>();
+                .As<IStreamManager>();
 
             builder.RegisterType<ImageManager>()
-                   .As<ImageManager>();
+                .As<ImageManager>();
 
-            builder.RegisterType<NavigationService>()
-                   .As<INavigationService>();
-
-            builder.RegisterType<SubscriptionsTreeViewModel>()
-                   .As<ISubscriptionsTreeViewModel>()
-                   .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+            builder.RegisterType<FeedTreeViewModel>()
+                .As<IFeedTreeViewModel>()
+                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             builder.RegisterType<StreamViewViewModel>()
-                   .As<IStreamViewViewModel>()
-                   .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
+                .As<IStreamViewViewModel>()
+                .PropertiesAutowired(PropertyWiringOptions.PreserveSetValues);
 
             builder.RegisterType<MainPageViewModel>()
-                   .SingleInstance();
+                .SingleInstance();
 
             // Perform registrations and build the container.
             var container = builder.Build();
@@ -74,12 +71,12 @@ namespace handyNews.UWP.Services
             return container;
         }
 
-        private bool ApiClientParameterPredicate(ParameterInfo parameterInfo, IComponentContext context)
+        private bool InoreaderClientParameterPredicate(ParameterInfo parameterInfo, IComponentContext context)
         {
             return parameterInfo.ParameterType == typeof(DelegatingHandler);
         }
 
-        private object ApiClientParameterAccessor(ParameterInfo parameterInfo, IComponentContext context)
+        private object InoreaderClientParameterAccessor(ParameterInfo parameterInfo, IComponentContext context)
         {
             if (parameterInfo.ParameterType == typeof(DelegatingHandler))
             {

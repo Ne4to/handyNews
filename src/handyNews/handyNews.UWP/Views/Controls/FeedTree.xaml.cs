@@ -5,26 +5,26 @@ using Microsoft.Practices.ServiceLocation;
 
 namespace handyNews.UWP.Views.Controls
 {
-    public sealed partial class SubscriptionsTree : UserControl
+    public sealed partial class FeedTree : UserControl
     {
-        private ISubscriptionsTreeViewModel _viewModel;
+        private IFeedTreeViewModel _viewModel;
 
-        public SubscriptionsTree()
-        {
-            InitializeComponent();
-        }
-
-        public ISubscriptionsTreeViewModel ViewModel
+        public IFeedTreeViewModel ViewModel
         {
             get
             {
                 if (_viewModel == null)
                 {
-                    _viewModel = ServiceLocator.Current.GetInstance<ISubscriptionsTreeViewModel>();
+                    _viewModel = ServiceLocator.Current.GetInstance<IFeedTreeViewModel>();
                 }
 
                 return _viewModel;
             }
+        }
+
+        public FeedTree()
+        {
+            InitializeComponent();
         }
 
         private void SubscriptionsTree_OnLoaded(object sender, RoutedEventArgs e)

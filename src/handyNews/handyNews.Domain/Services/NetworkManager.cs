@@ -27,7 +27,9 @@ namespace handyNews.Domain.Services
                 }
             }
             // ReSharper disable once EmptyGeneralCatchClause
-            catch (Exception) {}
+            catch (Exception)
+            {
+            }
         }
     }
 }

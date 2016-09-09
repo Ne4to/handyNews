@@ -1,57 +1,71 @@
-﻿<UserControl
-    x:Class="handyNews.UWP.Views.Controls.StreamView"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:handyNews.UWP.Views.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-    xmlns:behaviors="using:handyNews.UWP.Behaviors"
-    mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400" Loaded="StreamView_OnLoaded">
+﻿<UserControl x:Class = "handyNews.UWP.Views.Controls.StreamView"
+    xmlns = "http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x = "http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local = "using:handyNews.UWP.Views.Controls"
+    xmlns:d = "http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:interactivity = "using:Microsoft.Xaml.Interactivity"
+    xmlns:core = "using:Microsoft.Xaml.Interactions.Core"
+    xmlns:behaviors = "using:handyNews.UWP.Behaviors"
+    mc:Ignorable = "d"
+    d:DesignHeight = "300"
+    d:DesignWidth = "400"
+    Loaded = "StreamView_OnLoaded">
     <UserControl.Resources>
-        <Style x:Key="ListViewItemStyle1" TargetType="ListViewItem">
-            <Setter Property="IsHoldingEnabled" Value="False" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Margin" Value="0,0,0,5" />
+        <Style x:Key = "ListViewItemStyle1"
+            TargetType = "ListViewItem">
+            <Setter Property = "IsHoldingEnabled"
+                Value = "False" />
+            <Setter Property = "HorizontalContentAlignment"
+                Value = "Stretch" />
+            <Setter Property = "Margin"
+                Value = "0,0,0,5" />
             <!--<Setter Property="Padding" Value="12,0,12,0"/>-->
 
-            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
-            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}" />
-            <Setter Property="TabNavigation" Value="Local" />
-            <Setter Property="VerticalContentAlignment" Value="Top" />
-            <Setter Property="MinWidth" Value="{ThemeResource ListViewItemMinWidth}" />
-            <Setter Property="MinHeight" Value="{ThemeResource ListViewItemMinHeight}" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="Template">
+            <Setter Property = "FontFamily"
+                Value = "{ThemeResource ContentControlThemeFontFamily}" />
+            <Setter Property = "FontSize"
+                Value = "{ThemeResource ControlContentThemeFontSize}" />
+            <Setter Property = "Background"
+                Value = "Transparent" />
+            <Setter Property = "Foreground"
+                Value = "{ThemeResource SystemControlForegroundBaseHighBrush}" />
+            <Setter Property = "TabNavigation"
+                Value = "Local" />
+            <Setter Property = "VerticalContentAlignment"
+                Value = "Top" />
+            <Setter Property = "MinWidth"
+                Value = "{ThemeResource ListViewItemMinWidth}" />
+            <Setter Property = "MinHeight"
+                Value = "{ThemeResource ListViewItemMinHeight}" />
+            <Setter Property = "HorizontalAlignment"
+                Value = "Stretch" />
+            <Setter Property = "Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
-                        <ListViewItemPresenter CheckBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
-                                               ContentMargin="{TemplateBinding Padding}" CheckMode="Inline"
-                                               ContentTransitions="{TemplateBinding ContentTransitions}"
-                                               CheckBoxBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
-                                               DragForeground="{ThemeResource ListViewItemDragForegroundThemeBrush}"
-                                               DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
-                                               DragBackground="{ThemeResource ListViewItemDragBackgroundThemeBrush}"
-                                               DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
-                                               FocusBorderBrush="{ThemeResource SystemControlForegroundAltHighBrush}"
-                                               FocusSecondaryBorderBrush="{ThemeResource SystemControlForegroundBaseHighBrush}"
-                                               HorizontalContentAlignment="Stretch"
-                                               PointerOverForeground="{ThemeResource SystemControlHighlightAltBaseHighBrush}"
-                                               PressedBackground="{ThemeResource SystemControlHighlightListMediumBrush}"
-                                               PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}"
-                                               
-                                               ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
-                                               SelectedPressedBackground="{ThemeResource SystemControlHighlightListAccentHighBrush}"
-                                               SelectionCheckMarkVisualEnabled="True"
-                                               SelectedForeground="{ThemeResource SystemControlHighlightAltBaseHighBrush}"
-                                               SelectedPointerOverBackground="{ThemeResource SystemControlHighlightListAccentMediumBrush}"
-                                               SelectedBackground="{ThemeResource SystemControlHighlightListAccentLowBrush}"
-                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    <ControlTemplate TargetType = "ListViewItem">
+                        <ListViewItemPresenter
+                            CheckBrush = "{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                            ContentMargin = "{TemplateBinding Padding}"
+                            CheckMode = "Inline"
+                            ContentTransitions = "{TemplateBinding ContentTransitions}"
+                            CheckBoxBrush = "{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                            DragForeground = "{ThemeResource ListViewItemDragForegroundThemeBrush}"
+                            DragOpacity = "{ThemeResource ListViewItemDragThemeOpacity}"
+                            DragBackground = "{ThemeResource ListViewItemDragBackgroundThemeBrush}"
+                            DisabledOpacity = "{ThemeResource ListViewItemDisabledThemeOpacity}"
+                            FocusBorderBrush = "{ThemeResource SystemControlForegroundAltHighBrush}"
+                            FocusSecondaryBorderBrush = "{ThemeResource SystemControlForegroundBaseHighBrush}"
+                            HorizontalContentAlignment = "Stretch"
+                            PointerOverForeground = "{ThemeResource SystemControlHighlightAltBaseHighBrush}"
+                            PressedBackground = "{ThemeResource SystemControlHighlightListMediumBrush}"
+                            PlaceholderBackground = "{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}"
+                            ReorderHintOffset = "{ThemeResource ListViewItemReorderHintThemeOffset}"
+                            SelectedPressedBackground = "{ThemeResource SystemControlHighlightListAccentHighBrush}"
+                            SelectionCheckMarkVisualEnabled = "True"
+                            SelectedForeground = "{ThemeResource SystemControlHighlightAltBaseHighBrush}"
+                            SelectedPointerOverBackground = "{ThemeResource SystemControlHighlightListAccentMediumBrush}"
+                            SelectedBackground = "{ThemeResource SystemControlHighlightListAccentLowBrush}"
+                            VerticalContentAlignment = "{TemplateBinding VerticalContentAlignment}" />
 
                         <!--PointerOverBackground="{ThemeResource SystemControlHighlightListLowBrush}"-->
                     </ControlTemplate>
@@ -66,26 +80,26 @@
     </UserControl.Resources>
 
     <Grid>
-        <ListView x:Name="ItemsListView"
-                  ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}"
-                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                  IsItemClickEnabled="True" ItemContainerStyle="{StaticResource ListViewItemStyle1}">
+        <ListView x:Name = "ItemsListView"
+            ItemsSource = "{x:Bind ViewModel.Items, Mode=OneWay}"
+            HorizontalAlignment = "Stretch"
+            HorizontalContentAlignment = "Stretch"
+            IsItemClickEnabled = "True"
+            ItemContainerStyle = "{StaticResource ListViewItemStyle1}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <RelativePanel HorizontalAlignment="Stretch">
-                        <TextBlock x:Name="ItemHeader" 
-                                   Text="{Binding Title}" 
-                                   Style="{StaticResource SubheaderTextBlockStyle}" />
+                    <RelativePanel HorizontalAlignment = "Stretch">
+                        <TextBlock x:Name = "ItemHeader"
+                            Text = "{Binding Title}"
+                            Style = "{StaticResource SubheaderTextBlockStyle}" />
 
-                        <RichTextBlock x:Name="Rich" IsTextSelectionEnabled="False" RelativePanel.Below="ItemHeader">
+                        <RichTextBlock x:Name = "Rich"
+                            IsTextSelectionEnabled = "False"
+                            RelativePanel.Below = "ItemHeader">
                             <interactivity:Interaction.Behaviors>
-                                <behaviors:RichTextBlockHtmlBehavior HtmlContent="{Binding Content}" />
+                                <behaviors:RichTextBlockHtmlBehavior HtmlContent = "{Binding Content}" />
                             </interactivity:Interaction.Behaviors>
                         </RichTextBlock>
-
-                        <!--<WebView RelativePanel.Below="ItemHeader" Source="{Binding WebUri}">
-                            
-                        </WebView>-->
                     </RelativePanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

@@ -9,12 +9,12 @@ namespace handyNews.UWP.Behaviors
 {
     public class RichTextBlockHtmlBehavior : DependencyObject, IBehavior
     {
+        private long _callbackToken;
+        private bool _created;
+
         public static readonly DependencyProperty HtmlContentProperty = DependencyProperty.Register(
             "HtmlContent", typeof(object), typeof(RichTextBlockHtmlBehavior),
             new PropertyMetadata(null, OnHtmlContentPropertyChanged));
-
-        private long _callbackToken;
-        private bool _created;
 
         public object HtmlContent
         {
@@ -38,7 +38,7 @@ namespace handyNews.UWP.Behaviors
             richTextBlock.Loaded += richTextBlock_Loaded;
 
             _callbackToken = AssociatedObject.RegisterPropertyChangedCallback(UIElement.VisibilityProperty,
-                                                                              OnVisibilityPropertyChanged);
+                OnVisibilityPropertyChanged);
         }
 
         private void OnVisibilityPropertyChanged(DependencyObject sender, DependencyProperty dp)

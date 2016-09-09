@@ -7,6 +7,7 @@ namespace handyNews.Domain.Services
 {
     public class SettingsManager : ISettingsManager
     {
+        private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.LocalSettings;
         private const double DEFAULT_FONT_SIZE = 14D;
         private const double STREAM_TITLE_FONT_SIZE_MULT = 14D/DEFAULT_FONT_SIZE;
         private const double STREAM_DATE_FONT_SIZE_MULT = 11D/DEFAULT_FONT_SIZE;
@@ -21,21 +22,6 @@ namespace handyNews.Domain.Services
         private const double SUBSCRIPTION_TREE_ITEM_FONT_SIZE_MULT = 18D/DEFAULT_FONT_SIZE;
 
         private const string SETTINGS_CONTAINER_NAME = "AppSettings";
-        private readonly ApplicationDataContainer _rootContainer = ApplicationData.Current.LocalSettings;
-
-        public SettingsManager()
-        {
-            DisplayCulture = string.Empty;
-            HideEmptySubscriptions = true;
-            ShowNewestFirst = true;
-            StreamView = StreamView.ExpandedView;
-            FontSize = DEFAULT_FONT_SIZE;
-            TextAlignment = TextAlignment.Justify;
-            AutoMarkAsRead = StreamView == StreamView.ExpandedView;
-            PreloadItemCount = 10;
-
-            Load();
-        }
 
         public string DisplayCulture { get; set; }
         public bool HideEmptySubscriptions { get; set; }
@@ -65,6 +51,20 @@ namespace handyNews.Domain.Services
         public double PageHeaderFontSize => FontSize*PAGE_HEADER_FONT_SIZE_MULT;
 
         public double SubscriptionTreeItemFontSize => FontSize*SUBSCRIPTION_TREE_ITEM_FONT_SIZE_MULT;
+
+        public SettingsManager()
+        {
+            DisplayCulture = string.Empty;
+            HideEmptySubscriptions = true;
+            ShowNewestFirst = true;
+            StreamView = StreamView.ExpandedView;
+            FontSize = DEFAULT_FONT_SIZE;
+            TextAlignment = TextAlignment.Justify;
+            AutoMarkAsRead = StreamView == StreamView.ExpandedView;
+            PreloadItemCount = 10;
+
+            Load();
+        }
 
         public void Save()
         {

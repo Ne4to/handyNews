@@ -25,7 +25,7 @@ namespace handyNews.Domain.Utils
             var q =
                 from lvi in
                 VisualTreeHelper.FindElementsInHostCoordinates(checkPoint, scrollViewer)
-                                .OfType<ListViewItem>()
+                    .OfType<ListViewItem>()
                 where lvi.Content != null
                 select lvi.Content;
 

@@ -10,15 +10,9 @@ namespace handyNews.UWP.StateTriggers
         public static readonly DependencyProperty IsConditionMetProperty = DependencyProperty.Register(
             "IsConditionMet", typeof(bool), typeof(ConditionTrigger), new PropertyMetadata(default(bool), OnIsConditionMetPropertyChanged));
 
-        private static void OnIsConditionMetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var conditionTrigger = (ConditionTrigger)d;
-            conditionTrigger.OnIsConditionMetChanged((bool)e.OldValue, (bool)e.NewValue);
-        }
-
         public bool IsConditionMet
         {
-            get { return (bool)GetValue(IsConditionMetProperty); }
+            get { return (bool) GetValue(IsConditionMetProperty); }
             set { SetValue(IsConditionMetProperty, value); }
         }
 
@@ -27,6 +21,12 @@ namespace handyNews.UWP.StateTriggers
         {
             // Set initial value
             CurrentValue = GetCurrentValue();
+        }
+
+        private static void OnIsConditionMetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var conditionTrigger = (ConditionTrigger) d;
+            conditionTrigger.OnIsConditionMetChanged((bool) e.OldValue, (bool) e.NewValue);
         }
 
         private bool GetCurrentValue()

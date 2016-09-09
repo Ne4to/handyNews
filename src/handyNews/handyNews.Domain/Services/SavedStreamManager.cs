@@ -16,11 +16,15 @@ namespace handyNews.Domain.Services
 {
     public class SavedStreamManager
     {
-        private const string CACHE_FOLDER_NAME = "SavedItems";
-
         private readonly Lazy<List<SavedStreamItem>> _items;
         private readonly StorageFolder _rootCacheFolder = ApplicationData.Current.LocalFolder;
         private readonly LocalStorageManager _storageManager;
+        private const string CACHE_FOLDER_NAME = "SavedItems";
+
+        public IReadOnlyCollection<SavedStreamItem> Items
+        {
+            get { return new ReadOnlyCollection<SavedStreamItem>(_items.Value); }
+        }
 
         public SavedStreamManager([NotNull] LocalStorageManager storageManager)
         {
@@ -31,11 +35,6 @@ namespace handyNews.Domain.Services
             _storageManager = storageManager;
 
             _items = new Lazy<List<SavedStreamItem>>(InitItems);
-        }
-
-        public IReadOnlyCollection<SavedStreamItem> Items
-        {
-            get { return new ReadOnlyCollection<SavedStreamItem>(_items.Value); }
         }
 
         private List<SavedStreamItem> InitItems()
@@ -51,32 +50,32 @@ namespace handyNews.Domain.Services
             }
 
             var folderName = Guid.NewGuid()
-                                 .ToString("N");
+                .ToString("N");
 
             var parser = new HtmlParser();
             var plainText = parser.GetPlainText(item.Content, 200);
 
             var cacheFolder = await _rootCacheFolder.CreateFolderAsync(CACHE_FOLDER_NAME, CreationCollisionOption.OpenIfExists)
-                                                    .AsTask()
-                                                    .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
 
             var folder = await cacheFolder.CreateFolderAsync(folderName)
-                                          .AsTask()
-                                          .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
 
             var newHtml = await SaveImagesAsync(folder, item.Content)
                 .ConfigureAwait(false);
 
             var savedItem = new SavedStreamItem
-                            {
-                                Id = item.Id,
-                                Title = item.Title,
-                                Published = item.Published,
-                                WebUri = item.WebUri,
-                                ShortContent = plainText,
-                                Content = newHtml,
-                                ImageFolder = folderName
-                            };
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Published = item.Published,
+                WebUri = item.WebUri,
+                ShortContent = plainText,
+                Content = newHtml,
+                ImageFolder = folderName
+            };
 
             _items.Value.Add(savedItem);
             _storageManager.Save(savedItem);
@@ -127,7 +126,7 @@ namespace handyNews.Domain.Services
             try
             {
                 response = await client.GetAsync(src)
-                                       .ConfigureAwait(false);
+                    .ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -140,16 +139,16 @@ namespace handyNews.Domain.Services
             }
 
             var fileName = Guid.NewGuid()
-                               .ToString("N");
+                .ToString("N");
 
             var file = await folder.CreateFileAsync(fileName)
-                                   .AsTask()
-                                   .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
             using (var stream = await file.OpenStreamForWriteAsync()
-                                          .ConfigureAwait(false))
+                .ConfigureAwait(false))
             {
                 await response.Content.CopyToAsync(stream)
-                              .ConfigureAwait(false);
+                    .ConfigureAwait(false);
             }
 
             return fileName;
@@ -172,16 +171,16 @@ namespace handyNews.Domain.Services
             _storageManager.DeleteSavedStreamItem(item.Id);
 
             var cacheFolder = await _rootCacheFolder.CreateFolderAsync(CACHE_FOLDER_NAME, CreationCollisionOption.OpenIfExists)
-                                                    .AsTask()
-                                                    .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
 
             var folder = await cacheFolder.GetFolderAsync(item.ImageFolder)
-                                          .AsTask()
-                                          .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
 
             await folder.DeleteAsync(StorageDeleteOption.PermanentDelete)
-                        .AsTask()
-                        .ConfigureAwait(false);
+                .AsTask()
+                .ConfigureAwait(false);
         }
     }
 }

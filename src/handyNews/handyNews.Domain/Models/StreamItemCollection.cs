@@ -27,8 +27,27 @@ namespace handyNews.Domain.Models
 
         private bool _isBusy;
 
+        public string StreamId { get; }
+
+        public int StreamTimestamp { get; private set; }
+
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                OnPropertyChanged(nameof(IsBusy));
+            }
+        }
+
+        public bool HasMoreItems
+        {
+            get { return /*!_initCompleted ||*/ !string.IsNullOrEmpty(_continuation) && !_fault; }
+        }
+
         public StreamItemCollection(IStreamManager streamManager, string streamId, bool showNewestFirst,
-                                    ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
+            ITelemetryManager telemetryManager, bool allArticles, int preloadItemsCount)
             : base(preloadItemsCount)
         {
             if (streamManager == null)
@@ -53,9 +72,9 @@ namespace handyNews.Domain.Models
         }
 
         public StreamItemCollection([NotNull] StreamItemCollectionState state,
-                                    [NotNull] IStreamManager streamManager,
-                                    [NotNull] ITelemetryManager telemetryManager,
-                                    int preloadItemsCount)
+            [NotNull] IStreamManager streamManager,
+            [NotNull] ITelemetryManager telemetryManager,
+            int preloadItemsCount)
             : base(state.Items.Length)
         {
             if (state == null)
@@ -83,25 +102,7 @@ namespace handyNews.Domain.Models
             _preloadItemsCount = preloadItemsCount;
         }
 
-        public string StreamId { get; }
-
-        public int StreamTimestamp { get; private set; }
-
-        public bool IsBusy
-        {
-            get { return _isBusy; }
-            set
-            {
-                _isBusy = value;
-                OnPropertyChanged(nameof(IsBusy));
-            }
-        }
-
-        #region INotifyCollectionChanged
-
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        #endregion
 
         public event EventHandler LoadMoreItemsError;
 
@@ -114,13 +115,13 @@ namespace handyNews.Domain.Models
             try
             {
                 var options = new GetItemsOptions
-                              {
-                                  Count = _preloadItemsCount,
-                                  Continuation = null,
-                                  ShowNewestFirst = _showNewestFirst,
-                                  StreamId = StreamId,
-                                  IncludeRead = _allArticles
-                              };
+                {
+                    Count = _preloadItemsCount,
+                    Continuation = null,
+                    ShowNewestFirst = _showNewestFirst,
+                    StreamId = StreamId,
+                    IncludeRead = _allArticles
+                };
 
                 var result = await _streamManager.GetItemsAsync(options);
                 items = result.Items;
@@ -132,9 +133,7 @@ namespace handyNews.Domain.Models
                 IsBusy = false;
             }
 
-            Add(new HeaderSpaceStreamItem());
             AddRange(items);
-            Add(new EmptySpaceStreamItem());
             OnPropertyChanged(nameof(Count));
         }
 
@@ -148,13 +147,13 @@ namespace handyNews.Domain.Models
                 try
                 {
                     var options = new GetItemsOptions
-                                  {
-                                      Count = (int) count,
-                                      Continuation = _continuation,
-                                      IncludeRead = _allArticles,
-                                      ShowNewestFirst = _showNewestFirst,
-                                      StreamId = StreamId
-                                  };
+                    {
+                        Count = (int) count,
+                        Continuation = _continuation,
+                        IncludeRead = _allArticles,
+                        ShowNewestFirst = _showNewestFirst,
+                        StreamId = StreamId
+                    };
 
                     var result = await _streamManager.GetItemsAsync(options);
                     items = result.Items;
@@ -175,9 +174,9 @@ namespace handyNews.Domain.Models
                 NotifyOfInsertedItems(baseIndex, items.Length);
 
                 return new LoadMoreItemsResult
-                       {
-                           Count = (uint) items.Length
-                       };
+                {
+                    Count = (uint) items.Length
+                };
             }
             catch (Exception ex)
             {
@@ -190,9 +189,9 @@ namespace handyNews.Domain.Models
                 }
 
                 return new LoadMoreItemsResult
-                       {
-                           Count = 0
-                       };
+                {
+                    Count = 0
+                };
             }
             finally
             {
@@ -210,7 +209,7 @@ namespace handyNews.Domain.Models
             for (var i = 0; i < count; i++)
             {
                 var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, this[baseIndex],
-                                                                baseIndex);
+                    baseIndex);
                 CollectionChanged(this, args);
             }
         }
@@ -229,13 +228,6 @@ namespace handyNews.Domain.Models
             return state;
         }
 
-        #region ISupportIncrementalLoading
-
-        public bool HasMoreItems
-        {
-            get { return /*!_initCompleted ||*/ !string.IsNullOrEmpty(_continuation) && !_fault; }
-        }
-
         public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
             if (IsBusy)
@@ -250,17 +242,11 @@ namespace handyNews.Domain.Models
             return AsyncInfo.Run(c => LoadMoreItemsAsync(c, loadCount));
         }
 
-        #endregion
-
-        #region INotifyPropertyChanged
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        #endregion
     }
 }
